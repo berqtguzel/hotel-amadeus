@@ -1,3 +1,4 @@
+/* ================= LANG ================= */
 .ui-lang {
     display: inline-flex;
     align-items: center;
@@ -26,6 +27,7 @@
     color: #114833;
 }
 
+/* ================= COOKIE ================= */
 .ui-cookie-wrap {
     position: fixed;
     left: 16px;
@@ -40,8 +42,6 @@
     border-radius: 16px;
     border: 1px solid rgba(28, 154, 107, 0.22);
     background: rgba(255, 255, 255, 0.94);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
     box-shadow: 0 16px 30px rgba(15, 70, 48, 0.14);
     padding: 12px;
     pointer-events: auto;
@@ -90,16 +90,29 @@
     border: 1px solid #d6e9df;
 }
 
+/* ================= WHATSAPP ================= */
+
+/* ROOT */
 .ui-wa {
     position: fixed;
-    right: 16px;
     bottom: 20px;
-    z-index: 315;
+    z-index: 99999; /* 🔥 FIX */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
 }
 
+/* POSITION */
+.ui-wa--right {
+    right: 16px;
+}
+
+.ui-wa--left {
+    left: 16px;
+    align-items: flex-start;
+}
+
+/* PANEL */
 .ui-wa-panel {
     width: min(320px, calc(100vw - 32px));
     margin-bottom: 8px;
@@ -111,6 +124,7 @@
     animation: ui-wa-slide-up 0.25s ease-out;
 }
 
+/* ANIMATION */
 @keyframes ui-wa-slide-up {
     from {
         opacity: 0;
@@ -122,14 +136,15 @@
     }
 }
 
+/* HEADER */
 .ui-wa-head {
     padding: 10px 12px;
-    background: linear-gradient(135deg, #1ea672, #2fbf90);
-    color: #f5fffa;
     font-size: 14px;
     font-weight: 800;
+    color: #f5fffa;
 }
 
+/* BODY */
 .ui-wa-body {
     padding: 12px;
 }
@@ -141,32 +156,35 @@
     color: #2f5f4b;
 }
 
+/* BUTTON LINK */
 .ui-wa-link {
     margin-top: 8px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 34px;
     padding: 0 12px;
     border-radius: 999px;
     text-decoration: none;
     font-size: 12px;
     font-weight: 700;
-    color: #f5fffa;
-    background: linear-gradient(135deg, #1ea672, #2fbf90);
 }
 
+/* FLOAT BUTTON */
 .ui-wa-btn {
     width: 56px;
     height: 56px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
-    color: #ffffff;
-    font-weight: 800;
-    background: linear-gradient(135deg, #1ea672, #2fbf90);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 14px 24px rgba(13, 82, 54, 0.3);
 }
 
+/* ================= DARK MODE ================= */
 .dark .ui-cookie,
 [data-theme="dark"] .ui-cookie {
     background: rgba(11, 21, 17, 0.92);
@@ -198,10 +216,18 @@
     color: #c1e5d5;
 }
 
+/* ================= MOBILE ================= */
 @media (max-width: 700px) {
     .ui-wa {
         bottom: 92px;
+    }
+
+    .ui-wa--right {
         right: 12px;
+    }
+
+    .ui-wa--left {
+        left: 12px;
     }
 
     .ui-cookie-wrap {

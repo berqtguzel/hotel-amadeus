@@ -19,7 +19,9 @@ function matchStaticSlug(apiRoom) {
     }
     const nameLC = (apiRoom.name ?? apiRoom.hotel_name ?? "").toLowerCase();
     const match = ROOM_LIST.find(
-        (r) => nameLC.includes(r.id) || r.hotelName.toLowerCase().includes(nameLC.split(" ")[0]),
+        (r) =>
+            nameLC.includes(r.id) ||
+            r.hotelName.toLowerCase().includes(nameLC.split(" ")[0]),
     );
     return match?.id ?? apiRoom.slug ?? String(apiRoom.id);
 }
@@ -51,7 +53,7 @@ function buildFallbackHotels() {
 }
 
 const Title = ({ children }) => <h2 className="rs-title">{children}</h2>;
-const Eyebrow = ({ children }) => <div className="rs-eyebrow">{children}</div>;
+const Eyebrow = ({ children }) => <div className="eyebrow">{children}</div>;
 
 const HotelCard = ({ hotel, locale }) => {
     const { t } = useTranslation();
@@ -85,7 +87,11 @@ const HotelCard = ({ hotel, locale }) => {
                 {(hotel.items || []).map((item, i) => (
                     <li key={i}>
                         <FiCheck className="rs-icon" aria-hidden />
-                        <span>{typeof item === "string" ? item : item.name ?? item.label}</span>
+                        <span>
+                            {typeof item === "string"
+                                ? item
+                                : (item.name ?? item.label)}
+                        </span>
                     </li>
                 ))}
             </ul>

@@ -3,11 +3,46 @@ import { usePage } from "@inertiajs/react";
 import "../../../css/hotel-reviews.css";
 
 const FALLBACK_REVIEWS = [
-    { id: "r1", name: "Anna K.", location: "Leipzig", rating: 5, text: "Sehr ruhige Lage, unglaublich freundliches Team und ein tolles Fruhstuck. Wir kommen definitiv wieder.", stay: "2 Nachte · Heubacher Hohe" },
-    { id: "r2", name: "Mehmet D.", location: "Berlin", rating: 5, text: "Zimmer sauber, Essen frisch und die Natur direkt vor der Tur. Genau die Auszeit, die wir gebraucht haben.", stay: "3 Nachte · Frankenblick" },
-    { id: "r3", name: "Sophie W.", location: "Erfurt", rating: 4, text: "Wellnessbereich hat uns besonders gefallen. Personal war sehr hilfsbereit und herzlich.", stay: "Wochenende · Sommerberg" },
-    { id: "r4", name: "Jonas R.", location: "Hamburg", rating: 5, text: "Top Preis-Leistung, moderne Zimmer und super Ausgangspunkt fur Wanderungen im Thuringer Wald.", stay: "4 Nachte · Werrapark Resort" },
-    { id: "r5", name: "Claudia M.", location: "Nurnberg", rating: 5, text: "Die Mitarbeitenden machen den Unterschied: professionell, herzlich und immer erreichbar.", stay: "Familienreise · Heubacher Hohe" },
+    {
+        id: "r1",
+        name: "Anna K.",
+        location: "Leipzig",
+        rating: 5,
+        text: "Sehr ruhige Lage, unglaublich freundliches Team und ein tolles Fruhstuck. Wir kommen definitiv wieder.",
+        stay: "2 Nachte · Heubacher Hohe",
+    },
+    {
+        id: "r2",
+        name: "Mehmet D.",
+        location: "Berlin",
+        rating: 5,
+        text: "Zimmer sauber, Essen frisch und die Natur direkt vor der Tur. Genau die Auszeit, die wir gebraucht haben.",
+        stay: "3 Nachte · Frankenblick",
+    },
+    {
+        id: "r3",
+        name: "Sophie W.",
+        location: "Erfurt",
+        rating: 4,
+        text: "Wellnessbereich hat uns besonders gefallen. Personal war sehr hilfsbereit und herzlich.",
+        stay: "Wochenende · Sommerberg",
+    },
+    {
+        id: "r4",
+        name: "Jonas R.",
+        location: "Hamburg",
+        rating: 5,
+        text: "Top Preis-Leistung, moderne Zimmer und super Ausgangspunkt fur Wanderungen im Thuringer Wald.",
+        stay: "4 Nachte · Werrapark Resort",
+    },
+    {
+        id: "r5",
+        name: "Claudia M.",
+        location: "Nurnberg",
+        rating: 5,
+        text: "Die Mitarbeitenden machen den Unterschied: professionell, herzlich und immer erreichbar.",
+        stay: "Familienreise · Heubacher Hohe",
+    },
 ];
 
 function normalizeReview(r) {
@@ -32,9 +67,12 @@ export default function HotelReviews() {
     const apiReviews = props?.global?.reviews ?? [];
     const widgetsRatings = props?.global?.widgets?.ratings ?? {};
     const reviews = React.useMemo(() => {
-        const list = Array.isArray(apiReviews) && apiReviews.length
-            ? apiReviews
-            : (widgetsRatings.reviews ?? widgetsRatings.data ?? widgetsRatings);
+        const list =
+            Array.isArray(apiReviews) && apiReviews.length
+                ? apiReviews
+                : (widgetsRatings.reviews ??
+                  widgetsRatings.data ??
+                  widgetsRatings);
         const arr = Array.isArray(list) ? list : [...FALLBACK_REVIEWS];
         return (arr.length ? arr : FALLBACK_REVIEWS).map(normalizeReview);
     }, [apiReviews, widgetsRatings]);
@@ -43,7 +81,7 @@ export default function HotelReviews() {
     return (
         <section className="hr-wrap" aria-label="Hotelbewertungen">
             <div className="hr-head">
-                <span className="hr-eyebrow">Gastebewertungen</span>
+                <span className="eyebrow">Gastebewertungen</span>
                 <h2 className="hr-title">Was unsere Gaste uber uns sagen</h2>
                 <p className="hr-sub">
                     Echte Stimmen aus dem Werrapark Resort - transparent,
@@ -51,7 +89,11 @@ export default function HotelReviews() {
                 </p>
             </div>
 
-            <div className="hr-marquee" role="region" aria-label="Laufende Bewertungen">
+            <div
+                className="hr-marquee"
+                role="region"
+                aria-label="Laufende Bewertungen"
+            >
                 <div className="hr-track">
                     {track.map((r, i) => (
                         <article
@@ -59,14 +101,19 @@ export default function HotelReviews() {
                             key={`${r.id}-${i}`}
                             aria-label={`${r.name} Bewertung`}
                         >
-                            <div className="hr-stars" aria-label={`${r.rating} von 5 Sternen`}>
+                            <div
+                                className="hr-stars"
+                                aria-label={`${r.rating} von 5 Sternen`}
+                            >
                                 {stars(r.rating)}
                             </div>
                             <p className="hr-text">"{r.text}"</p>
                             <div className="hr-meta">
                                 <strong>{r.name}</strong>
                                 <span>
-                                    {[r.location, r.stay].filter(Boolean).join(" · ") || "—"}
+                                    {[r.location, r.stay]
+                                        .filter(Boolean)
+                                        .join(" · ") || "—"}
                                 </span>
                             </div>
                         </article>
@@ -76,5 +123,3 @@ export default function HotelReviews() {
         </section>
     );
 }
-
-

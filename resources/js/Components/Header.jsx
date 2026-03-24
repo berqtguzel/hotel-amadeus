@@ -74,9 +74,17 @@ export default function Header({ currentRoute }) {
     const branding = props?.global?.settings?.branding ?? {};
     const contact = props?.global?.settings?.contact ?? {};
 
-    const logoLight = branding.logo ?? DEFAULT_LOGO_LIGHT;
+    const logoLight =
+        branding.logo_light ??
+        branding.light_logo ??
+        branding.logo ??
+        DEFAULT_LOGO_LIGHT;
     const logoDark =
-        branding.dark_logo ?? branding.darklogo ?? DEFAULT_LOGO_DARK;
+        branding.logo_dark ??
+        branding.dark_logo ??
+        branding.darklogo ??
+        branding.logo ??
+        DEFAULT_LOGO_DARK;
 
     const contactEmail = contact.email ?? contact.mail ?? "info@werrapark.de";
     const contactPhone =
@@ -196,24 +204,26 @@ export default function Header({ currentRoute }) {
 
                     <div className="wh-nav-ctas wh-ctas-desktop">
                         <a
-                            href="https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0"
+                            href={`/track?${new URLSearchParams({
+                                redirect: "https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0",
+                                button_id: "header-gruppenbuchung",
+                                button_label: "Gruppenbuchung",
+                            }).toString()}`}
                             className="wh-btn wh-btn--light"
                             target="_blank"
                             rel="noopener noreferrer"
-                            data-track
-                            data-track-id="header-gruppenbuchung"
-                            data-track-label="Gruppenbuchung"
                         >
                             Gruppenbuchung
                         </a>
                         <a
-                            href="https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
-                            className="wh-btn wh-btn--primary"
+                            href={`/track?${new URLSearchParams({
+                                redirect: "https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
+                                button_id: "header-bestpreis",
+                                button_label: "Bestpreis buchen",
+                            }).toString()}`}
+                            className="wh-btn wh-btn--light"
                             target="_blank"
                             rel="noopener noreferrer"
-                            data-track
-                            data-track-id="header-bestpreis"
-                            data-track-label="Bestpreis buchen"
                         >
                             Bestpreis buchen
                         </a>
@@ -316,27 +326,29 @@ export default function Header({ currentRoute }) {
                         <div className="wh-m-ctas">
                             <LanguageSwitcher locale={locale} />
                             <a
-                                href="https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0"
+                                href={`/track?${new URLSearchParams({
+                                    redirect: "https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0",
+                                    button_id: "mobile-gruppenbuchung",
+                                    button_label: "Gruppenbuchung",
+                                }).toString()}`}
                                 className="wh-btn wh-btn--light wh-btn--block"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => setOpen(false)}
-                                data-track
-                                data-track-id="mobile-gruppenbuchung"
-                                data-track-label="Gruppenbuchung"
                             >
                                 Gruppenbuchung
                             </a>
 
                             <a
-                                href="https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
+                                href={`/track?${new URLSearchParams({
+                                    redirect: "https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
+                                    button_id: "mobile-bestpreis",
+                                    button_label: "Bestpreis buchen",
+                                }).toString()}`}
                                 className="wh-btn wh-btn--primary wh-btn--block"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => setOpen(false)}
-                                data-track
-                                data-track-id="mobile-bestpreis"
-                                data-track-label="Bestpreis buchen"
                             >
                                 Bestpreis buchen
                             </a>

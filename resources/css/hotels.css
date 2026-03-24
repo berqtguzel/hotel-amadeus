@@ -43,19 +43,21 @@
     margin-inline: auto;
 }
 .hotels-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-tight);
     text-align: center;
-    font-size: clamp(26px, 3vw, 42px);
-    font-weight: 800;
     margin-bottom: clamp(28px, 5vw, 52px);
-    color: white;
 }
 
 .hotels-subtitle {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
     margin: -20px auto 28px;
     max-width: 780px;
     text-align: center;
-    color: white;
-    font-size: clamp(14px, 1.8vw, 16px);
 }
 
 /* GRID */
@@ -147,17 +149,20 @@
     grid-auto-rows: max-content;
 }
 .hotel-body h3 {
-    font-size: clamp(0.98rem, 1.3vw, 1.1rem);
-    font-weight: 800;
-    line-height: 1.25;
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-snug);
     color: var(--hotel-text);
     text-align: center;
     margin-bottom: 2px;
 }
 .hotel-tagline {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
     margin: 2px 0 4px;
     text-align: center;
-    font-size: 0.82rem;
     color: rgba(15, 23, 42, 0.78);
 }
 
@@ -183,9 +188,10 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
     color: var(--hotel-text);
     text-decoration: none;
-    font-size: 0.66rem;
     transition:
         color 0.2s ease,
         transform 0.15s ease;
@@ -201,6 +207,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    letter-spacing: 0.02em;
     border: none;
     border-radius: 10px;
     background: linear-gradient(
@@ -210,9 +220,6 @@
     );
     color: #f8fffb;
     text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
     padding: 10px 12px;
     cursor: pointer;
     transition:

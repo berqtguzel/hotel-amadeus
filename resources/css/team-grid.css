@@ -1,38 +1,29 @@
 :root {
-    --tg-bg: #f6fbf8;
-    --tg-surface: #ffffff;
-    --tg-ink: #173529;
-    --tg-muted: #5f7d70;
-    --tg-accent: #1c9a6b;
-    --tg-border: rgba(20, 63, 47, 0.12);
-    --tg-shadow: 0 10px 26px rgba(14, 64, 45, 0.08);
+    --tg-bg: var(--background_color);
+    --tg-surface: var(--background_color);
+    --tg-ink: var(--text_color);
+    --tg-muted: var(--text_color);
+    --tg-accent: var(--site_accent_color);
+    --tg-primary: var(--site_primary_color);
+    --tg-secondary: var(--site_secondary_color);
+    --tg-border: rgba(0, 0, 0, 0.08);
+    --tg-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
 }
 
 .dark:root {
-    --tg-bg: #0d1411;
-    --tg-surface: #141f1a;
-    --tg-ink: #e8f7ef;
-    --tg-muted: #9bb9ad;
-    --tg-accent: #8ee7c8;
-    --tg-border: rgba(255, 255, 255, 0.1);
+    --tg-bg: #0e1619;
+    --tg-surface: #101814;
+    --tg-ink: #e7f6ed;
+    --tg-muted: #a6b7ad;
+    --tg-accent: var(--site_accent_color);
+    --tg-border: rgba(255, 255, 255, 0.12);
     --tg-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
 }
 
 .tg-section {
     position: relative;
     padding: clamp(30px, 4vw, 54px) 18px clamp(56px, 6vw, 84px);
-    background:
-        radial-gradient(
-            800px 520px at 0% 0%,
-            rgba(28, 154, 107, 0.13),
-            transparent 62%
-        ),
-        radial-gradient(
-            800px 520px at 100% 0%,
-            rgba(46, 191, 144, 0.1),
-            transparent 64%
-        ),
-        var(--tg-bg);
+    background: var(--tg-bg);
     overflow: hidden;
 }
 
@@ -47,7 +38,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.045;
+    opacity: 0.05;
     background-image: url("/images/Logo/werrapark-logo.png");
     background-repeat: repeat;
     background-size: 170px auto;
@@ -57,6 +48,8 @@
     opacity: 0.12;
     filter: invert(1);
 }
+
+/* HEADER */
 
 .tg-head {
     text-align: center;
@@ -68,9 +61,9 @@
     display: inline-block;
     padding: 5px 10px;
     border-radius: 999px;
-    border: 1px solid var(--tg-border);
-    background: color-mix(in oklab, var(--tg-surface) 80%, var(--tg-accent) 20%);
-    color: var(--tg-accent);
+    border: 1px solid var(--tg-primary);
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--tg-primary);
     font-size: 11px;
     letter-spacing: 0.1em;
     font-weight: 700;
@@ -79,16 +72,18 @@
 
 .tg-heading {
     margin: 8px 0 6px;
-    color: var(--tg-ink);
+    color: var(--site-h3-color);
     font-size: clamp(24px, 3.1vw, 34px);
     line-height: 1.1;
 }
 
 .tg-sub {
     margin: 0;
-    color: var(--tg-muted);
+    color: var(--text_color);
     font-size: clamp(13px, 1.45vw, 15px);
 }
+
+/* GRID */
 
 .tg-grid {
     display: grid;
@@ -98,21 +93,21 @@
 
 @media (max-width: 1100px) {
     .tg-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(3, 1fr);
     }
 }
-
 @media (max-width: 840px) {
     .tg-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 }
-
 @media (max-width: 560px) {
     .tg-grid {
         grid-template-columns: 1fr;
     }
 }
+
+/* CARD */
 
 .tg-card {
     border-radius: 14px;
@@ -120,10 +115,7 @@
     background: var(--tg-surface);
     box-shadow: var(--tg-shadow);
     overflow: hidden;
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.22s ease,
-        border-color 0.22s ease;
+    transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
 }
@@ -131,30 +123,42 @@
 .tg-card:hover,
 .tg-card:focus-within {
     transform: translateY(-2px);
-    border-color: rgba(28, 154, 107, 0.34);
-    box-shadow: 0 14px 30px rgba(14, 64, 45, 0.14);
+    border-color: var(--site_accent_color);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
 }
 
-.dark .tg-card:hover,
-.dark .tg-card:focus-within {
+.dark .tg-card:hover {
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
 }
 
 .tg-card.is-lead {
-    border-color: rgba(28, 154, 107, 0.42);
+    border-color: var(--site_primary_color);
 }
+
+/* MEDIA */
 
 .tg-media {
     position: relative;
     aspect-ratio: 4 / 5;
     overflow: hidden;
 }
+.tg-media__name {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    padding: 7px 9px;
+    border-radius: 10px;
+    background: var(--tg-surface);
+    color: var(--text_color);
+    border: 1px solid var(--tg-border);
+    font-size: 15px;
+}
 
 .tg-media__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: scale(1.01);
     transition: transform 0.35s ease;
 }
 
@@ -162,20 +166,7 @@
     transform: scale(1.04);
 }
 
-.tg-media__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.62) 0%,
-        rgba(0, 0, 0, 0.22) 38%,
-        rgba(0, 0, 0, 0.04) 70%
-    );
-}
-
-.tg-media__shine {
-    display: none;
-}
+/* NAMEBAR */
 
 .tg-namebar {
     position: absolute;
@@ -184,28 +175,16 @@
     bottom: 8px;
     padding: 7px 9px;
     border-radius: 10px;
-    background: rgba(248, 255, 251, 0.88);
-    color: #173529;
-    border: 1px solid rgba(22, 61, 45, 0.14);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    background: var(--tg-surface);
+    color: var(--text_color);
+    border: 1px solid var(--tg-border);
 }
 
 .dark .tg-namebar {
-    background: rgba(11, 22, 18, 0.72);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #ebfff5;
+    background: rgba(16, 24, 20, 0.8);
 }
 
-.tg-namebar__text {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+/* INFO */
 
 .tg-info {
     padding: 10px;
@@ -215,10 +194,11 @@
 .tg-info__title {
     min-height: 34px;
     font-size: 12px;
-    color: var(--tg-muted);
-    line-height: 1.4;
+    color: var(--text_color);
     margin-bottom: 8px;
 }
+
+/* CONTACT */
 
 .tg-contacts {
     display: flex;
@@ -234,31 +214,27 @@
     padding: 0 9px;
     border-radius: 999px;
     border: 1px solid var(--tg-border);
-    background: #f2f8f5;
-    color: #1c4534;
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text_color);
     font-size: 11px;
     font-weight: 700;
 }
 
 .dark .tg-chip {
-    background: #1a2822;
-    color: #d8f4e8;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .tg-chip--link {
     text-decoration: none;
-    background: color-mix(in oklab, var(--tg-accent) 18%, #ffffff 82%);
-    color: #114833;
-}
-
-.dark .tg-chip--link {
-    background: color-mix(in oklab, var(--tg-accent) 22%, #1a2822 78%);
-    color: #daf8eb;
+    background: var(--button_color);
+    color: var(--link_color);
 }
 
 .tg-chip--link:hover {
-    filter: brightness(0.98);
+    background: var(--site_secondary_color);
 }
+
+/* PERFORMANCE */
 
 @media (prefers-reduced-motion: reduce) {
     .tg-card,

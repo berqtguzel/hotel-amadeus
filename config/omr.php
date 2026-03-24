@@ -4,6 +4,8 @@ return [
 
     'base_url' => env('OMR_API_BASE'),
 
+    'video_base_url' => env('OMR_API_VIDEO_BASE'),
+
     'timeout' => env('OMR_API_TIMEOUT', 10),
 
     'tenant_id' => env('OMR_TENANT_ID'),

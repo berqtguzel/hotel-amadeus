@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'send_backup_email' => env('CONTACT_SEND_BACKUP_EMAIL', true),
+
     'dashboard' => [
         'api_url' => env('DASHBOARD_API_URL', 'https://api.dashboard.example.com'),
         'api_key' => env('DASHBOARD_API_KEY'),

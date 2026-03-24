@@ -1,174 +1,183 @@
 import React from "react";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
+import { useTranslation } from "@/i18n";
 import "@/../css/gift-voucher-page.css";
 
-export default function GiftVoucherPage({ currentRoute = "gutschein" }) {
-    const presetAmounts = [100, 200, 300, 400, 500];
-    const [selectedAmount, setSelectedAmount] = React.useState(100);
-    const [useCustom, setUseCustom] = React.useState(false);
-    const [customAmount, setCustomAmount] = React.useState("");
-    const [quantity, setQuantity] = React.useState(1);
-    const [recipientName, setRecipientName] = React.useState("");
-    const [recipientEmail, setRecipientEmail] = React.useState("");
-    const [message, setMessage] = React.useState("");
+export default function GiftVoucherPage({
+    currentRoute = "gutschein",
+    locale = "de",
+    companies = [],
+    paymentMethods = {},
+    billingApi = { ok: true, message: null },
+}) {
+    const { t } = useTranslation();
+    const stripe = paymentMethods.stripe ?? {};
+    const paypal = paymentMethods.paypal ?? {};
+    const sepa = paymentMethods.sepa ?? {};
 
-    const parsedCustom = Number(customAmount);
-    const customValue = Number.isFinite(parsedCustom)
-        ? Math.min(500, Math.max(10, parsedCustom))
-        : 0;
-    const amount = useCustom ? customValue || 10 : selectedAmount;
-    const total = amount * Math.max(1, quantity);
+    React.useEffect(() => {
+        const methodsDebug = {
+            stripe: {
+                enabled: Boolean(stripe.enabled),
+                has_public: stripe.has_public ?? false,
+                publishable_key: stripe.publishable_key ?? null,
+                connected_account_id: stripe.connected_account_id ?? null,
+            },
+            paypal: {
+                enabled: Boolean(paypal.enabled),
+                has_client_id: paypal.has_client_id ?? false,
+                client_id: paypal.client_id ?? null,
+                merchant_id: paypal.merchant_id ?? null,
+            },
+            sepa: {
+                enabled: Boolean(sepa.enabled),
+                creditor_name: sepa.creditor_name ?? null,
+                iban_masked: sepa.iban_masked ?? null,
+                bic: sepa.bic ?? null,
+                bank_name: sepa.bank_name ?? null,
+            },
+        };
+
+        console.log("Gift voucher debug", {
+            billingApi,
+            companies,
+            paymentMethods: methodsDebug,
+        });
+    }, [billingApi, companies, paypal, sepa, stripe]);
+
+    const methods = [
+        {
+            key: "stripe",
+            title: "Stripe",
+            desc: t("giftVoucher.methodStripeDesc"),
+            href: `/${locale}/gutschein/stripe`,
+            enabled: Boolean(stripe.enabled),
+            accent: "stripe",
+        },
+        {
+            key: "paypal",
+            title: "PayPal",
+            desc: t("giftVoucher.methodPaypalDesc"),
+            href: `/${locale}/gutschein/paypal`,
+            enabled: Boolean(paypal.enabled),
+            accent: "paypal",
+        },
+        {
+            key: "sepa",
+            title: "SEPA",
+            desc: t("giftVoucher.methodSepaDesc"),
+            href: `/${locale}/gutschein/sepa`,
+            enabled: Boolean(sepa.enabled),
+            accent: "sepa",
+        },
+    ];
 
     return (
         <AppLayout currentRoute={currentRoute}>
-            <Head title="Geschenkgutschein" />
+            <Head title={t("giftVoucher.pageTitle")} />
             <section className="gvf-page">
-                <div className="gvf-box">
-                    <header className="gvf-head">
-                        <h1>Geschenkgutschein</h1>
-                        <p>Waehle einen Betrag oder gib einen eigenen ein.</p>
+                <div className="gvf-box gvf-box--landing">
+                    <header className="gvf-head gvf-head--landing">
+                        <span className="gvf-kicker">
+                            {t("giftVoucher.landingKicker")}
+                        </span>
+                        <h1>{t("giftVoucher.pageTitle")}</h1>
+                        <p>{t("giftVoucher.heroSubtitle")}</p>
+                        <div className="gvf-pill-row">
+                            <span className="gvf-pill">
+                                {t("giftVoucher.pillInstant")}
+                            </span>
+                            <span className="gvf-pill">
+                                {t("giftVoucher.pillFlexible")}
+                            </span>
+                            <span className="gvf-pill">
+                                {t("giftVoucher.pillDigital")}
+                            </span>
+                        </div>
                     </header>
 
-                    <div className="gvf-top">
-                        <div className="gvf-amounts">
-                            <h2>Betrag auswaehlen</h2>
-
-                            <div className="gvf-amount-grid">
-                                {presetAmounts.map((value) => {
-                                    const active = !useCustom && selectedAmount === value;
-                                    return (
-                                        <button
-                                            key={value}
-                                            type="button"
-                                            className={`gvf-amount-card ${active ? "is-active" : ""}`}
-                                            onClick={() => {
-                                                setUseCustom(false);
-                                                setSelectedAmount(value);
-                                            }}
-                                        >
-                                            <span className="gvf-radio" />
-                                            <strong>EUR {value}</strong>
-                                            <small>Einmalig</small>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            <div
-                                className={`gvf-custom ${useCustom ? "is-active" : ""}`}
-                                onClick={() => setUseCustom(true)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) =>
-                                    (e.key === "Enter" || e.key === " ") &&
-                                    setUseCustom(true)
-                                }
-                            >
-                                <span className="gvf-radio" />
-                                <div className="gvf-custom-body">
-                                    <h3>Sonderbetrag</h3>
-                                    <div className="gvf-custom-input">
-                                        <span>EUR</span>
-                                        <input
-                                            type="number"
-                                            min={10}
-                                            max={500}
-                                            placeholder="z.B. 150"
-                                            value={customAmount}
-                                            onChange={(e) => {
-                                                setUseCustom(true);
-                                                setCustomAmount(e.target.value);
-                                            }}
-                                        />
-                                    </div>
-                                    <p>Min 10 EUR, Max 500 EUR</p>
-                                </div>
-                            </div>
+                    {billingApi && billingApi.ok === false ? (
+                        <div className="gvf-api-banner" role="status">
+                            <strong>Billing-API:</strong>{" "}
+                            {billingApi.message
+                                ? String(billingApi.message)
+                                : t("giftVoucher.apiFallback")}
                         </div>
+                    ) : null}
 
-                        <aside className="gvf-preview" aria-hidden="true">
-                            <div className="gvf-card gcf-back" />
-                            <div className="gvf-card gcf-front">
-                                <span className="gcf-chip" />
-                                <span className="gcf-brand">URLAUB-ZEIT.DE</span>
-                                <strong>Geschenkgutschein</strong>
-                                <em>EUR {amount}</em>
-                            </div>
-                        </aside>
+                    <section className="gvf-intro">
+                        <div className="gvf-intro-card">
+                            <span className="gvf-intro-label">
+                                {t("giftVoucher.giftFor")}
+                            </span>
+                            <h2>{t("giftVoucher.introTitle")}</h2>
+                            <p>{t("giftVoucher.introText")}</p>
+                        </div>
+                        <div className="gvf-intro-card gvf-intro-card--highlight">
+                            <span className="gvf-intro-label">
+                                {t("giftVoucher.brandLabel")}
+                            </span>
+                            <h2>Werrapark</h2>
+                            <p>{t("giftVoucher.brandText")}</p>
+                        </div>
+                    </section>
+
+                    <div className="gvf-method-header">
+                        <div>
+                            <h2>{t("giftVoucher.methodsTitle")}</h2>
+                            <p>{t("giftVoucher.methodsSubtitle")}</p>
+                        </div>
                     </div>
 
-                    <section className="gvf-section">
-                        <h2>Empfaengerinformationen</h2>
-                        <div className="gvf-form-row">
-                            <label>
-                                Name des Empfaengers
-                                <input
-                                    type="text"
-                                    placeholder="Vorname Nachname"
-                                    value={recipientName}
-                                    onChange={(e) =>
-                                        setRecipientName(e.target.value)
-                                    }
-                                />
-                            </label>
-                            <label>
-                                E-Mail des Empfaengers
-                                <input
-                                    type="email"
-                                    placeholder="beispiel@eposta.de"
-                                    value={recipientEmail}
-                                    onChange={(e) =>
-                                        setRecipientEmail(e.target.value)
-                                    }
-                                />
-                            </label>
-                        </div>
-                        <label className="gvf-full">
-                            Nachricht (auf die Karte geschrieben)
-                            <textarea
-                                rows={5}
-                                placeholder="Frohe Feiertage!"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                            />
-                        </label>
-                    </section>
-
-                    <section className="gvf-section">
-                        <h2>Zusammenfassung</h2>
-                        <div className="gvf-summary-grid">
-                            <label>
-                                Menge
-                                <input
-                                    type="number"
-                                    min={1}
-                                    value={quantity}
-                                    onChange={(e) =>
-                                        setQuantity(Number(e.target.value) || 1)
-                                    }
-                                />
-                            </label>
-                            <label>
-                                Ausgewaehlter Betrag
-                                <input type="text" value={`EUR ${amount}`} readOnly />
-                            </label>
-                            <label>
-                                Gesamt
-                                <input type="text" value={`EUR ${total}`} readOnly />
-                            </label>
-                        </div>
-
-                        <div className="gvf-footer">
-                            <div className="gvf-total">
-                                <span>Gesamt</span>
-                                <strong>EUR {total}</strong>
+                    <div className="gvf-pay-grid">
+                        {methods.map((m) => (
+                            <div
+                                key={m.key}
+                                className={`gvf-pay-card gvf-pay-card--${m.accent} ${
+                                    m.enabled ? "" : "is-disabled"
+                                }`}
+                            >
+                                <span className="gvf-pay-badge">{m.title}</span>
+                                <h2>{m.title}</h2>
+                                <p>{m.desc}</p>
+                                {m.enabled ? (
+                                    <Link
+                                        href={m.href}
+                                        className="gvf-pay-link"
+                                    >
+                                        {t("giftVoucher.continueWith", {
+                                            method: m.title,
+                                        })}
+                                    </Link>
+                                ) : (
+                                    <span className="gvf-pay-locked">
+                                        {t("giftVoucher.notActivated")}
+                                    </span>
+                                )}
                             </div>
-                            <button type="button" className="gvf-pay-btn">
-                                Bezahlen
-                            </button>
-                        </div>
-                    </section>
+                        ))}
+                    </div>
+
+                    {companies.length > 0 ? (
+                        <section className="gvf-side-section">
+                            <h2>{t("giftVoucher.companySectionTitle")}</h2>
+                            <ul className="gvf-company-list">
+                                {companies.map((c) => (
+                                    <li key={c.id ?? c.slug ?? c.name}>
+                                        <strong>{c.name ?? "—"}</strong>
+                                        {c.currency ? (
+                                            <span> · {c.currency}</span>
+                                        ) : null}
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    ) : null}
+
+                    <p className="gvf-invoice-hint">
+                        {t("giftVoucher.invoiceHint")}
+                    </p>
                 </div>
             </section>
         </AppLayout>

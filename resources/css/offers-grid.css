@@ -49,27 +49,30 @@ img {
 .og-eyebrow {
     display: inline-block;
     padding: 6px 12px;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     background: #e7efe9;
     color: var(--og-accent);
     border-radius: 999px;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 .og-title {
     margin: 10px 0 4px;
-    font-size: clamp(24px, 4.4vw, 40px);
-    font-weight: 800;
-    color: #173c2e;
+    font-family: var(--font-serif);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-tight);
 }
 .dark .og-title {
     color: white;
 }
 .og-subtitle {
     margin: 0 auto;
-    color: var(--og-muted);
-    font-size: clamp(14px, 2vw, 18px);
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
 }
 
 .og-flow-shell {
@@ -198,14 +201,18 @@ img {
 }
 .og-card-title {
     margin: 2px 0 4px;
-    font-size: 18px;
-    font-weight: 800;
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: var(--font-extrabold);
+    line-height: var(--leading-snug);
     color: #1e3c2d;
 }
 .og-card-sub {
     margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
     color: var(--og-muted);
-    font-size: 14px;
 }
 .og-meta {
     display: flex;
@@ -217,7 +224,8 @@ img {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
     color: #234;
     background: #eef3ef;
     border: var(--og-border);
@@ -231,14 +239,16 @@ img {
     margin-top: 8px;
 }
 .og-price {
-    font-weight: 800;
-    font-size: 20px;
+    font-family: var(--font-sans);
+    font-size: var(--text-xl);
+    font-weight: var(--font-extrabold);
     color: var(--og-accent-2);
 }
 .og-old-price {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
     color: #9aa79e;
     text-decoration: line-through;
-    font-size: 14px;
 }
 .og-actions {
     margin-top: 14px;
@@ -249,13 +259,14 @@ img {
 .og-btn {
     appearance: none;
     border: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
     text-decoration: none;
     padding: 12px 16px;
     border-radius: 12px;
-    background: var(--og-pill);
-    color: #213729;
-    font-weight: 700;
-    font-size: 14px;
+    background-color: var(--site-button-color);
+    color: var(--site-link-color);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     transition:
         transform 0.2s ease,

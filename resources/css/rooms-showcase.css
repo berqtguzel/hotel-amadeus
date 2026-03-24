@@ -69,12 +69,11 @@ body[data-theme="dark"] .rs-wrap,
     font-weight: 800;
     font-size: clamp(26px, 3.8vw, 44px);
     margin: 10px 0 8px;
-    color: var(--rs-title);
 }
 .rs-intro {
     max-width: 70ch;
     margin: 0 auto 18px;
-    color: var(--rs-muted);
+
     line-height: 1.7;
 }
 
@@ -211,6 +210,12 @@ body[data-theme="dark"] .rs-wrap,
 }
 .rs-list li .rs-icon {
     margin-top: 2px;
+}
+.rs-list span {
+    color: white;
+}
+.rs-card__meta span {
+    color: white;
 }
 
 .rs-cta {

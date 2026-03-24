@@ -1,322 +1,329 @@
 .gvf-page {
-  padding: 28px 20px 70px;
-  background: linear-gradient(180deg, #dae9fb, #cfe0f5);
+    padding: 28px 20px 70px;
+    background: linear-gradient(180deg, #dae9fb, #cfe0f5);
 }
 
 .gvf-box {
-  max-width: 1380px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(15, 78, 141, 0.12);
-  border-radius: 20px;
-  box-shadow: 0 26px 64px rgba(13, 33, 70, 0.15);
-  padding: 22px;
+    max-width: 1380px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 78, 141, 0.12);
+    border-radius: 20px;
+    box-shadow: 0 26px 64px rgba(13, 33, 70, 0.15);
+    padding: 22px;
 }
 
 .gvf-head {
-  text-align: center;
-  margin-bottom: 18px;
+    text-align: center;
+    margin-bottom: 18px;
 }
 
 .gvf-head h1 {
-  margin: 0 0 6px;
-  font-size: clamp(28px, 3.6vw, 40px);
-  line-height: 1.08;
-  color: #0f172a;
+    margin: 0 0 6px;
+    font-size: clamp(28px, 3.6vw, 40px);
+    line-height: 1.08;
+    color: #0f172a;
 }
 
 .gvf-head p {
-  margin: 0;
-  color: #64748b;
-  font-size: 16px;
+    margin: 0;
+    color: #64748b;
+    font-size: 16px;
 }
 
 .gvf-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .gvf-amounts h2,
 .gvf-section h2 {
-  margin: 0 0 12px;
-  font-size: 26px;
-  color: #0b4a8f;
+    margin: 0 0 12px;
+    font-size: 26px;
+    color: #0b4a8f;
 }
 
 .gvf-amount-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
 }
 
 .gvf-amount-card {
-  position: relative;
-  padding: 16px 14px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  background: #fff;
-  display: grid;
-  gap: 5px;
-  text-align: left;
-  cursor: pointer;
-  transition: transform .16s ease, border-color .2s ease, box-shadow .2s ease;
+    position: relative;
+    padding: 16px 14px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: #fff;
+    display: grid;
+    gap: 5px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        transform 0.16s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .gvf-amount-card strong {
-  font-size: 30px;
-  color: #1e293b;
+    font-size: 30px;
+    color: #1e293b;
 }
 
 .gvf-amount-card small {
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 600;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .gvf-amount-card:hover {
-  transform: translateY(-1px);
+    transform: translateY(-1px);
 }
 
 .gvf-amount-card.is-active {
-  border-color: #2563eb;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+    border-color: #2563eb;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
 }
 
 .gvf-radio {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid #cbd5e1;
-  background: #fff;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    background: #fff;
 }
 
 .gvf-amount-card.is-active .gvf-radio,
 .gvf-custom.is-active .gvf-radio {
-  border-color: #2563eb;
-  background: radial-gradient(circle at center, #2563eb 45%, transparent 46%);
+    border-color: #2563eb;
+    background: radial-gradient(circle at center, #2563eb 45%, transparent 46%);
 }
 
 .gvf-custom {
-  margin-top: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  border-radius: 14px;
-  padding: 16px;
-  position: relative;
-  cursor: pointer;
+    margin-top: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+    cursor: pointer;
 }
 
 .gvf-custom-body h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  color: #1e293b;
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: #1e293b;
 }
 
 .gvf-custom-input {
-  display: flex;
-  align-items: center;
-  width: min(290px, 100%);
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #f8fafc;
+    display: flex;
+    align-items: center;
+    width: min(290px, 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8fafc;
 }
 
 .gvf-custom-input span {
-  padding: 10px 12px;
-  color: #334155;
-  border-right: 1px solid #dbeafe;
-  font-weight: 700;
+    padding: 10px 12px;
+    color: #334155;
+    border-right: 1px solid #dbeafe;
+    font-weight: 700;
 }
 
 .gvf-custom-input input {
-  width: 100%;
-  border: 0;
-  outline: none;
-  padding: 10px 12px;
-  background: transparent;
-  color: #0f172a;
+    width: 100%;
+    border: 0;
+    outline: none;
+    padding: 10px 12px;
+    background: transparent;
+    color: #0f172a;
 }
 
 .gvf-custom-body p {
-  margin: 8px 0 0;
-  color: #64748b;
-  font-size: 14px;
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 14px;
 }
 
 .gvf-custom.is-active {
-  border-color: #2563eb;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+    border-color: #2563eb;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
 }
 
 .gvf-preview {
-  min-height: 245px;
-  display: grid;
-  place-items: center;
-  position: relative;
-  perspective: 1000px;
+    min-height: 245px;
+    display: grid;
+    place-items: center;
+    position: relative;
+    perspective: 1000px;
 }
 
 .gvf-card {
-  width: min(420px, 100%);
-  aspect-ratio: 16/10;
-  border-radius: 18px;
-  transition: transform .3s ease;
+    width: min(420px, 100%);
+    aspect-ratio: 16/10;
+    border-radius: 18px;
+    transition: transform 0.3s ease;
 }
 
 .gcf-back {
-  position: absolute;
-  transform: translate(-18px, 12px) rotate(8deg);
-  border: 1px solid rgba(255,255,255,.45);
-  background: linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.1));
+    position: absolute;
+    transform: translate(-18px, 12px) rotate(8deg);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.34),
+        rgba(255, 255, 255, 0.1)
+    );
 }
 
 .gcf-front {
-  position: relative;
-  transform: rotate(-4deg);
-  border: 1px solid rgba(255,255,255,.35);
-  background: linear-gradient(160deg, #2dcf7e, #0e9b5b 55%, #0a7d49);
-  box-shadow: 0 24px 56px rgba(5, 150, 105, 0.42);
-  color: #eff6ff;
-  padding: 18px;
-  display: grid;
-  align-content: space-between;
+    position: relative;
+    transform: rotate(-4deg);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: linear-gradient(160deg, #2dcf7e, #0e9b5b 55%, #0a7d49);
+    box-shadow: 0 24px 56px rgba(5, 150, 105, 0.42);
+    color: #eff6ff;
+    padding: 18px;
+    display: grid;
+    align-content: space-between;
 }
 
 .gcf-chip {
-  width: 42px;
-  height: 28px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #f7c15f, #eab308);
+    width: 42px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f7c15f, #eab308);
 }
 
 .gcf-brand {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: .08em;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
 }
 
 .gcf-front strong {
-  font-size: 26px;
+    font-size: 26px;
 }
 
 .gcf-front em {
-  justify-self: end;
-  font-style: normal;
-  font-size: 18px;
-  font-weight: 900;
-  background: rgba(255,255,255,.16);
-  border: 1px solid rgba(255,255,255,.3);
-  border-radius: 12px;
-  padding: 6px 10px;
+    justify-self: end;
+    font-style: normal;
+    font-size: 18px;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 6px 10px;
 }
 
 .gvf-section {
-  padding-top: 18px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
-  padding-bottom: 18px;
+    padding-top: 18px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+    padding-bottom: 18px;
 }
 
 .gvf-form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .gvf-section label {
-  display: grid;
-  gap: 6px;
-  color: #1e293b;
-  font-size: 15px;
-  font-weight: 600;
+    display: grid;
+    gap: 6px;
+    color: #1e293b;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .gvf-section input,
 .gvf-section textarea {
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  background: #fff;
-  padding: 10px 12px;
-  color: #0f172a;
-  outline: none;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px 12px;
+    color: #0f172a;
+    outline: none;
 }
 
 .gvf-section input:focus,
 .gvf-section textarea:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
 .gvf-full {
-  margin-top: 12px;
+    margin-top: 12px;
 }
 
 .gvf-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .gvf-footer {
-  margin-top: 16px;
-  border-top: 1px solid rgba(15, 23, 42, 0.1);
-  padding-top: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+    margin-top: 16px;
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+    padding-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .gvf-total {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #64748b;
 }
 
 .gvf-total strong {
-  color: #0f172a;
-  font-size: 24px;
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  padding: 6px 12px;
+    color: #0f172a;
+    font-size: 24px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 6px 12px;
 }
 
 .gvf-pay-btn {
-  border: 0;
-  border-radius: 10px;
-  padding: 12px 22px;
-  font-weight: 800;
-  color: #eff6ff;
-  background: linear-gradient(90deg, #2563eb, #1d4ed8);
-  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.32);
-  cursor: pointer;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-weight: 800;
+    color: #eff6ff;
+    background: linear-gradient(90deg, #2563eb, #1d4ed8);
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.32);
+    cursor: pointer;
 }
 
 .gvf-pay-btn:hover {
-  filter: brightness(1.04);
+    filter: brightness(1.04);
 }
 
 html[data-theme="dark"] .gvf-page,
 .dark .gvf-page {
-  background: linear-gradient(180deg, #09101f, #0b1424);
+    background: linear-gradient(180deg, #09101f, #0b1424);
 }
 
 html[data-theme="dark"] .gvf-box,
 .dark .gvf-box {
-  background: rgba(2, 6, 23, 0.9);
-  border-color: rgba(255,255,255,.1);
-  box-shadow: 0 30px 70px rgba(0,0,0,.5);
+    background: rgba(2, 6, 23, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
 }
 
 html[data-theme="dark"] .gvf-head h1,
@@ -327,14 +334,14 @@ html[data-theme="dark"] .gvf-section label,
 .dark .gvf-amounts h2,
 .dark .gvf-section h2,
 .dark .gvf-section label {
-  color: #e2e8f0;
+    color: #e2e8f0;
 }
 
 html[data-theme="dark"] .gvf-head p,
 html[data-theme="dark"] .gvf-custom-body p,
 .dark .gvf-head p,
 .dark .gvf-custom-body p {
-  color: #94a3b8;
+    color: #94a3b8;
 }
 
 html[data-theme="dark"] .gvf-amount-card,
@@ -347,48 +354,742 @@ html[data-theme="dark"] .gvf-total strong,
 .dark .gvf-section input,
 .dark .gvf-section textarea,
 .dark .gvf-total strong {
-  background: rgba(15, 23, 42, 0.84);
-  border-color: rgba(255,255,255,.18);
-  color: #e2e8f0;
+    background: rgba(15, 23, 42, 0.84);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
 }
 
 html[data-theme="dark"] .gvf-amount-card strong,
 html[data-theme="dark"] .gvf-amount-card small,
 .dark .gvf-amount-card strong,
 .dark .gvf-amount-card small {
-  color: #cbd5e1;
+    color: #cbd5e1;
 }
 
 html[data-theme="dark"] .gvf-footer,
 .dark .gvf-footer {
-  border-top-color: rgba(255,255,255,.14);
+    border-top-color: rgba(255, 255, 255, 0.14);
 }
 
 @media (max-width: 1200px) {
-  .gvf-amount-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+    .gvf-amount-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 980px) {
-  .gvf-top {
-    grid-template-columns: minmax(0, 1fr);
-  }
+    .gvf-top {
+        grid-template-columns: minmax(0, 1fr);
+    }
 
-  .gvf-preview {
-    order: -1;
-  }
+    .gvf-preview {
+        order: -1;
+    }
 
-  .gvf-form-row,
-  .gvf-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
+    .gvf-form-row,
+    .gvf-summary-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 @media (max-width: 700px) {
-  .gvf-amount-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+    .gvf-amount-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
+/* Landing + payment method selection */
+.gvf-box--landing {
+    padding-bottom: 28px;
+}
 
+.gvf-api-banner {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    color: #7f1d1d;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.gvf-pay-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.gvf-pay-card {
+    border-radius: 16px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: #fff;
+    padding: 18px 16px;
+    display: grid;
+    gap: 10px;
+    min-height: 160px;
+    align-content: start;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.gvf-pay-card h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #0b4a8f;
+}
+
+.gvf-pay-card p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.45;
+    flex: 1;
+}
+
+.gvf-pay-card.is-disabled {
+    opacity: 0.55;
+    filter: grayscale(0.2);
+}
+
+.gvf-pay-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 800;
+    text-decoration: none;
+    color: #eff6ff;
+    background: linear-gradient(90deg, #2563eb, #1d4ed8);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+}
+
+.gvf-pay-link:hover {
+    filter: brightness(1.05);
+}
+
+.gvf-pay-card--paypal .gvf-pay-link {
+    background: linear-gradient(90deg, #0070ba, #003087);
+}
+
+.gvf-pay-card--sepa .gvf-pay-link {
+    background: linear-gradient(90deg, #0f766e, #0d9488);
+}
+
+.gvf-pay-locked {
+    font-size: 13px;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.gvf-invoice-hint {
+    margin: 22px 0 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.gvf-method-stack {
+    display: grid;
+    gap: 8px;
+}
+
+.gvf-side-section {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.gvf-side-section h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    color: #0b4a8f;
+}
+
+.gvf-company-list {
+    margin: 0;
+    padding-left: 18px;
+    color: #334155;
+}
+
+.gvf-table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.gvf-invoices-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.gvf-invoices-table th,
+.gvf-invoices-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.gvf-invoices-table th {
+    background: rgba(37, 99, 235, 0.08);
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Checkout */
+.gvf-checkout-top {
+    margin-bottom: 8px;
+}
+
+.gvf-back {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.gvf-back:hover {
+    text-decoration: underline;
+}
+
+.gvf-payment-slot {
+    margin-top: 14px;
+}
+
+.gvf-method-panel {
+    border-radius: 14px;
+    border: 1px dashed rgba(37, 99, 235, 0.35);
+    background: rgba(37, 99, 235, 0.06);
+    padding: 14px 16px;
+}
+
+.gvf-method-panel h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: #0b4a8f;
+}
+
+.gvf-hint {
+    margin: 0 0 8px;
+    color: #14532d;
+    font-size: 14px;
+}
+
+.gvf-warn {
+    margin: 0 0 8px;
+    color: #9a3412;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.gvf-note {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.gvf-method-panel code {
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.gvf-sepa-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.gvf-sepa-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #334155;
+}
+
+.gvf-sepa-list span {
+    color: #64748b;
+}
+
+.gvf-pay-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.2);
+}
+
+.gvf-pay-btn--paypal {
+    background: linear-gradient(90deg, #0070ba, #003087);
+    box-shadow: 0 12px 28px rgba(0, 112, 186, 0.35);
+}
+
+.gvf-pay-btn--sepa {
+    background: linear-gradient(90deg, #0f766e, #0d9488);
+    box-shadow: 0 12px 28px rgba(15, 118, 110, 0.32);
+}
+
+@media (max-width: 980px) {
+    .gvf-pay-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+html[data-theme="dark"] .gvf-api-banner,
+.dark .gvf-api-banner {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.35);
+    color: #fecaca;
+}
+
+html[data-theme="dark"] .gvf-pay-card,
+.dark .gvf-pay-card {
+    background: rgba(15, 23, 42, 0.84);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .gvf-invoices-table th,
+.dark .gvf-invoices-table th {
+    background: rgba(37, 99, 235, 0.18);
+    color: #e2e8f0;
+}
+
+html[data-theme="dark"] .gvf-invoices-table td,
+.dark .gvf-invoices-table th {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .gvf-method-panel,
+.dark .gvf-method-panel {
+    border-color: rgba(96, 165, 250, 0.35);
+    background: rgba(37, 99, 235, 0.12);
+}
+
+html[data-theme="dark"] .gvf-method-panel code,
+.dark .gvf-method-panel code {
+    background: rgba(2, 6, 23, 0.65);
+    color: #e2e8f0;
+}
+
+/* Refined gift voucher layout */
+.gvf-page {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(255, 255, 255, 0.78),
+            transparent 34%
+        ),
+        linear-gradient(180deg, #dbeafe 0%, #d5e6fb 44%, #eaf2fb 100%);
+}
+
+.gvf-box {
+    overflow: hidden;
+    border-radius: 26px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+}
+
+.gvf-head--landing,
+.gvf-head--checkout {
+    text-align: left;
+    max-width: 760px;
+    margin-bottom: 24px;
+}
+
+.gvf-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    background: rgba(255, 255, 255, 0.84);
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.gvf-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.gvf-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.gvf-intro {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.gvf-intro-card {
+    padding: 22px;
+    border-radius: 20px;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.92),
+        rgba(248, 250, 252, 0.92)
+    );
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.gvf-intro-card--highlight {
+    background: linear-gradient(145deg, #0f172a, #1e3a8a 55%, #2563eb);
+    color: #eff6ff;
+}
+
+.gvf-intro-card--highlight p,
+.gvf-intro-card--highlight .gvf-intro-label {
+    color: rgba(239, 246, 255, 0.88);
+}
+
+.gvf-intro-card h2 {
+    margin: 0 0 8px;
+    font-size: clamp(24px, 3vw, 32px);
+    line-height: 1.1;
+}
+
+.gvf-intro-card p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.gvf-intro-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+}
+
+.gvf-method-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 10px 0 14px;
+}
+
+.gvf-method-header h2,
+.gvf-section-head h2 {
+    margin: 0 0 6px;
+}
+
+.gvf-method-header p,
+.gvf-section-head p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.55;
+}
+
+.gvf-pay-grid {
+    gap: 18px;
+}
+
+.gvf-pay-card {
+    position: relative;
+    min-height: 210px;
+    padding: 24px 20px 20px;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.gvf-pay-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, #2563eb, #1d4ed8);
+}
+
+.gvf-pay-card--paypal::before {
+    background: linear-gradient(90deg, #0070ba, #003087);
+}
+
+.gvf-pay-card--sepa::before {
+    background: linear-gradient(90deg, #0f766e, #0d9488);
+}
+
+.gvf-pay-badge {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 14px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.08);
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.gvf-pay-card--paypal .gvf-pay-badge {
+    background: rgba(0, 112, 186, 0.12);
+    color: #005ea6;
+}
+
+.gvf-pay-card--sepa .gvf-pay-badge {
+    background: rgba(15, 118, 110, 0.12);
+    color: #0f766e;
+}
+
+.gvf-pay-card h2 {
+    font-size: 28px;
+}
+
+.gvf-pay-card p {
+    font-size: 15px;
+}
+
+.gvf-pay-card.is-disabled {
+    opacity: 1;
+    filter: none;
+}
+
+.gvf-pay-card.is-disabled .gvf-pay-link {
+    pointer-events: none;
+}
+
+.gvf-pay-locked {
+    margin-top: auto;
+    padding: 11px 14px;
+    border-radius: 12px;
+    background: rgba(148, 163, 184, 0.12);
+    color: #64748b;
+}
+
+.gvf-side-section {
+    margin-top: 26px;
+}
+
+.gvf-company-list {
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.gvf-company-list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.gvf-box--checkout {
+    padding-top: 20px;
+}
+
+.gvf-checkout-top {
+    margin-bottom: 18px;
+}
+
+.gvf-back {
+    margin-bottom: 16px;
+    padding: 8px 0;
+}
+
+.gvf-section-head {
+    margin-bottom: 14px;
+}
+
+.gvf-amount-card,
+.gvf-custom,
+.gvf-section input,
+.gvf-section textarea,
+.gvf-method-panel {
+    border-radius: 16px;
+}
+
+.gvf-amount-card {
+    padding: 18px 16px 16px;
+}
+
+.gvf-amount-card strong {
+    font-size: 28px;
+}
+
+.gvf-preview {
+    min-height: 320px;
+}
+
+.gcf-front {
+    transform: rotate(-5deg);
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(255, 255, 255, 0.2),
+            transparent 26%
+        ),
+        linear-gradient(145deg, #0f172a 0%, #14532d 45%, #15803d 100%);
+}
+
+.gcf-brand {
+    font-size: 16px;
+    letter-spacing: 0.14em;
+}
+
+.gcf-tag {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 32px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.gcf-copy {
+    margin: 10px 0 0;
+    max-width: 240px;
+    color: rgba(239, 246, 255, 0.84);
+    line-height: 1.5;
+}
+
+.gvf-summary-grid {
+    margin-top: 6px;
+}
+
+.gvf-payment-slot {
+    margin-top: 18px;
+}
+
+.gvf-method-panel {
+    padding: 18px;
+    background: linear-gradient(
+        180deg,
+        rgba(37, 99, 235, 0.06),
+        rgba(255, 255, 255, 0.66)
+    );
+}
+
+.gvf-api-banner,
+.gvf-invoice-hint {
+    border-radius: 16px;
+}
+
+html[data-theme="dark"] .gvf-page,
+.dark .gvf-page {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(59, 130, 246, 0.18),
+            transparent 28%
+        ),
+        linear-gradient(180deg, #07101f 0%, #0b1424 52%, #101c34 100%);
+}
+
+html[data-theme="dark"] .gvf-kicker,
+html[data-theme="dark"] .gvf-pill,
+html[data-theme="dark"] .gvf-company-list li,
+.dark .gvf-kicker,
+.dark .gvf-pill,
+.dark .gvf-company-list li {
+    background: rgba(15, 23, 42, 0.82);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #dbeafe;
+}
+
+html[data-theme="dark"] .gvf-intro-card,
+.dark .gvf-intro-card {
+    background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.92),
+        rgba(10, 16, 31, 0.92)
+    );
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .gvf-intro-card h2,
+html[data-theme="dark"] .gvf-method-header h2,
+html[data-theme="dark"] .gvf-section-head h2,
+html[data-theme="dark"] .gcf-copy,
+.dark .gvf-intro-card h2,
+.dark .gvf-method-header h2,
+.dark .gvf-section-head h2,
+.dark .gcf-copy {
+    color: #e2e8f0;
+}
+
+html[data-theme="dark"] .gvf-intro-card p,
+html[data-theme="dark"] .gvf-method-header p,
+html[data-theme="dark"] .gvf-section-head p,
+html[data-theme="dark"] .gvf-invoice-hint,
+.dark .gvf-intro-card p,
+.dark .gvf-method-header p,
+.dark .gvf-section-head p,
+.dark .gvf-invoice-hint {
+    color: #94a3b8;
+}
+
+html[data-theme="dark"] .gvf-invoice-hint,
+.dark .gvf-invoice-hint {
+    background: rgba(37, 99, 235, 0.14);
+    border-color: rgba(96, 165, 250, 0.18);
+}
+
+@media (max-width: 980px) {
+    .gvf-intro {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .gvf-box {
+        padding: 18px;
+    }
+
+    .gvf-pay-card {
+        min-height: auto;
+    }
+
+    .gcf-brand {
+        right: 14px;
+        top: 14px;
+        font-size: 14px;
+    }
+}

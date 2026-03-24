@@ -100,6 +100,58 @@ class PageService
             'blocks' => $data['blocks'] ?? [],
             'locale' => $locale,
             'is_demo' => false,
+            'meta' => $this->normalizeMeta($data, $trans),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $trans
+     * @return array<string, mixed|null>
+     */
+    private function normalizeMeta(array $data, array $trans): array
+    {
+        $merged = [];
+
+        foreach (['meta', 'seo'] as $key) {
+            foreach ([$data[$key] ?? null, $trans[$key] ?? null] as $blob) {
+                if (is_array($blob)) {
+                    $merged = array_merge($merged, $blob);
+                }
+            }
+        }
+
+        $pick = function (array $keys) use ($merged, $data, $trans) {
+            foreach ($keys as $k) {
+                if (isset($merged[$k]) && $merged[$k] !== '' && $merged[$k] !== null) {
+                    return $merged[$k];
+                }
+            }
+            foreach ($keys as $k) {
+                if (isset($data[$k]) && $data[$k] !== '' && $data[$k] !== null) {
+                    return $data[$k];
+                }
+                if (isset($trans[$k]) && $trans[$k] !== '' && $trans[$k] !== null) {
+                    return $trans[$k];
+                }
+            }
+
+            return null;
+        };
+
+        return [
+            'title' => $pick(['title', 'meta_title', 'metaTitle']),
+            'description' => $pick(['description', 'meta_description', 'metaDescription']),
+            'keywords' => $pick(['keywords', 'meta_keywords', 'metaKeywords']),
+            'og_title' => $pick(['og_title', 'ogTitle']),
+            'og_description' => $pick(['og_description', 'ogDescription']),
+            'og_image' => $pick(['og_image', 'ogImage', 'image', 'hero_image']),
+            'og_type' => $pick(['og_type', 'ogType']) ?? 'website',
+            'twitter_card' => $pick(['twitter_card', 'twitterCard']) ?? 'summary_large_image',
+            'twitter_title' => $pick(['twitter_title', 'twitterTitle']),
+            'twitter_description' => $pick(['twitter_description', 'twitterDescription']),
+            'twitter_image' => $pick(['twitter_image', 'twitterImage']),
+            'canonical_url' => $pick(['canonical_url', 'canonicalUrl', 'url']),
         ];
     }
 

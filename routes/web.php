@@ -4,20 +4,32 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\RoomPageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ArtisanCommandController;
 use App\Http\Controllers\ButtonTrackingController;
+use App\Http\Controllers\GiftVoucherController;
 use App\Http\Controllers\SettingsController;
 use App\Services\SliderService;
+use App\Services\PageService;
+use App\Services\ApiHealthService;
 
 Route::post('/api/button-tracking/track', [ButtonTrackingController::class, 'track'])
     ->name('button-tracking.track');
+
+Route::get('/track', [ButtonTrackingController::class, 'trackAndRedirect'])
+    ->name('button-tracking.redirect');
+
+Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit'])->name('contact.forms.submit');
 
 Route::get('/api/settings', [SettingsController::class, 'index'])->name('settings.index');
 Route::get('/api/settings/frontend', [SettingsController::class, 'frontend'])->name('settings.frontend');
 Route::get('/api/settings/{key}', [SettingsController::class, 'show'])->name('settings.show');
 Route::post('/api/settings/clear-cache', [SettingsController::class, 'clearCache'])->name('settings.clear-cache');
+
+Route::get('/api/billing/companies', [GiftVoucherController::class, 'companiesJson'])->name('billing.companies');
+Route::get('/api/billing/invoices', [GiftVoucherController::class, 'invoicesJson'])->name('billing.invoices');
 
 Route::get('/api/slider/debug', function () {
     $locale = request()->query('locale', 'de');
@@ -36,15 +48,22 @@ Route::get('/api/slider/debug', function () {
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/{locale}/uber-uns', fn (string $locale) => Inertia::render('Home/UberUns', [
-    'currentRoute' => 'uberuns',
-    'locale' => $locale,
-]))->where('locale', 'de|en|tr')->name('uberuns.locale');
+Route::get('/{locale}/uber-uns', function (string $locale) {
+    $locale = strtolower($locale);
+    $slug = 'uber-uns';
+    $page = null;
+    if (app(ApiHealthService::class)->isAvailable()) {
+        $page = app(PageService::class)->getPage($slug, $locale);
+    }
 
-Route::get('/uber-uns', fn () => Inertia::render('Home/UberUns', [
-    'currentRoute' => 'uberuns',
-    'locale' => 'de',
-]))->name('uberuns');
+    return Inertia::render('Home/UberUns', [
+        'currentRoute' => 'uberuns',
+        'locale' => $locale,
+        'page' => $page,
+    ]);
+})->where('locale', 'de|en|tr')->name('uberuns.locale');
+
+Route::get('/uber-uns', fn () => redirect('/de/uber-uns'))->name('uberuns');
 
 Route::get('/{locale}', [HomeController::class, 'index'])
     ->where('locale', 'de|en|tr')
@@ -117,19 +136,21 @@ Route::get('/offers/{offer}', function (string $offer) {
     return redirect("/de/offers/{$offer}");
 });
 
-// Geschenkgutschein-Seite
-Route::get('/{locale}/gutschein', function (string $locale) {
-    return Inertia::render('GiftVoucher/Index', [
-        'locale' => $locale,
-        'currentRoute' => 'gutschein',
-    ]);
-})->where([
-    'locale' => 'de|en|tr',
-])->name('gutschein.index');
+// Geschenkgutschein (Stripe / PayPal / SEPA — spät zuerst)
+Route::get('/{locale}/gutschein/stripe', [GiftVoucherController::class, 'stripe'])
+    ->where('locale', 'de|en|tr')
+    ->name('gutschein.stripe');
+Route::get('/{locale}/gutschein/paypal', [GiftVoucherController::class, 'paypal'])
+    ->where('locale', 'de|en|tr')
+    ->name('gutschein.paypal');
+Route::get('/{locale}/gutschein/sepa', [GiftVoucherController::class, 'sepa'])
+    ->where('locale', 'de|en|tr')
+    ->name('gutschein.sepa');
+Route::get('/{locale}/gutschein', [GiftVoucherController::class, 'index'])
+    ->where('locale', 'de|en|tr')
+    ->name('gutschein.index');
 
-Route::get('/gutschein', function () {
-    return redirect('/de/gutschein');
-});
+Route::get('/gutschein', fn () => redirect('/de/gutschein'));
 
 Route::controller(PageController::class)->group(function () {
 

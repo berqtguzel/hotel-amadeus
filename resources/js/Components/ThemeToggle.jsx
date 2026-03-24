@@ -34,13 +34,16 @@ export default function ThemeToggle() {
                     </svg>
                 </span>
                 <span className="ttgl-icon ttgl-icon--moon">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
                         <path d="M20.7 14.3a8.5 8.5 0 1 1-11-11 1 1 0 0 1 1.3 1.2A6.8 6.8 0 0 0 19.5 13a1 1 0 0 1 1.2 1.3Z" />
                     </svg>
                 </span>
                 <span className="ttgl-thumb" />
             </span>
-            <span className="ttgl-label">{isDark ? "Dark" : "Light"}</span>
         </button>
     );
 }

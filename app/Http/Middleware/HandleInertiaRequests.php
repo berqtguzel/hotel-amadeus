@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'flash' => [
                 'commandResult' => $request->session()->get('commandResult'),
+                'success'       => $request->session()->get('success'),
             ],
 
             'global' => [
@@ -76,7 +77,7 @@ class HandleInertiaRequests extends Middleware
                 'slider'      => $apiUp ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale) : null,
             ],
 
-            'ziggy' => fn () => array_merge(
+            'ziggy' => fn() => array_merge(
                 (new Ziggy)->toArray(),
                 ['location' => $request->url()]
             ),

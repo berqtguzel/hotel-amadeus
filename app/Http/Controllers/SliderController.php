@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+
 class SliderController extends Controller
 {
+    private const CACHE_VERSION = 2;
+
     public function getSliders(string $locale, string $slug)
     {
-        $base       = rtrim(config('omr.base_url'), '/');
+        $base       = rtrim(config('omr.video_base_url') ?: config('omr.base_url'), '/');
         $tenant     = config('omr.tenant_id');
         $mainTenant = config('omr.main_tenant') ?: $tenant;
 
@@ -20,7 +23,11 @@ class SliderController extends Controller
             abort(500, 'OMR_TENANT_ID missing');
         }
 
-        $cacheKey = "slider_show:{$mainTenant}:{$locale}:{$slug}";
+        if (!$base) {
+            abort(500, 'OMR base URL missing');
+        }
+
+        $cacheKey = "slider_show:v" . self::CACHE_VERSION . ":{$mainTenant}:{$locale}:{$slug}";
 
         $sliderData = Cache::remember($cacheKey, now()->addHours(1), function () use (
             $base,
@@ -45,14 +52,27 @@ class SliderController extends Controller
                         'status' => $response->status(),
                         'tenant' => $tenant,
                         'locale' => $locale,
+                        'url'    => "{$base}/v1/sliders/{$slug}",
+                        'body'   => $response->body(),
                     ]);
+
                     return null;
                 }
 
                 $data = $response->json('data');
 
-                return is_array($data) ? $data : null;
+                if (!is_array($data)) {
+                    Log::warning('Slider API returned invalid data format', [
+                        'slug'   => $slug,
+                        'tenant' => $tenant,
+                        'locale' => $locale,
+                        'data'   => $data,
+                    ]);
 
+                    return null;
+                }
+
+                return self::fixStorageUrls($data);
             } catch (\Throwable $e) {
                 Log::error('Error fetching slider data', [
                     'slug'   => $slug,
@@ -60,6 +80,7 @@ class SliderController extends Controller
                     'tenant' => $tenant,
                     'locale' => $locale,
                 ]);
+
                 return null;
             }
         });
@@ -69,5 +90,19 @@ class SliderController extends Controller
         }
 
         return response()->json(['data' => $sliderData]);
+    }
+
+
+    private static function fixStorageUrls(mixed $data): mixed
+    {
+        if (is_array($data)) {
+            return array_map([self::class, 'fixStorageUrls'], $data);
+        }
+
+        if (is_string($data)) {
+            return str_replace('/api/storage/', '/storage/', $data);
+        }
+
+        return $data;
     }
 }

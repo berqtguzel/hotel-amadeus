@@ -16,7 +16,7 @@ export default function VideoPromo({
         <section className="vp-section">
             <div className="vp-shell">
                 <header className="vp-head">
-                    <span className="vp-eyebrow">Video</span>
+                    <span className="eyebrow">Video</span>
                     <h2 className="vp-title">{title}</h2>
                     <p className="vp-subtitle">{subtitle}</p>
                 </header>
@@ -67,9 +67,7 @@ export default function VideoPromo({
                             <span className="vp-meta" aria-hidden="true">
                                 Werrapark Resort Film
                             </span>
-                            <span className="vp-cta">
-                                Jetzt ansehen
-                            </span>
+                            <span className="vp-cta">Jetzt ansehen</span>
                         </button>
                     )}
                 </div>

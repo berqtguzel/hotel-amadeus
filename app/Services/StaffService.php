@@ -54,7 +54,7 @@ class StaffService
             }
 
             $json = $response->json();
-            $data = $json['data'] ?? $json;
+            $data = $this->unwrapStaffPayload($json);
 
             if (!is_array($data)) {
                 return [];
@@ -65,6 +65,27 @@ class StaffService
             Log::debug('Staff API error', ['error' => $e->getMessage()]);
             return [];
         }
+    }
+
+    /**
+     * Staff API yanitinda liste bazen data.data altinda gelir.
+     *
+     * @param  array<string, mixed>  $payload
+     * @return array<int, array<string, mixed>>
+     */
+    private function unwrapStaffPayload(array $payload): array
+    {
+        $data = $payload['data'] ?? $payload;
+
+        if (is_array($data) && isset($data['data']) && is_array($data['data'])) {
+            $data = $data['data'];
+        }
+
+        if (!is_array($data) || !array_is_list($data)) {
+            return [];
+        }
+
+        return array_values(array_filter($data, 'is_array'));
     }
 
     /**
@@ -97,8 +118,15 @@ class StaffService
             $website     = $attrs['website'] ?? $attrs['url'] ?? $attrs['web'] ?? null;
             if (!$website && is_array($socialLinks)) {
                 foreach ($socialLinks as $s) {
-                    if (is_array($s) && (($s['type'] ?? '') === 'website' || ($s['platform'] ?? '') === 'website')) {
-                        $website = $s['url'] ?? $s['link'] ?? null;
+                    if (!is_array($s)) {
+                        continue;
+                    }
+
+                    $type = strtolower((string) ($s['type'] ?? $s['platform'] ?? ''));
+                    $url  = $s['url'] ?? $s['link'] ?? null;
+
+                    if ($type === 'website' && $url) {
+                        $website = $url;
                         break;
                     }
                 }

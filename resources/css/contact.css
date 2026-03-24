@@ -121,9 +121,11 @@ html.dark .ct-section {
 
 .ct-title {
     margin: 0;
-    font-weight: 900;
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-family: var(--font-serif);
+    font-weight: var(--font-bold);
+    font-size: var(--text-display);
     letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
 }
 
 .ct-title::after {
@@ -142,9 +144,19 @@ html.dark .ct-section {
 }
 
 .ct-subtitle {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
     color: var(--ct-muted);
     max-width: 70ch;
     margin: 0.75rem auto 0;
+}
+
+.ct-block__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    margin: 0 0 clamp(16px, 3vw, 24px);
 }
 
 .ct-grid {
@@ -217,14 +229,16 @@ html.dark .ct-card:hover {
 
 .ct-card__name {
     margin: 0;
-    font-size: 1.05rem;
-    font-weight: 800;
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
 }
 
 .ct-card__role {
     margin: 2px 0 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
     color: var(--ct-muted);
-    font-size: 0.92rem;
 }
 
 .ct-panel {
@@ -265,8 +279,10 @@ html.dark .ct-panel__info {
 
 .ct-panel__title {
     margin: 0;
-    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-    font-weight: 800;
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
 }
 
 .ct-info {
@@ -317,7 +333,9 @@ html.dark .ct-panel__info {
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .ct-map-placeholder--link:hover {
@@ -336,8 +354,8 @@ html.dark .ct-panel__info {
     display: inline-flex;
     padding: 4px 10px;
     border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
     letter-spacing: 0.12em;
     text-transform: uppercase;
     background: rgba(0, 0, 0, 0.12);
@@ -346,9 +364,29 @@ html.dark .ct-panel__info {
 }
 
 .ct-map-text {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
     color: var(--ct-muted);
     margin: 0;
+}
+
+.ct-form-status {
+    padding: 12px 16px;
+    border-radius: var(--ct-radius-md);
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+}
+
+.ct-form-status--success {
+    background: color-mix(in oklab, var(--ct-accent) 20%, transparent);
+    border: 1px solid var(--ct-accent);
+    color: var(--ct-text);
+}
+
+.ct-form-status--error {
+    background: color-mix(in oklab, #dc2626 18%, transparent);
+    border: 1px solid #dc2626;
+    color: var(--ct-text);
 }
 
 .ct-form {
@@ -378,8 +416,16 @@ html.dark .ct-panel__info {
     grid-column: 1/-1;
 }
 
+.ct-field label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+}
+
 .ct-field input,
 .ct-field textarea {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
     border: 1px solid var(--ct-line);
     border-radius: var(--ct-radius-md);
     padding: 12px 14px;
@@ -406,7 +452,9 @@ html.dark .ct-panel__info {
     justify-content: center;
     padding: 12px 22px;
     border-radius: 999px;
-    font-weight: 800;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     border: none;
@@ -466,9 +514,7 @@ html.dark .ct-panel__info {
     height: 56px;
     border-radius: 50%;
     object-fit: cover;
-
     flex-shrink: 0;
-
     border: 3px solid color-mix(in oklab, var(--ct-accent) 35%, transparent);
 }
 
@@ -486,18 +532,19 @@ html.dark .ct-panel__info {
 
 .ct-card__name {
     margin: 0;
-    font-size: 1.05rem;
-    font-weight: 800;
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    font-weight: var(--font-extrabold);
 }
 
 /* role */
 
 .ct-card__role {
     margin: 0;
-    font-size: 0.92rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
     color: var(--ct-muted);
-
-    line-height: 1.3;
 }
 
 /* ================================
@@ -518,8 +565,8 @@ html.dark .ct-panel__info {
     display: flex;
     align-items: center;
     gap: 8px;
-
-    font-size: 0.92rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
 }
 
 /* icon */
@@ -542,4 +589,144 @@ html.dark .ct-panel__info {
 
 .ct-meta-row a:hover {
     text-decoration: underline;
+}
+
+/* ========================================
+   SUCCESS MODAL
+======================================== */
+
+.ct-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ct-modal__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 27, 20, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.ct-modal__backdrop-enter {
+    transition: opacity 0.2s ease-out;
+}
+
+.ct-modal__backdrop-enter-from {
+    opacity: 0;
+}
+
+.ct-modal__backdrop-enter-to {
+    opacity: 1;
+}
+
+.ct-modal__backdrop-leave {
+    transition: opacity 0.15s ease-in;
+}
+
+.ct-modal__backdrop-leave-from {
+    opacity: 1;
+}
+
+.ct-modal__backdrop-leave-to {
+    opacity: 0;
+}
+
+.ct-modal__wrap {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+}
+
+.ct-modal__container {
+    display: flex;
+    min-height: 100px;
+    align-items: center;
+    justify-content: center;
+}
+
+.ct-modal__panel {
+    width: 100%;
+    padding: 32px 28px;
+    background: var(--ct-surface);
+    border-radius: var(--ct-radius-lg);
+    box-shadow: var(--ct-shadow);
+    border: 1px solid var(--ct-line);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+}
+
+.ct-modal__panel-enter {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.ct-modal__panel-enter-from {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.ct-modal__panel-enter-to {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ct-modal__panel-leave {
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+.ct-modal__panel-leave-from {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ct-modal__panel-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.ct-modal__icon {
+    color: var(--ct-accent);
+}
+
+.ct-modal__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    color: var(--ct-text);
+    margin: 0;
+}
+
+.ct-modal__desc {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--ct-muted);
+    margin: 0;
+}
+
+.ct-modal__btn {
+    margin-top: 8px;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(90deg, var(--ct-accent), var(--ct-accent-2));
+    color: #fff;
+    transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.ct-modal__btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
 }

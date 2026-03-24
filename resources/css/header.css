@@ -81,12 +81,7 @@
 
 .wh-topbar {
     color: #fff;
-    background: linear-gradient(
-        90deg,
-        var(--wp-green-300),
-        var(--wp-green-400) 55%,
-        var(--wp-green-500)
-    );
+    background: var(--site-primary-color);
 }
 
 .dark .wh-topbar {
@@ -121,6 +116,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
     color: #eaf8f2;
     text-decoration: none;
     opacity: 0.95;
@@ -173,11 +170,12 @@
     height: 34px;
     padding: 0 14px;
 
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+
     border-radius: 999px;
     border: 1px solid transparent;
-
-    font-size: 13px;
-    font-weight: 700;
 
     cursor: pointer;
     text-decoration: none;
@@ -207,17 +205,18 @@
 }
 
 .wh-btn--primary {
-    background: var(--wp-green-500);
+    background: var(--site-button-color);
     color: #fff;
-    box-shadow: 0 12px 28px rgba(31, 129, 85, 0.35);
+    box-shadow: 0 12px 28px
+        color-mix(in srgb, var(--site-button-color) 35%, transparent);
 }
 
 .wh-btn--primary:hover {
-    background: var(--wp-green-600);
+    filter: brightness(0.92);
 }
 
 .wh-navwrap {
-    background: var(--wp-green-400);
+    background: var(--site-header-background-color);
     border-bottom: 1px solid var(--wp-border);
     box-shadow: var(--wp-shadow-sm);
 }
@@ -281,16 +280,23 @@ html.dark .wh-brand__logo--dark {
     align-items: center;
     padding: 14px 10px;
     border-radius: 12px;
-    font-size: 16px;
-    color: white;
-    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: var(--font-bold);
+    color: var(--site-link-color, #ffffff);
     text-decoration: none;
     transition: 0.18s;
 }
 
 .wh-link:hover {
-    background: var(--wp-green-100);
-    color: var(--wp-green-700);
+    color: var(--site-text-color);
+}
+
+.wh-link .wh-arrow {
+    color: var(--site-link-color);
+}
+.wh-link:hover .wh-arrow {
+    color: var(--wp-green-600);
 }
 
 .wh-hamburger {
@@ -354,7 +360,7 @@ html.dark .wh-brand__logo--dark {
     top: 0;
     height: 100%;
     width: min(88%, 380px);
-    background: var(--wp-green-500);
+    background: var(--site-primary-color);
     border-left: 1px solid var(--wp-border);
     box-shadow: var(--wp-shadow);
     transform: translateX(100%);
@@ -363,7 +369,7 @@ html.dark .wh-brand__logo--dark {
     flex-direction: column;
 }
 .dark .wh-drawer__panel {
-    background: var(--wp-green-800);
+    background: color-mix(in oklab, var(--site-primary-color) 40%, black);
 }
 
 .wh-drawer.is-open .wh-drawer__panel {
@@ -391,10 +397,12 @@ html.dark .wh-brand__logo--dark {
 .wh-m-link {
     display: block;
     padding: 12px 14px;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-weight: var(--font-bold);
     border-radius: 10px;
     text-decoration: none;
-    font-weight: 700;
-    color: var(--wp-ink-900);
+    color: #fff;
     transition: background 0.18s ease;
 }
 
@@ -479,6 +487,8 @@ html.dark .wh-brand__logo--dark {
 .wh-dropdown-link {
     display: block;
     padding: 10px 14px;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
     text-decoration: none;
     color: #333;
     border-radius: 8px;
@@ -497,9 +507,10 @@ html.dark .wh-brand__logo--dark {
 
 .wh-m-sublink {
     padding: 8px 14px;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
     text-decoration: none;
     color: #333;
-    font-size: 14px;
 }
 
 .wh-nav-ctas {

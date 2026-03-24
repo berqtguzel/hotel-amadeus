@@ -82,9 +82,7 @@ const THEMES = [
     },
 ];
 
-export default function TravelThemes({
-    items = THEMES,
-}) {
+export default function TravelThemes({ items = THEMES }) {
     const [feature, ...rest] = items;
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
@@ -124,7 +122,7 @@ export default function TravelThemes({
                 className={`tt3-header ${headerVisible ? "tt3-revealed" : "tt3-hidden"}`}
             >
                 <div className="tt3-head-text">
-                    <span className="tt3-eyebrow">{t("themes.eyebrow")}</span>
+                    <span className="eyebrow">{t("themes.eyebrow")}</span>
                     <h2 className="tt3-title">{t("themes.title")}</h2>
                     <p className="tt3-desc">{t("themes.description")}</p>
 
@@ -135,10 +133,7 @@ export default function TravelThemes({
                         >
                             {t("themes.allThemes")}
                         </a>
-                        <a
-                            className="tt3-btn tt3-btn--ghost"
-                            href="/offers"
-                        >
+                        <a className="tt3-btn tt3-btn--ghost" href="/offers">
                             {t("themes.bestPrice")}
                         </a>
                     </div>

@@ -13,8 +13,9 @@ class ContactFormsService
 
     public function getContactForms(string $locale): array
     {
-        $locale = strtolower($locale);
-        $cacheKey = self::CACHE_KEY_PREFIX . $locale;
+        $locale  = strtolower($locale);
+        $tenant  = config('omr.main_tenant') ?: config('omr.tenant_id') ?: '';
+        $cacheKey = self::CACHE_KEY_PREFIX . ($tenant ? "{$tenant}_{$locale}" : $locale);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
             return $this->fetch($locale);
@@ -23,8 +24,9 @@ class ContactFormsService
 
     public function clearCache(): void
     {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: '';
         foreach (['de', 'en', 'tr'] as $locale) {
-            Cache::forget(self::CACHE_KEY_PREFIX . $locale);
+            Cache::forget(self::CACHE_KEY_PREFIX . ($tenant ? "{$tenant}_{$locale}" : $locale));
         }
     }
 
@@ -41,9 +43,15 @@ class ContactFormsService
         $url = "{$base}{$endpoint}/contact/forms";
 
         try {
-            $response = Http::timeout(10)
-                ->withHeaders(['X-Tenant-ID' => $tenant])
+            $response = Http::withoutVerifying()
+                ->timeout(30)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept'      => 'application/json',
+                    'X-Tenant-ID' => $tenant,
+                ])
                 ->get($url, [
+                    'tenant' => $tenant,
                     'locale' => $locale,
                     'lang'   => $locale,
                 ]);
@@ -78,9 +86,13 @@ class ContactFormsService
                 'email'   => '',
             ],
             'formFields'   => [],
+            'forms'        => [],
         ];
 
-        $forms = $data['forms'] ?? $data['items'] ?? $data;
+        $forms = $data['forms'] ?? $data['items'] ?? null;
+        if ($forms === null && isset($data[0]) && is_array($data[0])) {
+            $forms = $data;
+        }
         if (isset($forms['forms'])) {
             $forms = $forms['forms'];
         }
@@ -93,7 +105,7 @@ class ContactFormsService
                 continue;
             }
             $attrs = $form['attributes'] ?? $form;
-            $type  = strtolower($attrs['type'] ?? $attrs['slug'] ?? $attrs['id'] ?? 'general');
+            $type  = strtolower($attrs['type'] ?? $attrs['slug'] ?? 'general');
 
             $people = $attrs['people'] ?? $attrs['contacts'] ?? $attrs['items'] ?? [$form];
 
@@ -108,7 +120,29 @@ class ContactFormsService
                     $this->normalizePeople($people, $base)
                 );
             } elseif (isset($attrs['fields'])) {
-                $out['formFields'] = array_merge($out['formFields'], $this->normalizeFields($attrs['fields']));
+                $normalized = $this->normalizeFields($attrs['fields']);
+                $out['formFields'] = array_merge($out['formFields'], $normalized);
+                if ($attrs['is_active'] ?? true) {
+                    $out['forms'][] = [
+                        'id'     => $attrs['id'] ?? null,
+                        'name'   => $attrs['name'] ?? '',
+                        'fields' => $normalized,
+                    ];
+                }
+            }
+        }
+
+        if (empty($out['formFields']) && !empty($forms)) {
+            foreach ($forms as $form) {
+                if (!is_array($form) || empty($form['fields'])) {
+                    continue;
+                }
+                if ($form['is_active'] ?? true) {
+                    $normalized = $this->normalizeFields($form['fields']);
+                    $out['formFields'] = $normalized;
+                    $out['forms']     = [['id' => $form['id'] ?? null, 'name' => $form['name'] ?? '', 'fields' => $normalized]];
+                    break;
+                }
             }
         }
 
@@ -169,12 +203,14 @@ class ContactFormsService
             if (!is_array($f)) {
                 continue;
             }
+            $label = $f['label'] ?? $f['name'] ?? $f['key'] ?? '';
+            $name  = $f['name'] ?? $f['key'] ?? $label;
             $out[] = [
-                'name'        => $f['name'] ?? $f['key'] ?? '',
+                'name'        => is_string($name) ? strtolower($name) : '',
                 'type'        => $f['type'] ?? 'text',
-                'label'       => $f['label'] ?? $f['placeholder'] ?? '',
-                'placeholder' => $f['placeholder'] ?? '',
-                'required'    => $f['required'] ?? false,
+                'label'       => $label,
+                'placeholder' => $f['placeholder'] ?? $label,
+                'required'    => (bool) ($f['required'] ?? false),
             ];
         }
 

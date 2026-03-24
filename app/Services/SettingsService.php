@@ -45,43 +45,58 @@ class SettingsService
     }
 
     /**
-     * Tek bir setting grubunu çeker
+     * Tek bir setting grubunu çeker (SettingsController::getSettings kullanır)
      */
     public function get(string $key, ?string $locale = null): array
     {
-        if (!in_array($key, self::SETTINGS_KEYS, true)) {
+        $locale = $locale ?? config('omr.default_locale', 'de');
+        $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
+
+        if (!$tenantId) {
             return [];
         }
 
-        $locale = $locale ?? config('omr.default_locale', 'de');
-        $cacheKey = self::CACHE_KEY_PREFIX . $key . ':' . $locale;
+        $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
+        $sectionKey = $key === 'custom_code' ? 'custom-code' : $key;
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($key, $locale) {
-            return $this->fetch($key, $locale);
-        });
+        return $settings[$sectionKey] ?? [];
     }
 
     /**
-     * Frontend için gerekli settings (header, footer, branding vb.)
+     * Frontend için gerekli settings (SettingsController::getSettings kullanır)
      */
     public function getForFrontend(string $locale): array
     {
         $locale = strtolower($locale);
-        $cacheKey = self::CACHE_KEY_PREFIX . 'frontend:' . $locale;
+        $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
+        if (!$tenantId) {
             return [
-                'general'     => $this->normalize($this->fetch('general', $locale)),
-                'contact'     => $this->normalizeContact($this->normalize($this->fetch('contact', $locale))),
-                'social'      => $this->normalize($this->fetch('social', $locale)),
-                'branding'    => $this->normalizeBranding($this->fetch('branding', $locale)),
-                'colors'      => $this->normalize($this->fetch('colors', $locale)),
-                'footer'      => $this->normalize($this->fetch('footer', $locale)),
-                'seo'         => $this->normalize($this->fetch('seo', $locale)),
-                'analytics'   => $this->normalize($this->fetch('analytics', $locale)),
-                'custom_code' => $this->normalize($this->fetch('custom-code', $locale)),
+                'general'     => [],
+                'contact'     => [],
+                'social'      => [],
+                'branding'    => [],
+                'colors'      => [],
+                'footer'      => [],
+                'seo'         => [],
+                'analytics'   => [],
+                'custom_code' => [],
             ];
-        });
+        }
+
+        $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
+
+        return [
+            'general'     => $settings['general'] ?? [],
+            'contact'     => $this->normalizeContact($settings['contact'] ?? []),
+            'social'      => $settings['social'] ?? [],
+            'branding'    => $this->normalizeBranding($settings['branding'] ?? []),
+            'colors'      => $settings['colors'] ?? [],
+            'footer'      => $settings['footer'] ?? [],
+            'seo'         => $settings['seo'] ?? [],
+            'analytics'   => $settings['analytics'] ?? [],
+            'custom_code' => $settings['custom-code'] ?? [],
+        ];
     }
 
     /**
@@ -89,13 +104,16 @@ class SettingsService
      */
     public function clearCache(): void
     {
-        $tags = ['de', 'en', 'tr'];
-        foreach (self::SETTINGS_KEYS as $key) {
-            foreach ($tags as $locale) {
+        $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
+        $mainTenant = config('omr.main_tenant') ?: env('OMR_MAIN_TENANT') ?: $tenantId;
+
+        foreach (['de', 'en', 'tr'] as $locale) {
+            if ($tenantId) {
+                Cache::forget("settings_{$tenantId}_{$locale}_{$mainTenant}");
+            }
+            foreach (self::SETTINGS_KEYS as $key) {
                 Cache::forget(self::CACHE_KEY_PREFIX . $key . ':' . $locale);
             }
-        }
-        foreach ($tags as $locale) {
             Cache::forget(self::CACHE_KEY_PREFIX . 'all:' . $locale);
             Cache::forget(self::CACHE_KEY_PREFIX . 'frontend:' . $locale);
         }
@@ -132,7 +150,7 @@ class SettingsService
         if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
             return $url;
         }
-        $base = rtrim(config('omr.base_url'), '/');
+        $base = rtrim(config('omr.base_url') ?? env('OMR_API_BASE') ?? env('VITE_REMOTE_API_BASE', 'https://omerdogan.de/api'), '/');
         return $base . (str_starts_with($url, '/') ? '' : '/') . $url;
     }
 
@@ -175,6 +193,14 @@ class SettingsService
             }
         }
         return true;
+    }
+
+    /**
+     * Contact normalizasyonu (public - SettingsController tarafından kullanılır)
+     */
+    public function normalizeContactPublic(array $data): array
+    {
+        return $this->normalizeContact($data);
     }
 
     /**

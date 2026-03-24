@@ -1,4 +1,10 @@
-import React, { useMemo, useEffect, useState, useRef, useCallback } from "react";
+import React, {
+    useMemo,
+    useEffect,
+    useState,
+    useRef,
+    useCallback,
+} from "react";
 import { Link, usePage } from "@inertiajs/react";
 import FlowingMenu from "../ReactBits/Components/FlowingMenu";
 import Cubes from "../ReactBits/Backgrounds/Cubes";
@@ -79,11 +85,9 @@ const OffersGrid = () => {
                 ref={headRef}
                 className={`og-head ${headVisible ? "og-revealed" : "og-hidden"}`}
             >
-                <div className="og-eyebrow">{t("offers.eyebrow")}</div>
+                <div className="eyebrow">{t("offers.eyebrow")}</div>
                 <h2 className="og-title">{t("offers.title")}</h2>
-                <p className="og-subtitle">
-                    {t("offers.subtitle")}
-                </p>
+                <p className="og-subtitle">{t("offers.subtitle")}</p>
             </header>
 
             <div

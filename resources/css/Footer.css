@@ -3,11 +3,9 @@
     --wh-brand-700: #11652d;
     --wh-ink: #e8f5ec;
     --wh-ink-soft: #b8d4c4;
-
     --wh-deep: #0d2416;
     --wh-deeper: #08120c;
     --wh-line: rgba(255, 255, 255, 0.12);
-
     --wh-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
@@ -31,11 +29,7 @@
 
 /* ===== CTA BAR ===== */
 .wh-foot-cta {
-    background: linear-gradient(
-        135deg,
-        var(--wh-brand-700) 0%,
-        var(--wh-brand) 100%
-    );
+    background: var(--site-primary-color);
     color: #fff;
 }
 .wh-foot-cta__inner {
@@ -49,15 +43,18 @@
 }
 .wh-foot-cta h3 {
     margin: 0;
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
     letter-spacing: 0.02em;
+    line-height: var(--leading-snug);
+    color: var(--site-h1-color);
 }
 
 /* ===== MAIN FOOTER ===== */
 .wh-foot {
-    color: var(--wh-ink);
-    background: var(--wh-deep);
+    color: var(--site-text-color);
+    background: var(--site-footer-background-color);
 }
 .wh-foot-main {
     padding: 48px 0 40px;
@@ -103,7 +100,7 @@
 
 .wh-foot-title {
     margin: 0 0 16px;
-    color: #fff;
+    color: white;
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -111,7 +108,8 @@
     opacity: 0.95;
 }
 .wh-foot-text {
-    color: var(--wh-ink-soft);
+    color: var(--site-text-color);
+    opacity: 0.9;
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.7;
@@ -125,10 +123,12 @@
     gap: 12px;
 }
 .wh-foot-address {
-    color: var(--wh-ink-soft);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: white;
+    opacity: 0.9;
     font-style: normal;
-    line-height: 1.6;
-    font-size: 0.9rem;
     text-align: center;
 }
 .wh-foot-links {
@@ -138,9 +138,10 @@
     gap: 6px;
 }
 .wh-foot-link {
-    color: var(--wh-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--site-link-color);
     text-decoration: none;
-    font-size: 0.9rem;
     opacity: 0.92;
 }
 .wh-foot-link:hover {
@@ -164,16 +165,18 @@
     gap: 4px;
 }
 .wh-foot-extra-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #fff;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
+    color: var(--site-h1-color);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 .wh-foot-extra a {
-    color: var(--wh-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--site-link-color);
     text-decoration: none;
-    font-size: 0.88rem;
 }
 .wh-foot-extra a:hover {
     text-decoration: underline;
@@ -191,7 +194,7 @@
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    color: var(--wh-deep);
+    color: var(--site-primary-color);
     background: rgba(255, 255, 255, 0.95);
     text-decoration: none;
     box-shadow: var(--wh-shadow);
@@ -218,9 +221,10 @@
     gap: 10px;
 }
 .wh-foot-list a {
-    color: var(--wh-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    color: var(--site-link-color);
     text-decoration: none;
-    font-size: 0.95rem;
     opacity: 0.9;
 }
 .wh-foot-list a:hover {
@@ -243,13 +247,14 @@
 .wh-input {
     flex: 1;
     min-width: 180px;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
     border-radius: 10px;
     border: 1px solid var(--wh-line);
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
     padding: 12px 16px;
     outline: none;
-    font-size: 0.9rem;
 }
 .wh-input::placeholder {
     color: rgba(255, 255, 255, 0.7);
@@ -264,10 +269,11 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
     border-radius: 10px;
     padding: 12px 20px;
-    font-weight: 700;
-    font-size: 0.9rem;
     border: 1px solid transparent;
     cursor: pointer;
     text-decoration: none;
@@ -297,7 +303,11 @@
 
 /* ===== BOTTOM BAR ===== */
 .wh-foot-bottom {
-    background: var(--wh-deeper);
+    background: color-mix(
+        in oklab,
+        var(--site-footer-background-color) 92%,
+        black
+    );
     border-top: 1px solid var(--wh-line);
 }
 .wh-foot-bottom__inner {
@@ -306,13 +316,15 @@
     justify-content: center;
     gap: 24px;
     padding: 20px 0;
-    color: var(--wh-ink-soft);
+    color: var(--site-text-color);
+    opacity: 0.85;
     flex-wrap: wrap;
     text-align: center;
 }
 .wh-foot-copy {
     margin: 0;
-    font-size: 0.9rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
 }
 .wh-foot-mini {
     list-style: none;
@@ -324,12 +336,14 @@
     justify-content: center;
 }
 .wh-foot-mini a {
-    color: var(--wh-ink-soft);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--site-text-color);
+    opacity: 0.85;
     text-decoration: none;
-    font-size: 0.9rem;
 }
 .wh-foot-mini a:hover {
-    color: var(--wh-ink);
+    color: var(--site-link-color);
     text-decoration: underline;
 }
 

@@ -1,99 +1,108 @@
 import React from "react";
+import { usePage } from "@inertiajs/react";
 import { FiMail, FiInstagram, FiFacebook, FiTwitter } from "react-icons/fi";
 import "../../../css/experience-hero.css";
 import CountUp from "../ReactBits/Texts/CountUp";
-import { usePage } from "@inertiajs/react";
-usePage;
-const ExperienceHero = ({
-    eyebrow = "Werrapark",
-    title = "Urlaub im finnischen Blockhaus",
-    description = `
-    Ein individuelles Urlaubszuhause in Kombination mit jeder Menge Freizeitofferten.
-    Sie bestimmen das Urlaubsprogramm! Die traumhafte Natur, die ungezwungene Verwöhnatmosphäre
-    und die zahlreichen Entspannungsangebote im Wellness & Beauty-Resort machen das Genießen
-    im „Werrapark“ ganz einfach.
-  `,
-    years = 24,
-    email = "info@werrapark.de",
-    image = "/images/blockhaus.jpeg",
-}) => {
+
+const ExperienceHero = () => {
     const { props } = usePage();
-    console.log("Tenant ID:", props);
+
+    const data = props?.global?.widgets?.serviceHighlights || {};
+    const settingsContact = props?.global?.settings?.contact || {};
+    const settingsSocial = props?.global?.settings?.social || {};
+    const locale = props?.locale || "de";
+
+    const item = Array.isArray(data) ? data[0] : data;
+
+    const translation =
+        item?.translations?.find((t) => t.language_code === locale) ||
+        item?.translations?.[0] ||
+        {};
+
+    const title = translation.name || item?.name || "";
+    const description = translation.description || item?.description || "";
+    const image = item?.image || "";
+    const years = item?.years || 25;
+    const email =
+        settingsContact?.email || settingsContact?.reservation_email || "";
+
+    const socialLinks = [
+        { key: "facebook", url: settingsSocial?.facebook_url },
+        { key: "instagram", url: settingsSocial?.instagram_url },
+        { key: "twitter", url: settingsSocial?.twitter_url },
+    ].filter((link) => link.url);
 
     return (
-        <section className="ex-wrap" aria-label="Über uns – Blockhaus Erlebnis">
-            <div className="ex-pattern" aria-hidden="true" />
+        <section className="ex-wrap">
+            <div className="ex-pattern" />
 
             <div className="ex-container">
                 <figure className="ex-media">
-                    <img
-                        src={image}
-                        alt="Festlich dekorierter Saal – Werrapark"
-                        loading="lazy"
-                    />
-                    <figcaption
-                        className="ex-badge"
-                        aria-label={`${years} Jahre Erfahrung`}
-                    >
+                    {image && <img src={image} alt={title} loading="lazy" />}
+
+                    <figcaption className="ex-badge">
                         <span className="ex-badge-num">
                             <CountUp
                                 from={0}
-                                to={years}
-                                separator=","
-                                direction="up"
-                                duration={1}
-                                className="count-up-text"
+                                to={Number(years)}
+                                duration={1.4}
                             />
                         </span>
-                        <span className="ex-badge-sub">Jahre Erfahrung</span>
                     </figcaption>
                 </figure>
+
                 <div className="ex-content">
-                    <div className="ex-eyebrow">{eyebrow}</div>
+                    <div className="eyebrow">Werrapark</div>
+
                     <h1 className="ex-title">{title}</h1>
 
-                    <p className="ex-desc">{description}</p>
+                    <div
+                        className="ex-desc"
+                        dangerouslySetInnerHTML={{ __html: description }}
+                    />
 
                     <hr className="ex-rule" />
 
                     <div className="ex-meta">
-                        <div className="ex-meta-block">
-                            <div className="ex-meta-label">E-Mail</div>
-                            <a href={`mailto:${email}`} className="ex-link">
-                                <FiMail
-                                    className="ex-icon"
-                                    aria-hidden="true"
-                                />
-                                {email}
-                            </a>
-                        </div>
-
-                        <div className="ex-meta-block">
-                            <div className="ex-meta-label">Soziale Medien</div>
-                            <div className="ex-social">
-                                <a
-                                    className="ex-social-btn"
-                                    href="https://facebook.com"
-                                    aria-label="Facebook"
-                                >
-                                    <FiFacebook />
-                                </a>
-                                <a
-                                    className="ex-social-btn"
-                                    href="https://instagram.com"
-                                    aria-label="Instagram"
-                                >
-                                    <FiInstagram />
-                                </a>
-                                <a
-                                    className="ex-social-btn"
-                                    href="https://twitter.com"
-                                    aria-label="Twitter X"
-                                >
-                                    <FiTwitter />
+                        {email && (
+                            <div className="ex-meta-block">
+                                <div className="ex-meta-label">E-Mail</div>
+                                <a href={`mailto:${email}`} className="ex-link">
+                                    <FiMail className="ex-icon" />
+                                    {email}
                                 </a>
                             </div>
-                        </div>
+                        )}
+
+                        {socialLinks.length > 0 && (
+                            <div className="ex-meta-block">
+                                <div className="ex-meta-label">
+                                    Soziale Medien
+                                </div>
+                                <div className="ex-social">
+                                    {socialLinks.map((entry) => {
+                                        const Icon =
+                                            entry.key === "facebook"
+                                                ? FiFacebook
+                                                : entry.key === "instagram"
+                                                  ? FiInstagram
+                                                  : FiTwitter;
+
+                                        return (
+                                            <a
+                                                key={entry.key}
+                                                className="ex-social-btn"
+                                                href={entry.url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                <Icon />
+                                            </a>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -75,7 +75,7 @@ export default function RoomsGallery({
 
             <div className="rg-shell">
                 <header className="rg-top">
-                    <span className="rg-eyebrow">{eyebrow}</span>
+                    <span className="eyebrow">{eyebrow}</span>
                     <h2 id="rg-title" className="rg-title">
                         {heading}
                     </h2>
