@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
-
+use Illuminate\Support\Facades\Http;
 class AppServiceProvider extends ServiceProvider
 {
     private static function colorsToCssVars(array $colors): string
@@ -52,10 +52,13 @@ class AppServiceProvider extends ServiceProvider
     }
 
     public function boot(): void
+
     {
+
         if (filter_var(env('FORCE_HTTPS', false), FILTER_VALIDATE_BOOL)) {
             URL::forceScheme('https');
         }
+
 
         $locale = request()->route('locale')
             ?? (in_array(request()->segment(1), ['de', 'en', 'tr'], true) ? request()->segment(1) : null)

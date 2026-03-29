@@ -10,16 +10,49 @@ import {
     Compass,
 } from "lucide-react";
 import AppLayout from "@/Layouts/AppLayout";
-import { HOTEL_MAP } from "@/Data/HotelsData";
-import HOTELS from "@/Data/HotelsData";
 import { useTranslation } from "@/i18n";
 import "@/../css/hotel-detail.css";
 
-export default function HotelShow({ hotel }) {
+export default function HotelShow({ hotel: hotelId }) {
     const { props } = usePage();
-    const locale = props?.locale ?? "de";
     const { t } = useTranslation();
-    const data = HOTEL_MAP[hotel] ?? HOTELS[0];
+
+    // 1. Global hotels listesinden tıklanan oteli ID ile buluyoruz
+    const hotelList = props.global?.hotels || [];
+    const locale = props.global?.locale ?? "de";
+
+    // URL'den gelen ID string olabilir, bu yüzden == kullanarak buluyoruz
+    const data = hotelList.find((h) => h.id == hotelId);
+
+    // Eğer otel bulunamazsa (veya sayfa yenilenirken henüz yüklenmediyse)
+    if (!data) {
+        return (
+            <AppLayout currentRoute="rooms">
+                <div
+                    className="hd-wrap"
+                    style={{ padding: "100px", textAlign: "center" }}
+                >
+                    <h2>
+                        {t("hotelDetail.notFound") || "Hotel nicht gefunden"}
+                    </h2>
+                    <a href={`/${locale}/hotels`}>
+                        {t("hotelDetail.backToList") || "Zurück zur Liste"}
+                    </a>
+                </div>
+            </AppLayout>
+        );
+    }
+
+    // API'den gelmeyen ancak tasarımda olan listeler için güvenli fallbackler (varsayılanlar)
+    const highlights = data.roomHighlights || [
+        t("hotelDetail.defaultHighlight") || "Modernes Design",
+    ];
+    const amenities = data.services
+        ? data.services.split(",")
+        : data.amenities || ["WiFi", "TV", "Spa"];
+    const activities = data.activities || [
+        t("hotelDetail.defaultActivity") || "Wandern & Natur",
+    ];
 
     return (
         <AppLayout currentRoute="rooms">
@@ -28,9 +61,10 @@ export default function HotelShow({ hotel }) {
             <section className="hd-wrap" aria-labelledby="hotel-title">
                 <div className="hd-hero">
                     <div className="hd-hero-inner">
+                        {/* API'den gelen cover_image */}
                         <img
-                            src={data.image}
-                            alt=""
+                            src={data.cover_image}
+                            alt={data.name}
                             className="hd-hero-bg"
                             loading="lazy"
                             decoding="async"
@@ -38,7 +72,8 @@ export default function HotelShow({ hotel }) {
                         <div className="hd-hero-layout">
                             <div className="hd-hero-copy">
                                 <p className="hd-eyebrow">
-                                    {t("hotelDetail.eyebrow")} • Werrapark Resort
+                                    {t("hotelDetail.eyebrow")} • Werrapark
+                                    Resort
                                 </p>
                                 <h1 id="hotel-title" className="hd-title">
                                     {data.name}
@@ -47,7 +82,8 @@ export default function HotelShow({ hotel }) {
                                     <MapPin size={15} />
                                     {data.location}
                                 </p>
-                                <p className="hd-intro">{data.intro}</p>
+                                {/* API'den gelen description'ı buraya basıyoruz */}
+                                <p className="hd-intro">{data.description}</p>
 
                                 <div className="hd-rating">
                                     {[...Array(5)].map((_, i) => (
@@ -55,7 +91,7 @@ export default function HotelShow({ hotel }) {
                                             key={i}
                                             size={18}
                                             className={
-                                                i < data.rating
+                                                i < Math.floor(data.stars)
                                                     ? "hd-star active"
                                                     : "hd-star"
                                             }
@@ -65,10 +101,7 @@ export default function HotelShow({ hotel }) {
                                 </div>
                             </div>
 
-                            <div
-                                className="hd-hero-media"
-                                aria-hidden="true"
-                            >
+                            <div className="hd-hero-media" aria-hidden="true">
                                 <div className="hd-hero-img-wrap">
                                     <span className="hd-hero-grad" />
                                 </div>
@@ -84,7 +117,7 @@ export default function HotelShow({ hotel }) {
                                 {t("hotelDetail.roomHighlights")}
                             </h2>
                             <ul className="hd-list">
-                                {data.roomHighlights.map((item, i) => (
+                                {highlights.map((item, i) => (
                                     <li key={i}>
                                         <CheckCircle2 size={16} />
                                         <span>{item}</span>
@@ -99,9 +132,9 @@ export default function HotelShow({ hotel }) {
                                 {t("hotelDetail.amenities")}
                             </h2>
                             <div className="hd-chip-grid">
-                                {data.amenities.map((item, i) => (
+                                {amenities.map((item, i) => (
                                     <span className="hd-chip" key={i}>
-                                        {item}
+                                        {item.trim()}
                                     </span>
                                 ))}
                             </div>
@@ -113,7 +146,7 @@ export default function HotelShow({ hotel }) {
                                 {t("hotelDetail.activities")}
                             </h2>
                             <ul className="hd-list">
-                                {data.activities.map((item, i) => (
+                                {activities.map((item, i) => (
                                     <li key={i}>
                                         <CheckCircle2 size={16} />
                                         <span>{item}</span>
@@ -123,7 +156,10 @@ export default function HotelShow({ hotel }) {
                         </div>
                     </article>
 
-                    <aside className="hd-aside" aria-label={t("hotelDetail.requestTitle")}>
+                    <aside
+                        className="hd-aside"
+                        aria-label={t("hotelDetail.requestTitle")}
+                    >
                         <div className="hd-aside-card">
                             <h2 className="hd-aside-title">
                                 {t("hotelDetail.requestTitle")}
@@ -149,7 +185,9 @@ export default function HotelShow({ hotel }) {
 
                             <p className="hd-ideal-for">
                                 <strong>{t("hotelDetail.idealFor")}</strong>{" "}
-                                {data.idealFor}
+                                {data.idealFor ||
+                                    t("hotelDetail.defaultIdeal") ||
+                                    "Familien & Paare"}
                             </p>
 
                             <div className="hd-actions">
@@ -160,7 +198,7 @@ export default function HotelShow({ hotel }) {
                                     {t("hotelDetail.contactBtn")}
                                 </a>
                                 <a
-                                    href="/"
+                                    href={`/${locale}`}
                                     className="hd-btn hd-btn--ghost"
                                 >
                                     {t("hotelDetail.homeBtn")}

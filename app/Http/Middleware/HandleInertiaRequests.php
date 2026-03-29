@@ -15,6 +15,7 @@ use App\Services\StaffService;
 use App\Services\ReviewsService;
 use App\Services\ContactFormsService;
 use App\Services\SliderService;
+use App\Services\HotelService; // 1. Servisi buraya import ettik
 
 class HandleInertiaRequests extends Middleware
 {
@@ -30,6 +31,7 @@ class HandleInertiaRequests extends Middleware
         private ReviewsService $reviewsService,
         private ContactFormsService $contactFormsService,
         private SliderService $sliderService,
+        private HotelService $hotelService, // 2. Constructor'a inject ettik
     ) {}
 
     public function version(Request $request): ?string
@@ -55,6 +57,8 @@ class HandleInertiaRequests extends Middleware
                 'apiHealth' => $health,
                 'websites'  => $apiUp ? $this->globalWebsiteService->getWebsites($locale) : [],
                 'menu'      => $apiUp ? $this->menuService->getMenu($locale) : [],
+                // 3. Otelleri buraya ekledik
+                'hotels'    => $apiUp ? $this->hotelService->getHotels() : [],
                 'widgets'   => $apiUp ? $this->widgetService->getWidgets($locale) : [
                     'ratings' => [],
                     'whatsapp' => [],
@@ -71,10 +75,10 @@ class HandleInertiaRequests extends Middleware
                     'analytics'   => [],
                     'custom_code' => [],
                 ],
-                'staff'    => $apiUp ? $this->staffService->getStaff($locale) : [],
+                'staff'        => $apiUp ? $this->staffService->getStaff($locale) : [],
                 'reviews'      => $apiUp ? $this->reviewsService->getReviews($locale) : [],
                 'contactForms' => $apiUp ? $this->contactFormsService->getContactForms($locale) : [],
-                'slider'      => $apiUp ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale) : null,
+                'slider'       => $apiUp ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale) : null,
             ],
 
             'ziggy' => fn() => array_merge(
