@@ -450,8 +450,6 @@ html[data-theme="dark"] .tt3-btn--ghost {
     }
 }
 
-/* ---- Scroll-reveal animasyonları ---- */
-
 .tt3-hidden .tt3-head-text {
     opacity: 0;
     transform: translateY(32px);

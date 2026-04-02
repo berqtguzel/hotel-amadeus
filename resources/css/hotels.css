@@ -179,11 +179,11 @@
     justify-content: center;
     gap: 4px;
 }
-.star {
+.hotel-star-empty {
     color: #94a3b8;
     transition: color 0.2s ease;
 }
-.star.active {
+.hotel-star-filled {
     color: var(--hotel-green-light);
 }
 

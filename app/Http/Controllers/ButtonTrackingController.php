@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 class ButtonTrackingController extends Controller
 {
@@ -17,33 +16,36 @@ class ButtonTrackingController extends Controller
 
     public function track(Request $request): JsonResponse
     {
-        $payload = [
-            'button_id' => $request->input('button_id'),
-            'button_label' => $request->input('button_label'),
-            'button_name' => $request->input('button_name'),
-            'page' => $request->input('page'),
-            'metadata' => $request->input('metadata', []),
-        ];
+        $validated = $request->validate([
+            'event' => 'nullable|string|max:255',
+            'button_id' => 'nullable|string|max:255',
+            'button_label' => 'nullable|string|max:255',
+            'button_name' => 'nullable|string|max:255',
+            'page' => 'nullable|string',
+            'url' => 'nullable|string',
+            'metadata' => 'nullable|array',
+        ]);
 
-        $payload = array_filter($payload, fn ($v) => $v !== null && $v !== '');
+        $payload = array_filter($validated, fn ($v) => $v !== null && $v !== '');
+
+        Log::info('TRACKING RECEIVED', $payload);
 
         $ok = $this->tracking->track($payload);
 
-        return response()->json(['success' => $ok]);
+        return response()->json([
+            'success' => $ok,
+        ]);
     }
 
-    /**
-     * Track buton tıklaması ve redirect. JS kullanılmadan server-side tracking.
-     */
     public function trackAndRedirect(Request $request): RedirectResponse|JsonResponse
     {
-        $valid = Validator::make($request->query(), [
+        $validated = $request->validate([
             'redirect' => 'required|string',
             'button_id' => 'nullable|string|max:255',
             'button_label' => 'nullable|string|max:255',
-        ])->valid();
+        ]);
 
-        $redirect = $valid['redirect'];
+        $redirect = $validated['redirect'];
 
         if (str_starts_with($redirect, '/')) {
             $target = url($redirect);
@@ -54,16 +56,17 @@ class ButtonTrackingController extends Controller
         }
 
         $payload = [
-            'button_id' => $valid['button_id'] ?? null,
-            'button_label' => $valid['button_label'] ?? null,
-            'page' => $request->header('Referer') ?? $request->fullUrl(),
+            'event' => 'redirect_click',
+            'button_id' => $validated['button_id'] ?? null,
+            'button_label' => $validated['button_label'] ?? null,
+            'page' => $request->header('referer') ?? $request->fullUrl(),
         ];
+
         $payload = array_filter($payload, fn ($v) => $v !== null && $v !== '');
 
-        if (!empty($payload)) {
-            $this->tracking->track($payload);
-            Log::info('[ButtonTracking] Tracked', ['payload' => $payload, 'redirect' => $target]);
-        }
+        Log::info('TRACK + REDIRECT', $payload);
+
+        $this->tracking->track($payload);
 
         return redirect()->away($target);
     }

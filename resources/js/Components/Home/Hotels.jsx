@@ -42,88 +42,92 @@ export default function Hotels() {
                     {orderedHotels.length > 0 ? (
                         orderedHotels.map((hotel) => {
                             const hotelSlug =
-                                hotel.slug || slugifyHotel(hotel.name) || hotel.id;
+                                hotel.slug ||
+                                slugifyHotel(hotel.name) ||
+                                hotel.id;
 
                             return (
-                            <ElectricBorder
-                                key={hotel.slug || hotel.id || hotel.name}
-                                color={"var(--hotel-green)"}
-                                secondaryColor={"var(--hotel-green-light)"}
-                                borderRadius={16}
-                                borderWidth={2}
-                                glow={0.28}
-                                speed={1.0}
-                                hoverIntensity={1.0}
-                                className="hotel-eb"
-                            >
-                                <div
-                                    className="hotel-card eb-reset"
-                                    role="article"
-                                    aria-label={hotel.name}
+                                <ElectricBorder
+                                    key={hotel.slug || hotel.id || hotel.name}
+                                    color={"var(--hotel-green)"}
+                                    secondaryColor={"var(--hotel-green-light)"}
+                                    borderRadius={16}
+                                    borderWidth={2}
+                                    glow={0.28}
+                                    speed={1.0}
+                                    hoverIntensity={1.0}
+                                    className="hotel-eb"
                                 >
-                                    <div className="hotel-image">
-                                        <img
-                                            src={hotel.cover_image}
-                                            alt={hotel.name}
-                                            loading="lazy"
-                                        />
-                                    </div>
-
-                                    <div className="hotel-body">
-                                        <h3>{hotel.name}</h3>
-
-                                        <div className="hotel-rating">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star
-                                                    key={i}
-                                                    size={18}
-                                                    className={
-                                                        i <
-                                                        Math.floor(hotel.stars)
-                                                            ? "star active"
-                                                            : "star"
-                                                    }
-                                                    aria-hidden
-                                                />
-                                            ))}
+                                    <div
+                                        className="hotel-card eb-reset"
+                                        role="article"
+                                        aria-label={hotel.name}
+                                    >
+                                        <div className="hotel-image">
+                                            <img
+                                                src={hotel.cover_image}
+                                                alt={hotel.name}
+                                                loading="lazy"
+                                            />
                                         </div>
 
-                                        <div className="hotel-contact">
-                                            {hotel.email && (
-                                                <a
-                                                    href={`mailto:${hotel.email}`}
-                                                    className="hotel-link"
-                                                    onClick={(e) =>
-                                                        e.stopPropagation()
-                                                    }
-                                                >
-                                                    <Mail size={16} />{" "}
-                                                    {hotel.email}
-                                                </a>
-                                            )}
-                                            {hotel.phone && (
-                                                <a
-                                                    href={`tel:${hotel.phone}`}
-                                                    className="hotel-link"
-                                                    onClick={(e) =>
-                                                        e.stopPropagation()
-                                                    }
-                                                >
-                                                    <Phone size={16} />{" "}
-                                                    {hotel.phone}
-                                                </a>
-                                            )}
-                                        </div>
+                                        <div className="hotel-body">
+                                            <h3>{hotel.name}</h3>
 
-                                        <Link
-                                            className="hotel-detail-btn"
-                                            href={`/${locale}/hotels/${hotelSlug}`}
-                                        >
-                                            {t("hotels.cta")}
-                                        </Link>
+                                            <div className="hotel-rating">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        size={18}
+                                                        className={
+                                                            i <
+                                                            Math.floor(
+                                                                hotel.stars,
+                                                            )
+                                                                ? "hotel-star-filled "
+                                                                : "hotel-star-empty"
+                                                        }
+                                                        aria-hidden
+                                                    />
+                                                ))}
+                                            </div>
+
+                                            <div className="hotel-contact">
+                                                {hotel.email && (
+                                                    <a
+                                                        href={`mailto:${hotel.email}`}
+                                                        className="hotel-link"
+                                                        onClick={(e) =>
+                                                            e.stopPropagation()
+                                                        }
+                                                    >
+                                                        <Mail size={16} />{" "}
+                                                        {hotel.email}
+                                                    </a>
+                                                )}
+                                                {hotel.phone && (
+                                                    <a
+                                                        href={`tel:${hotel.phone}`}
+                                                        className="hotel-link"
+                                                        onClick={(e) =>
+                                                            e.stopPropagation()
+                                                        }
+                                                    >
+                                                        <Phone size={16} />{" "}
+                                                        {hotel.phone}
+                                                    </a>
+                                                )}
+                                            </div>
+
+                                            <Link
+                                                className="hotel-detail-btn"
+                                                href={`/${locale}/hotels/${hotelSlug}`}
+                                            >
+                                                {t("hotels.cta")}
+                                            </Link>
+                                        </div>
                                     </div>
-                                </div>
-                            </ElectricBorder>
+                                </ElectricBorder>
                             );
                         })
                     ) : (

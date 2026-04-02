@@ -2,6 +2,7 @@
     "hotels.title": "Otellerimiz",
     "hotels.subtitle": "Thüringen Ormanı'ndaki otellerimizi keşfedin – konforlu, doğayla iç içe ve samimi bir misafirperverlik anlayışıyla.",
     "hotels.cta": "Otele Git",
+
     "rooms.eyebrow": "Konaklama",
     "rooms.title": "En İyi Odalarımız",
     "rooms.intro": "Özel otelimizde size konfor ve tasarımı birleştiren unutulmaz bir deneyim sunuyoruz. Modern tasarımlı odalarımızda rahatlayın.",
@@ -12,11 +13,13 @@
     "rooms.priceLabel": "Fiyat",
     "rooms.emptyTitle": "Odalar Hazırlanıyor",
     "rooms.emptyText": "Oda verileri hazır olduğunda, API üzerinden burada otomatik olarak görünecektir.",
+
     "team.heading": "Ekibimiz",
     "team.subtitle": "Konaklamanızı özel kılan insanlarla tanışın.",
     "team.call": "Ara",
     "team.email": "E-Posta",
     "team.web": "Web",
+
     "themes.eyebrow": "İmkanlar & Daha Fazlası",
     "themes.title": "Tatil Temaları",
     "themes.description": "Günlük stresinizi geride bırakıp Thüringen Ormanı'nda rahatlamak ister misiniz? Temiz hava ve hareket hayranı olarak el değmemiş doğayı ve çeşitli aktiviteleri takdir ediyor musunuz? Tatil temanızı seçin – gerisini biz hallederiz.",
@@ -24,11 +27,13 @@
     "themes.bestPrice": "En İyi Fiyat Garantisi",
     "themes.readMore": "Daha fazla oku",
     "themes.discover": "Keşfet",
+
     "offers.eyebrow": "Özel Teklifler",
     "offers.title": "Kampanyalar Hakkında Bilgi",
     "offers.subtitle": "Sizin için seçtiğimiz paketler ve sezonluk fırsatlar. Detayları kartlardan inceleyebilirsiniz.",
     "offers.viewDetails": "Detayları Gör",
     "offers.addFavorite": "Favorilere Ekle",
+
     "videoPromo.eyebrow": "Video",
     "videoPromo.title": "Tanıtım Videomuzu İzleyin",
     "videoPromo.subtitle": "Werrapark Resort'un atmosferine, doğasına ve deneyimlerine kısa bir bakış.",
@@ -37,6 +42,7 @@
     "videoPromo.playAria": "Videoyu oynat",
     "videoPromo.meta": "Werrapark Resort Filmi",
     "videoPromo.cta": "Şimdi İzle",
+
     "about.pageTitle": "Hakkımızda – Werrapark",
     "about.heroTitle": "Hakkımızda",
     "about.heroSubtitle": "Thüringen Ormanı'nın kalbinde doğayla bağ kuran, misafir odaklı bir deneyim sunuyoruz.",
@@ -67,6 +73,7 @@
     "about.ctaTitle": "Sizi ağırlamaktan mutluluk duyacağız",
     "about.ctaText": "Sorularınız için bizimle iletişime geçin – ekibimiz size yardımcı olmaktan mutluluk duyacaktır.",
     "about.ctaButton": "İletişime Geç",
+
     "offerDetail.eyebrow": "Teklif",
     "offerDetail.intro": "Bu teklifin detaylarını keşfedin; Thüringen Ormanı'nda doğayı, konforu ve lezzetli anları birleştirin.",
     "offerDetail.limitedBadge": "Sınırlı Kontenjan",
@@ -79,6 +86,7 @@
     "offerDetail.priceText": "Bize tercih ettiğiniz tarihleri gönderin – uygunluğu kontrol edip size özel bir teklif hazırlayalım.",
     "offerDetail.requestBtn": "Teklif İste",
     "offerDetail.moreOffersBtn": "Diğer Teklifler",
+
     "roomDetail.eyebrow": "Özel Oda",
     "roomDetail.pageTitle": "{{name}} - Oda & Detaylar",
     "roomDetail.idealFor": "İdeal:",
@@ -129,6 +137,7 @@
     "roomDetail.prevImage": "Önceki Resim",
     "roomDetail.nextImage": "Sonraki Resim",
     "roomDetail.imageN": "Resim {{n}}",
+
     "hotelDetail.eyebrow": "Otellerimiz",
     "hotelDetail.descriptionTitle": "Otel Hakkında",
     "hotelDetail.roomHighlights": "Oda Özellikleri",
@@ -140,6 +149,7 @@
     "hotelDetail.contactBtn": "İletişime Geç",
     "hotelDetail.websiteBtn": "Web Sitesini Ziyaret Et",
     "hotelDetail.homeBtn": "Ana Sayfaya Dön",
+
     "reviews.sectionAria": "Otel Değerlendirmeleri",
     "reviews.eyebrow": "Misafir Yorumları",
     "reviews.title": "Misafirlerimiz Bizim Hakkımızda Ne Diyor?",
@@ -169,6 +179,7 @@
     "reviews.labelMessage": "Yorumunuz",
     "reviews.placeholderMessage": "Deneyiminizi detaylı şekilde yazabilirsiniz...",
     "reviews.btnSubmit": "Yorumu Gönder",
+
     "contact.title": "İletişim",
     "contact.subtitle": "Bize istediğiniz kanaldan ulaşabilirsiniz. Mesajınızı bekliyoruz.",
     "contact.executives": "Yönetim Ekibi",
@@ -192,14 +203,17 @@
     "contact.error": "Gönderim sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
     "contact.validationRequired": "{{field}} alanı zorunludur.",
     "contact.validationEmail": "Lütfen geçerli bir e-posta adresi girin.",
+
     "map.eyebrow": "Konum",
     "map.title": "Werrapark Resort - Almanya'nın Kalbinde",
     "map.subtitle": "Bizi el değmemiş doğayla çevrili Thüringen Ormanı'nın kalbinde keşfedin.",
     "map.markerTitle": "Werrapark Resort",
     "map.loading": "Harita yükleniyor...",
     "map.openMap": "Google Haritalar'da Aç",
+
     "loader.brand": "Werrapark",
     "loader.loading": "Yükleniyor",
+
     "giftVoucher.pageTitle": "Hediye Çeki",
     "giftVoucher.landingKicker": "Werrapark Hediye Fikirleri",
     "giftVoucher.checkoutKicker": "Güvenli Ödeme",
@@ -230,7 +244,7 @@
     "giftVoucher.oneTime": "Tek seferlik",
     "giftVoucher.customAmount": "İstenen Tutar",
     "giftVoucher.customPlaceholder": "Örn: 150",
-    "giftVoucher.customRange": "En az 10 EUR, en fazla 500 EUR",
+    "giftVoucher.customRange": "En az 100 EUR, en fazla 500 EUR",
     "giftVoucher.cardTag": "Werrapark Hediye Çeki",
     "giftVoucher.cardTitle": "Dinlenme Zamanı",
     "giftVoucher.cardSubtitle": "Thüringen Ormanı'nda konaklamalar, lezzet anları ve küçük molalar için şık bir hediye çeki.",
@@ -307,10 +321,12 @@
     "giftVoucherPromo.benefit3": "Özel günler için mükemmel",
     "giftVoucherPromo.cardTitle": "Hediye Çeki",
     "giftVoucherPromo.cardAmount": "10-500 EUR",
+
     "cookie.title": "Çerez Ayarları",
     "cookie.text": "İşletim için gerekli çerezleri kullanıyoruz. İsteğe bağlı çerezler, analiz ve WhatsApp iletişimini etkinleştirir.",
     "cookie.acceptAll": "Hepsini Kabul Et",
     "cookie.essentialOnly": "Sadece Gerekli Olanlar",
+
     "whatsapp.heading": "WhatsApp Destek",
     "whatsapp.text": "Bize doğrudan yazın – size en kısa sürede dönüş yapacağız.",
     "whatsapp.startChat": "Sohbeti Başlat",

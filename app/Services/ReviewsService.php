@@ -10,6 +10,8 @@ use Throwable;
 class ReviewsService
 {
     private const CACHE_KEY_PREFIX = 'omr_reviews_';
+    private const CRITERIA_LIST_CACHE_KEY = 'omr_review_criteria_list';
+    private const CRITERIA_MAP_CACHE_KEY  = 'omr_review_criteria_map';
 
     /**
      * Önbellekten veya API'den yorumları getirir.
@@ -25,55 +27,92 @@ class ReviewsService
     }
 
     /**
-     * Yeni bir yorum oluşturur (POST).
+     * Criteria listesini getirir.
      */
-public function createReview(array $data): array
+ public function getCriteriaList(): array
 {
-    $base = rtrim(config('omr.base_url'), '/');
+    return Cache::remember('review_criteria_list', now()->addHours(6), function () {
 
-    $endpoint = rtrim(config('omr.endpoint'), '/');
+        $url = config('omr.base_url') . config('omr.endpoint') . '/criteria';
 
-    $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
+        try {
+            $res = Http::withHeaders([
+                'X-Tenant-ID' => config('omr.tenant_id')
+            ])->get($url);
 
-    if (!$tenant || !$base) {
-        return ['error' => 'Config missing'];
-    }
-    $url = "{$base}{$endpoint}/reviews";
+            return $res->json()['data'] ?? [];
 
-    try {
-        $response = Http::timeout(10)
-            ->withHeaders([
-                'X-Tenant-ID' => $tenant,
-                'Accept'      => 'application/json',
-            ])
-            ->post($url, [
-                'author_name'  => $data['author_name'] ?? '',
-                'author_email' => $data['author_email'] ?? '',
-                'review_text'  => $data['content'] ?? '',
-                'rating'       => $data['rating'] ?? 5,
-                'stay_date'    => now()->format('Y-m-d'),
-            ]);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    });
+}
 
-        if (!$response->successful()) {
-            return [
-                'error'   => 'API_REJECTED',
-                'details' => $response->json()
-            ];
+public function getCriteriaMap(): array
+{
+    return collect($this->getCriteriaList())
+        ->pluck('id', 'name')
+        ->toArray();
+}
+
+    /**
+     * Yeni yorum oluşturur.
+     */
+    public function createReview(array $data): array
+    {
+        $base     = rtrim(config('omr.base_url'), '/');
+        $endpoint = rtrim(config('omr.endpoint'), '/');
+        $tenant   = config('omr.main_tenant') ?: config('omr.tenant_id');
+
+        if (!$tenant || !$base) {
+            return ['error' => 'Config missing'];
         }
 
-        $this->clearCache();
-        return $response->json();
+        $url = "{$base}{$endpoint}/reviews";
 
-    } catch (\Throwable $e) {
-        return ['error' => 'EXCEPTION', 'message' => $e->getMessage()];
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'X-Tenant-ID' => $tenant,
+                    'Accept'      => 'application/json',
+                ])
+                ->post($url, [
+                    'author_name'  => $data['author_name'] ?? '',
+                    'author_email' => $data['author_email'] ?? '',
+                    'review_text'  => $data['content'] ?? '',
+                    'rating'       => $data['rating'] ?? 5,
+                    'ratings'      => $data['ratings'] ?? [],
+                    'stay_date'    => now()->format('Y-m-d'),
+                ]);
+
+            if (!$response->successful()) {
+                return [
+                    'error'   => 'API_REJECTED',
+                    'details' => $response->json(),
+                ];
+            }
+
+            $this->clearCache();
+
+            return $response->json();
+        } catch (Throwable $e) {
+            return [
+                'error'   => 'EXCEPTION',
+                'message' => $e->getMessage(),
+            ];
+        }
     }
-}
+
     public function clearCache(): void
     {
         foreach (['de', 'en', 'tr'] as $locale) {
             Cache::forget($this->cacheKey($locale));
         }
+
+        Cache::forget(self::CRITERIA_LIST_CACHE_KEY);
+        Cache::forget(self::CRITERIA_MAP_CACHE_KEY);
     }
+
     private function fetch(string $locale): array
     {
         $base     = rtrim(config('omr.base_url'), '/');
@@ -88,7 +127,10 @@ public function createReview(array $data): array
 
         try {
             $response = Http::timeout(10)
-                ->withHeaders(['X-Tenant-ID' => $tenant])
+                ->withHeaders([
+                    'X-Tenant-ID' => $tenant,
+                    'Accept'      => 'application/json',
+                ])
                 ->get($url, [
                     'locale' => $locale,
                     'lang'   => $locale,
@@ -111,7 +153,6 @@ public function createReview(array $data): array
             }
 
             return $this->normalizeReviews($data, $locale);
-
         } catch (Throwable $e) {
             Log::debug('Reviews API error', ['error' => $e->getMessage()]);
             return [];
@@ -123,23 +164,24 @@ public function createReview(array $data): array
         $out = [];
 
         foreach ($data as $item) {
-            if (!is_array($item)) continue;
+            if (!is_array($item)) {
+                continue;
+            }
 
             $attrs = $item['attributes'] ?? $item;
 
-
-            if (isset($attrs['status']) && $attrs['status'] !== 'approved') {
+            if (isset($attrs['status']) && !in_array($attrs['status'], ['approved', 'active'], true)) {
                 continue;
             }
 
             $ratingRaw = $attrs['rating'] ?? $attrs['stars'] ?? 5;
-            $rating = is_numeric($ratingRaw) ? (float)$ratingRaw : 5.0;
+            $rating = is_numeric($ratingRaw) ? (float) $ratingRaw : 5.0;
 
             if ($rating > 5) {
                 $rating = round($rating / 2, 1);
             }
-            $rating = max(1, min(5, (int) round($rating)));
 
+            $rating = max(1, min(5, (int) round($rating)));
 
             $stayDate = $attrs['stay_date'] ?? $attrs['stay'] ?? $attrs['period'] ?? null;
             $stayFormatted = $stayDate ? $this->formatStayDate($stayDate, $locale) : '';
@@ -151,6 +193,7 @@ public function createReview(array $data): array
                 'rating'   => $rating,
                 'text'     => $attrs['content'] ?? $attrs['comment'] ?? '',
                 'stay'     => $stayFormatted,
+                'ratings'  => $attrs['ratings'] ?? [],
             ];
         }
 
@@ -161,6 +204,7 @@ public function createReview(array $data): array
     {
         try {
             $dt = new \DateTimeImmutable($date);
+
             $formatter = new \IntlDateFormatter(
                 $locale === 'de' ? 'de_DE' : ($locale === 'tr' ? 'tr_TR' : 'en_US'),
                 \IntlDateFormatter::MEDIUM,
@@ -179,6 +223,7 @@ public function createReview(array $data): array
     private function cacheKey(string $locale): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
         return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

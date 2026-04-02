@@ -1,7 +1,8 @@
 import React from "react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { useTranslation } from "@/i18n";
-import { usePage } from "@inertiajs/react";
+import { useEffect } from "react";
+
 function getNumberLocale(locale) {
     if (locale === "tr") return "tr-TR";
     if (locale === "en") return "en-GB";
@@ -20,10 +21,9 @@ export default function GiftVoucherForm({
     companies = [],
     defaultCompanyId = null,
 }) {
-    const { coupons } = usePage().props;
-
-    console.log(coupons);
+    const { coupons, url } = usePage().props;
     const { t } = useTranslation();
+
     const presetAmounts = [100, 200, 300, 400, 500];
     const [selectedAmount, setSelectedAmount] = React.useState(100);
     const [useCustom, setUseCustom] = React.useState(false);
@@ -38,13 +38,17 @@ export default function GiftVoucherForm({
     const [submitting, setSubmitting] = React.useState(false);
     const [submitError, setSubmitError] = React.useState("");
 
+    const API = "https://omerdogan.de/api/v1/button-tracking/track";
+
     const parsedCustom = Number(customAmount);
     const customValue = Number.isFinite(parsedCustom)
         ? Math.min(500, Math.max(10, parsedCustom))
         : 0;
+
     const amount = useCustom ? customValue || 10 : selectedAmount;
     const total = amount * Math.max(1, quantity);
     const back = backHref ?? `/${locale}/gutschein`;
+
     const money = new Intl.NumberFormat(getNumberLocale(locale), {
         style: "currency",
         currency: "EUR",
@@ -55,6 +59,7 @@ export default function GiftVoucherForm({
         (payload) => {
             const invoice = payload?.invoice ?? null;
             const created = payload?.data ?? null;
+
             const invoiceRef =
                 invoice?.id ??
                 created?.id ??
@@ -84,10 +89,12 @@ export default function GiftVoucherForm({
             }
 
             const fieldErrors = payload.errors;
+
             if (fieldErrors && typeof fieldErrors === "object") {
                 const firstEntry = Object.values(fieldErrors).find(
                     (entry) => Array.isArray(entry) && entry[0],
                 );
+
                 if (Array.isArray(firstEntry) && firstEntry[0]) {
                     return String(firstEntry[0]);
                 }
@@ -101,6 +108,51 @@ export default function GiftVoucherForm({
         },
         [t],
     );
+    const getSessionId = () => {
+        let sessionId = localStorage.getItem("tracking_session_id");
+
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            localStorage.setItem("tracking_session_id", sessionId);
+        }
+
+        return sessionId;
+    };
+
+    const sendTracking = React.useCallback((payload) => {
+        fetch("https://omerdogan.de/api/v1/button-tracking/track", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Tenant-ID": "test_werraparkde_69b90f95bde60",
+            },
+            body: JSON.stringify({
+                button_key: payload.button || payload.button_id || "unknown",
+                session_id: getSessionId(), // 💥 KRİTİK
+                variant: payload.variant || "default",
+                page: window.location.href,
+                metadata: payload.metadata || {},
+            }),
+        })
+            .then((res) => res.json().catch(() => ({})))
+            .then((data) => {
+                console.log("✅ TRACKING RESPONSE:", data);
+            })
+            .catch((err) => {
+                console.error("❌ TRACKING ERROR:", err);
+            });
+    }, []);
+    useEffect(() => {
+        sendTracking({
+            button: "page_view",
+            variant: "default",
+            metadata: {
+                url,
+                locale,
+                payment_method: paymentMethod,
+            },
+        });
+    }, [url]);
 
     const handleSubmit = async () => {
         if (!paymentReady || submitting) {
@@ -110,6 +162,16 @@ export default function GiftVoucherForm({
         const cleanName = recipientName.trim();
         const cleanEmail = recipientEmail.trim();
         const numericCompanyId = Number(companyId);
+
+        sendTracking({
+            button: "gift-voucher-submit",
+            variant: "default",
+            metadata: {
+                amount,
+                quantity,
+                payment_method: paymentMethod,
+            },
+        });
 
         if (!cleanName) {
             setSubmitError(t("giftVoucher.validationName"));
@@ -161,6 +223,7 @@ export default function GiftVoucherForm({
             if (!response.ok) {
                 throw new Error(resolveErrorMessage(payload));
             }
+
             const invoiceHref = buildInvoiceHref(payload);
 
             if (!invoiceHref) {
@@ -179,6 +242,7 @@ export default function GiftVoucherForm({
             setSubmitting(false);
         }
     };
+
     const actionClassName = `gvf-pay-btn ${submitVariant}`.trim();
 
     return (
@@ -188,6 +252,7 @@ export default function GiftVoucherForm({
                     <Link href={back} className="gvf-back">
                         ← {t("giftVoucher.backToMethods")}
                     </Link>
+
                     <header className="gvf-head gvf-head--checkout">
                         <span className="gvf-kicker">
                             {t("giftVoucher.checkoutKicker")}
@@ -214,6 +279,7 @@ export default function GiftVoucherForm({
                             {presetAmounts.map((value) => {
                                 const active =
                                     !useCustom && selectedAmount === value;
+
                                 return (
                                     <button
                                         key={value}
@@ -222,6 +288,21 @@ export default function GiftVoucherForm({
                                         onClick={() => {
                                             setUseCustom(false);
                                             setSelectedAmount(value);
+
+                                            sendTracking({
+                                                event: "button_click",
+                                                button_id: `gift-voucher-amount-${value}`,
+                                                button_label: `${value} EUR`,
+                                                button_name:
+                                                    "gift_voucher_amount_select",
+                                                page: window.location.href,
+                                                metadata: {
+                                                    locale,
+                                                    amount: value,
+                                                    payment_method:
+                                                        paymentMethod,
+                                                },
+                                            });
                                         }}
                                     >
                                         <span className="gvf-radio" />
@@ -236,13 +317,41 @@ export default function GiftVoucherForm({
 
                         <div
                             className={`gvf-custom ${useCustom ? "is-active" : ""}`}
-                            onClick={() => setUseCustom(true)}
+                            onClick={() => {
+                                setUseCustom(true);
+
+                                sendTracking({
+                                    event: "button_click",
+                                    button_id: "gift-voucher-custom-amount",
+                                    button_label: "Custom Amount",
+                                    button_name: "gift_voucher_custom_amount",
+                                    page: window.location.href,
+                                    metadata: {
+                                        locale,
+                                        payment_method: paymentMethod,
+                                    },
+                                });
+                            }}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) =>
-                                (e.key === "Enter" || e.key === " ") &&
-                                setUseCustom(true)
-                            }
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    setUseCustom(true);
+
+                                    sendTracking({
+                                        event: "button_click",
+                                        button_id: "gift-voucher-custom-amount",
+                                        button_label: "Custom Amount",
+                                        button_name:
+                                            "gift_voucher_custom_amount",
+                                        page: window.location.href,
+                                        metadata: {
+                                            locale,
+                                            payment_method: paymentMethod,
+                                        },
+                                    });
+                                }
+                            }}
                         >
                             <span className="gvf-radio" />
                             <div className="gvf-custom-body">
@@ -251,7 +360,7 @@ export default function GiftVoucherForm({
                                     <span>EUR</span>
                                     <input
                                         type="number"
-                                        min={10}
+                                        min={100}
                                         max={500}
                                         placeholder={t(
                                             "giftVoucher.customPlaceholder",
@@ -287,6 +396,7 @@ export default function GiftVoucherForm({
                         <h2>{t("giftVoucher.recipientInfo")}</h2>
                         <p>{t("giftVoucher.recipientHint")}</p>
                     </div>
+
                     <div className="gvf-form-row">
                         <label>
                             {t("giftVoucher.recipientName")}
@@ -301,6 +411,7 @@ export default function GiftVoucherForm({
                                 }
                             />
                         </label>
+
                         <label>
                             {t("giftVoucher.recipientEmail")}
                             <input
@@ -315,6 +426,7 @@ export default function GiftVoucherForm({
                             />
                         </label>
                     </div>
+
                     <label className="gvf-full">
                         {t("giftVoucher.messageLabel")}
                         <textarea
@@ -331,6 +443,7 @@ export default function GiftVoucherForm({
                         <h2>{t("giftVoucher.summaryTitle")}</h2>
                         <p>{t("giftVoucher.summaryHint")}</p>
                     </div>
+
                     <div className="gvf-summary-grid">
                         {companies.length > 1 ? (
                             <label>
@@ -352,6 +465,7 @@ export default function GiftVoucherForm({
                                 </select>
                             </label>
                         ) : null}
+
                         <label>
                             {t("giftVoucher.quantity")}
                             <input
@@ -363,6 +477,7 @@ export default function GiftVoucherForm({
                                 }
                             />
                         </label>
+
                         <label>
                             {t("giftVoucher.selectedAmount")}
                             <input
@@ -371,6 +486,7 @@ export default function GiftVoucherForm({
                                 readOnly
                             />
                         </label>
+
                         <label>
                             {t("giftVoucher.total")}
                             <input
@@ -390,6 +506,7 @@ export default function GiftVoucherForm({
                             <span>{t("giftVoucher.total")}</span>
                             <strong>{money.format(total)}</strong>
                         </div>
+
                         <button
                             type="button"
                             className={actionClassName}
@@ -414,6 +531,26 @@ export default function GiftVoucherForm({
                         </div>
                     ) : null}
                 </section>
+
+                {Array.isArray(coupons) && coupons.length > 0 ? (
+                    <section className="gvf-section">
+                        <div className="gvf-section-head">
+                            <h2>{t("giftVoucher.availableCoupons")}</h2>
+                        </div>
+
+                        <div className="gvf-summary-grid">
+                            {coupons.map((coupon, index) => (
+                                <div key={coupon?.id ?? index}>
+                                    <strong>
+                                        {coupon?.title ??
+                                            coupon?.name ??
+                                            `Coupon ${index + 1}`}
+                                    </strong>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                ) : null}
             </div>
         </section>
     );

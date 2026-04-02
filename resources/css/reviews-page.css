@@ -40,10 +40,6 @@ body {
     padding: 0;
 }
 
-/* =========================================================
-   PAGE WRAPPER
-   ========================================================= */
-
 .review-page {
     position: relative;
     overflow: hidden;
@@ -73,10 +69,6 @@ body {
     gap: 40px;
     align-items: stretch;
 }
-
-/* =========================================================
-   DECORATIVE BACKGROUND
-   ========================================================= */
 
 .review-bg-shape {
     position: absolute;
@@ -120,10 +112,6 @@ body {
     z-index: 0;
     pointer-events: none;
 }
-
-/* =========================================================
-   LEFT HERO
-   ========================================================= */
 
 .review-hero {
     position: relative;
@@ -195,10 +183,6 @@ body {
     font-size: 0.98rem;
     line-height: 1.5;
 }
-
-/* =========================================================
-   FORM CARD
-   ========================================================= */
 
 .review-card {
     position: relative;
@@ -292,10 +276,6 @@ body {
     font-weight: 800;
 }
 
-/* =========================================================
-   FORM
-   ========================================================= */
-
 .review-form {
     display: flex;
     flex-direction: column;
@@ -360,10 +340,6 @@ body {
     transform: translateY(-1px);
 }
 
-/* =========================================================
-   RATING PANEL
-   ========================================================= */
-
 .rating-panel {
     display: flex;
     align-items: center;
@@ -404,8 +380,8 @@ body {
 }
 
 .star {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border: none;
     border-radius: 18px;
     cursor: pointer;
@@ -428,10 +404,6 @@ body {
     color: var(--site-footer-background-color);
     background: linear-gradient(180deg, #ffffff 0%, #adfac7 100%);
 }
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
 
 .review-actions {
     display: flex;
@@ -478,10 +450,6 @@ body {
     pointer-events: none;
 }
 
-/* =========================================================
-   STATUS MESSAGE
-   ========================================================= */
-
 .status-msg {
     border-radius: 18px;
     padding: 18px 20px;
@@ -503,10 +471,6 @@ body {
     border-color: rgba(239, 68, 68, 0.2);
 }
 
-/* =========================================================
-   SPINNER
-   ========================================================= */
-
 .spinner {
     width: 20px;
     height: 20px;
@@ -521,10 +485,6 @@ body {
         transform: rotate(360deg);
     }
 }
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
 
 @media (max-width: 1200px) {
     .review-container {

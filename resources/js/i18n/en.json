@@ -2,6 +2,7 @@
     "hotels.title": "Our Hotels",
     "hotels.subtitle": "Discover our properties in the Thuringian Forest – comfortable, close to nature, and with warm hospitality.",
     "hotels.cta": "To Hotel",
+
     "rooms.eyebrow": "Accommodations",
     "rooms.title": "Our Best Rooms",
     "rooms.intro": "We offer you an unforgettable experience in our exclusive hotel – combined with comfort and design. Relax in modernly designed rooms.",
@@ -12,11 +13,13 @@
     "rooms.priceLabel": "Price",
     "rooms.emptyTitle": "Rooms are being prepared",
     "rooms.emptyText": "As soon as room data is available, it will appear here automatically from the API.",
+
     "team.heading": "Our Team",
     "team.subtitle": "Meet the people who make your stay special.",
     "team.call": "Call",
     "team.email": "Email",
     "team.web": "Web",
+
     "themes.eyebrow": "Facilities & More",
     "themes.title": "Holiday Themes",
     "themes.description": "Would you like to leave everyday stress behind and relax in the Thuringian Forest? As a fan of fresh air and activity, do you appreciate untouched nature and varied exercise options? Find your holiday theme – we take care of the rest.",
@@ -24,11 +27,13 @@
     "themes.bestPrice": "Best Price Booking",
     "themes.readMore": "Read more",
     "themes.discover": "Discover",
+
     "offers.eyebrow": "Special Offers",
     "offers.title": "Information on Offers",
     "offers.subtitle": "Packages and seasonal offers we have selected for you. You can check the details in the cards.",
     "offers.viewDetails": "View Details",
     "offers.addFavorite": "Add to Favorites",
+
     "videoPromo.eyebrow": "Video",
     "videoPromo.title": "Watch Our Promotional Video",
     "videoPromo.subtitle": "A brief insight into the atmosphere, nature, and experiences at Werrapark Resort.",
@@ -37,6 +42,7 @@
     "videoPromo.playAria": "Play video",
     "videoPromo.meta": "Werrapark Resort Film",
     "videoPromo.cta": "Watch Now",
+
     "about.pageTitle": "About Us – Werrapark",
     "about.heroTitle": "About Us",
     "about.heroSubtitle": "In the heart of the Thuringian Forest, we offer a nature-connected, guest-oriented experience.",
@@ -67,6 +73,7 @@
     "about.ctaTitle": "We look forward to welcoming you",
     "about.ctaText": "If you have any questions, contact us – our team is happy to help.",
     "about.ctaButton": "Get in Touch",
+
     "offerDetail.eyebrow": "Offer",
     "offerDetail.intro": "Discover the details of this offer and combine nature, comfort, and culinary moments in the Thuringian Forest.",
     "offerDetail.limitedBadge": "Limited Availability",
@@ -79,6 +86,7 @@
     "offerDetail.priceText": "Send us your desired dates – we will check availability and create an individual offer.",
     "offerDetail.requestBtn": "Request Offer",
     "offerDetail.moreOffersBtn": "More Offers",
+
     "roomDetail.eyebrow": "Room Signature",
     "roomDetail.pageTitle": "{{name}} - Room & Details",
     "roomDetail.idealFor": "Ideal for",
@@ -129,6 +137,7 @@
     "roomDetail.prevImage": "Previous Image",
     "roomDetail.nextImage": "Next Image",
     "roomDetail.imageN": "Image {{n}}",
+
     "hotelDetail.eyebrow": "Our Hotels",
     "hotelDetail.descriptionTitle": "About the Hotel",
     "hotelDetail.roomHighlights": "Room Highlights",
@@ -140,6 +149,7 @@
     "hotelDetail.contactBtn": "Get in Touch",
     "hotelDetail.websiteBtn": "Visit Website",
     "hotelDetail.homeBtn": "Back to Home",
+
     "reviews.sectionAria": "Hotel Reviews",
     "reviews.eyebrow": "Guest Reviews",
     "reviews.title": "What Our Guests Say About Us",
@@ -169,6 +179,7 @@
     "reviews.labelMessage": "Your Review",
     "reviews.placeholderMessage": "Write your experience in detail...",
     "reviews.btnSubmit": "Submit Review",
+
     "contact.title": "Contact",
     "contact.subtitle": "You can reach us through any desired channel. We look forward to your message.",
     "contact.executives": "Executive Team",
@@ -192,14 +203,17 @@
     "contact.error": "There was an error sending. Please try again later.",
     "contact.validationRequired": "{{field}} is required.",
     "contact.validationEmail": "Please enter a valid email address.",
+
     "map.eyebrow": "Location",
     "map.title": "Werrapark Resort - In the Heart of Germany",
     "map.subtitle": "Discover us in the heart of the Thuringian Forest, surrounded by untouched nature.",
     "map.markerTitle": "Werrapark Resort",
     "map.loading": "Map is loading...",
     "map.openMap": "Open in Google Maps",
+
     "loader.brand": "Werrapark",
     "loader.loading": "Loading",
+
     "giftVoucher.pageTitle": "Gift Voucher",
     "giftVoucher.landingKicker": "Werrapark Gift Ideas",
     "giftVoucher.checkoutKicker": "Pay Securely",
@@ -230,7 +244,7 @@
     "giftVoucher.oneTime": "One-time",
     "giftVoucher.customAmount": "Desired Amount",
     "giftVoucher.customPlaceholder": "e.g., 150",
-    "giftVoucher.customRange": "Minimum 10 EUR, maximum 500 EUR",
+    "giftVoucher.customRange": "Minimum 100 EUR, maximum 500 EUR",
     "giftVoucher.cardTag": "Werrapark Gift Voucher",
     "giftVoucher.cardTitle": "Time for Relaxation",
     "giftVoucher.cardSubtitle": "A stylish voucher for stays, culinary moments, and small breaks in the Thuringian Forest.",
@@ -307,10 +321,12 @@
     "giftVoucherPromo.benefit3": "Perfect for special occasions",
     "giftVoucherPromo.cardTitle": "Gift Voucher",
     "giftVoucherPromo.cardAmount": "10-500 EUR",
+
     "cookie.title": "Cookie Settings",
     "cookie.text": "We use necessary cookies for operation. Optional cookies enable analysis and WhatsApp communication.",
     "cookie.acceptAll": "Accept All",
     "cookie.essentialOnly": "Only Necessary",
+
     "whatsapp.heading": "WhatsApp Support",
     "whatsapp.text": "Write to us directly – we will get back to you as soon as possible.",
     "whatsapp.startChat": "Start Chat",

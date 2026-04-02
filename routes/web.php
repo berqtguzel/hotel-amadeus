@@ -15,6 +15,7 @@ use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\ReviewsController;
 use App\Services\CouponService;
 use App\Services\PageService;
+use App\Services\ReviewsService;
 use App\Services\ApiHealthService;
 use App\Services\SettingsService;
 use App\Services\HolidayThemeService;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
 Route::get('/api/hotels', [HotelController::class, 'index'])->name('api.hotels');
-Route::post('/api/button-tracking/track', [ButtonTrackingController::class, 'track'])->name('button-tracking.track');
+
 Route::get('/track', [ButtonTrackingController::class, 'trackAndRedirect'])->name('button-tracking.redirect');
 Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit'])->name('contact.forms.submit');
 Route::get('/robots.txt', function (SettingsService $settingsService) {
@@ -54,7 +55,11 @@ Route::prefix('api/billing')->group(function () {
 Route::prefix('api/reviews')->group(function () {
     Route::get('/{locale}', [ReviewsController::class, 'index'])->name('reviews.index');
     Route::post('/', [ReviewsController::class, 'store'])->name('reviews.store');
+
+    // 🔥 CRITERIA API
+    Route::get('/criteria', [ReviewsController::class, 'criteria'])->name('reviews.criteria');
 });
+
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -154,12 +159,16 @@ Route::prefix('/{locale}/gutschein')
         Route::get('/rechnung/{invoice}', [GiftVoucherController::class, 'invoicePage'])->name('gutschein.invoice');
     });
 
-    Route::get('/{locale}/bewertungen', function (string $locale) {
+
+Route::get('/{locale}/bewertungen', function (string $locale, ReviewsService $service) {
     $locale = strtolower($locale);
 
     return Inertia::render('Reviews/Index', [
-        'locale' => $locale,
+        'locale'   => $locale,
+        'reviews'  => $service->getReviews($locale),
+        'criteria' => $service->getCriteriaList(), // 🔥 EN KRİTİK SATIR
     ]);
+
 })->where(['locale' => 'de|en|tr'])->name('reviews.page');
 Route::controller(PageController::class)->group(function () {
     Route::get('/{locale}/{slug}', 'show')

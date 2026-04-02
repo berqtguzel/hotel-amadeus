@@ -13,33 +13,57 @@ export default function GiftVoucherPage({
     billingApi = { ok: true, message: null },
 }) {
     const { t } = useTranslation();
+
     const stripe = paymentMethods.stripe ?? {};
     const paypal = paymentMethods.paypal ?? {};
     const sepa = paymentMethods.sepa ?? {};
 
+    // 🔥 SESSION ID
+    const getSessionId = () => {
+        let sessionId = localStorage.getItem("tracking_session_id");
+
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            localStorage.setItem("tracking_session_id", sessionId);
+        }
+
+        return sessionId;
+    };
+    const sendTracking = (payload) => {
+        const formData = new FormData();
+
+        formData.append("button_key", payload.button || "unknown");
+
+        formData.append("session_id", getSessionId());
+
+        formData.append(
+            "metadata",
+            JSON.stringify({
+                page: window.location.href,
+                ...(payload.metadata || {}),
+            }),
+        );
+
+        fetch("https://omerdogan.de/api/v1/button-tracking/track", {
+            method: "POST",
+            headers: {
+                "X-Tenant-ID": "test_werraparkde_69b90f95bde60",
+            },
+            body: formData,
+        })
+            .then((res) => res.json())
+            .then(console.log);
+    };
+
+    // 🔥 PAGE TRACKING
     React.useEffect(() => {
-        const methodsDebug = {
-            stripe: {
-                enabled: Boolean(stripe.enabled),
-                has_public: stripe.has_public ?? false,
-                publishable_key: stripe.publishable_key ?? null,
-                connected_account_id: stripe.connected_account_id ?? null,
+        sendTracking({
+            button: "page_view_gutschein",
+            metadata: {
+                locale,
             },
-            paypal: {
-                enabled: Boolean(paypal.enabled),
-                has_client_id: paypal.has_client_id ?? false,
-                client_id: paypal.client_id ?? null,
-                merchant_id: paypal.merchant_id ?? null,
-            },
-            sepa: {
-                enabled: Boolean(sepa.enabled),
-                creditor_name: sepa.creditor_name ?? null,
-                iban_masked: sepa.iban_masked ?? null,
-                bic: sepa.bic ?? null,
-                bank_name: sepa.bank_name ?? null,
-            },
-        };
-    }, [billingApi, companies, paypal, sepa, stripe]);
+        });
+    }, [locale, sendTracking]);
 
     const methods = [
         {
@@ -74,6 +98,7 @@ export default function GiftVoucherPage({
                 title={t("giftVoucher.pageTitle")}
                 description={t("giftVoucher.heroSubtitle")}
             />
+
             <section className="gvf-page">
                 <div className="gvf-box gvf-box--landing">
                     <header className="gvf-head gvf-head--landing">
@@ -82,52 +107,9 @@ export default function GiftVoucherPage({
                         </span>
                         <h1>{t("giftVoucher.pageTitle")}</h1>
                         <p>{t("giftVoucher.heroSubtitle")}</p>
-                        <div className="gvf-pill-row">
-                            <span className="gvf-pill">
-                                {t("giftVoucher.pillInstant")}
-                            </span>
-                            <span className="gvf-pill">
-                                {t("giftVoucher.pillFlexible")}
-                            </span>
-                            <span className="gvf-pill">
-                                {t("giftVoucher.pillDigital")}
-                            </span>
-                        </div>
                     </header>
 
-                    {billingApi && billingApi.ok === false ? (
-                        <div className="gvf-api-banner" role="status">
-                            <strong>Billing-API:</strong>{" "}
-                            {billingApi.message
-                                ? String(billingApi.message)
-                                : t("giftVoucher.apiFallback")}
-                        </div>
-                    ) : null}
-
-                    <section className="gvf-intro">
-                        <div className="gvf-intro-card">
-                            <span className="gvf-intro-label">
-                                {t("giftVoucher.giftFor")}
-                            </span>
-                            <h1>{t("giftVoucher.introTitle")}</h1>
-                            <p>{t("giftVoucher.introText")}</p>
-                        </div>
-                        <div className="gvf-intro-card gvf-intro-card--highlight">
-                            <span className="gvf-intro-label">
-                                {t("giftVoucher.brandLabel")}
-                            </span>
-                            <h1>Werrapark</h1>
-                            <p>{t("giftVoucher.brandText")}</p>
-                        </div>
-                    </section>
-
-                    <div className="gvf-method-header">
-                        <div>
-                            <h1>{t("giftVoucher.methodsTitle")}</h1>
-                            <p>{t("giftVoucher.methodsSubtitle")}</p>
-                        </div>
-                    </div>
-
+                    {/* 🔥 PAYMENT METHODS */}
                     <div className="gvf-pay-grid">
                         {methods.map((m) => (
                             <div
@@ -139,10 +121,20 @@ export default function GiftVoucherPage({
                                 <span className="gvf-pay-badge">{m.title}</span>
                                 <h2>{m.title}</h2>
                                 <p>{m.desc}</p>
+
                                 {m.enabled ? (
                                     <Link
                                         href={m.href}
                                         className="gvf-pay-link"
+                                        onClick={() => {
+                                            sendTracking({
+                                                button: `select_payment_${m.key}`,
+                                                metadata: {
+                                                    method: m.key,
+                                                    locale,
+                                                },
+                                            });
+                                        }}
                                     >
                                         {t("giftVoucher.continueWith", {
                                             method: m.title,
@@ -156,22 +148,6 @@ export default function GiftVoucherPage({
                             </div>
                         ))}
                     </div>
-
-                    {/* {companies.length > 0 ? (
-                        <section className="gvf-side-section">
-                            <h2>{t("giftVoucher.companySectionTitle")}</h2>
-                            <ul className="gvf-company-list">
-                                {companies.map((c) => (
-                                    <li key={c.id ?? c.slug ?? c.name}>
-                                        <strong>{c.name ?? "—"}</strong>
-                                        {c.currency ? (
-                                            <span> · {c.currency}</span>
-                                        ) : null}
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-                    ) : null} */}
 
                     <p className="gvf-invoice-hint">
                         {t("giftVoucher.invoiceHint")}
