@@ -28,9 +28,6 @@ export default function GiftVoucherPromo() {
                         <Link className="gvp-btn gvp-btn--primary" href={href}>
                             {t("giftVoucherPromo.primaryCta")}
                         </Link>
-                        <Link className="gvp-btn gvp-btn--ghost" href={href}>
-                            {t("giftVoucherPromo.secondaryCta")}
-                        </Link>
                     </div>
 
                     <ul

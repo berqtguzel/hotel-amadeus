@@ -35,7 +35,7 @@ export default function HotelReviews() {
         return arr.map(normalizeReview);
     }, [apiReviews, widgetsRatings]);
     const track = [...reviews, ...reviews];
-    console.log("Inertia Props:", props.global);
+
     return (
         <section className="hr-wrap" aria-label={t("reviews.sectionAria")}>
             <div className="hr-head">

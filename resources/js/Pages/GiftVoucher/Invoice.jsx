@@ -18,13 +18,36 @@ export default function GiftVoucherInvoicePage({
     invoiceRef = null,
 }) {
     const { t } = useTranslation();
+
     const money = new Intl.NumberFormat(getNumberLocale(locale), {
         style: "currency",
         currency: "EUR",
         maximumFractionDigits: 0,
     });
+
     const homeHref = `/${locale}`;
-    const totalValue = Number(invoice?.total_amount ?? invoice?.total ?? 0);
+
+    const invoiceNumber =
+        invoice?.invoice_number || invoice?.number || invoiceRef || "—";
+
+    const status = invoice?.payment?.status || invoice?.status || "pending";
+
+    const paymentMethod =
+        invoice?.payment?.method || invoice?.payment_method || "—";
+
+    const totalValue =
+        invoice?.pricing?.total_amount ??
+        invoice?.total_amount ??
+        invoice?.total ??
+        0;
+
+    const customerName =
+        invoice?.customer?.name || invoice?.customer_name || "—";
+
+    const customerEmail =
+        invoice?.customer?.email || invoice?.customer_email || "—";
+
+    const description = invoice?.description || null;
 
     return (
         <AppLayout currentRoute={currentRoute}>
@@ -32,6 +55,7 @@ export default function GiftVoucherInvoicePage({
                 title={t("giftVoucher.invoicePageTitle")}
                 description={t("giftVoucher.invoicePageSubtitle")}
             />
+
             <section className="gvf-page">
                 <div className="gvf-box gvf-box--checkout">
                     <header className="gvf-head gvf-head--checkout">
@@ -48,48 +72,59 @@ export default function GiftVoucherInvoicePage({
                                 <strong>
                                     {t("giftVoucher.invoiceCreatedSuccess")}
                                 </strong>
+
                                 <div className="gvf-invoice-result-grid">
                                     <div>
-                                        <span>{t("giftVoucher.resultInvoice")}</span>
-                                        <b>
-                                            {invoice.invoice_number ||
-                                                invoice.number ||
-                                                invoiceRef ||
-                                                "—"}
-                                        </b>
+                                        <span>
+                                            {t("giftVoucher.resultInvoice")}
+                                        </span>
+                                        <b>{invoiceNumber}</b>
                                     </div>
+
                                     <div>
-                                        <span>{t("giftVoucher.resultStatus")}</span>
-                                        <b>{invoice.status || "pending"}</b>
+                                        <span>
+                                            {t("giftVoucher.resultStatus")}
+                                        </span>
+                                        <b>{status}</b>
                                     </div>
+
                                     <div>
-                                        <span>{t("giftVoucher.resultMethod")}</span>
-                                        <b>{invoice.payment_method || "—"}</b>
+                                        <span>
+                                            {t("giftVoucher.resultMethod")}
+                                        </span>
+                                        <b>{paymentMethod}</b>
                                     </div>
+
                                     <div>
-                                        <span>{t("giftVoucher.resultTotal")}</span>
-                                        <b>
-                                            {money.format(
-                                                Number.isFinite(totalValue)
-                                                    ? totalValue
-                                                    : 0,
-                                            )}
-                                        </b>
+                                        <span>
+                                            {t("giftVoucher.resultTotal")}
+                                        </span>
+                                        <b>{money.format(totalValue)}</b>
                                     </div>
+
                                     <div>
-                                        <span>{t("giftVoucher.resultCustomer")}</span>
-                                        <b>{invoice.customer_name || "—"}</b>
+                                        <span>
+                                            {t("giftVoucher.resultCustomer")}
+                                        </span>
+                                        <b>{customerName}</b>
                                     </div>
+
                                     <div>
-                                        <span>{t("giftVoucher.resultEmail")}</span>
-                                        <b>{invoice.customer_email || "—"}</b>
+                                        <span>
+                                            {t("giftVoucher.resultEmail")}
+                                        </span>
+                                        <b>{customerEmail}</b>
                                     </div>
                                 </div>
 
-                                {invoice.description ? (
+                                {description ? (
                                     <div className="gvf-method-panel">
-                                        <h3>{t("giftVoucher.invoiceDescription")}</h3>
-                                        <p>{invoice.description}</p>
+                                        <h3>
+                                            {t(
+                                                "giftVoucher.invoiceDescription",
+                                            )}
+                                        </h3>
+                                        <p>{description}</p>
                                     </div>
                                 ) : null}
                             </div>
@@ -97,7 +132,9 @@ export default function GiftVoucherInvoicePage({
                     ) : (
                         <section className="gvf-section">
                             <div className="gvf-submit-state gvf-submit-state--error">
-                                <strong>{t("giftVoucher.invoiceNotFoundTitle")}</strong>
+                                <strong>
+                                    {t("giftVoucher.invoiceNotFoundTitle")}
+                                </strong>
                                 <p>{t("giftVoucher.invoiceNotFoundText")}</p>
                             </div>
                         </section>

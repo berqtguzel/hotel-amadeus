@@ -13,7 +13,10 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
-
+'tracking' => [
+    'url' => env('TRACKING_API_URL', 'https://omerdogan.de/api/v1/button-tracking/track'),
+    'tenant' => env('TRACKING_TENANT', 'test_werraparkde_69b90f95bde60'),
+],
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

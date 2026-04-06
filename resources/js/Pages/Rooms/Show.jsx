@@ -490,9 +490,6 @@ export default function RoomShow() {
     const { props } = usePage();
     const { t, locale } = useTranslation();
 
-    console.log("RoomPage props:", props);
-    console.log("Room prices from API:", props?.room?.room_prices);
-
     const data = React.useMemo(
         () => normalizeRoom(props?.room, locale),
         [props?.room, locale],

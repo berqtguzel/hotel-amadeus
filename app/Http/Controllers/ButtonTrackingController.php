@@ -26,11 +26,21 @@ class ButtonTrackingController extends Controller
             'metadata' => 'nullable|array',
         ]);
 
-        $payload = array_filter($validated, fn ($v) => $v !== null && $v !== '');
+        $payload = $validated;
 
-        Log::info('TRACKING RECEIVED', $payload);
+        $payload['metadata'] = $payload['metadata'] ?? [];
 
+        $payload['metadata']['page'] =
+            $request->header('referer') ?? $request->fullUrl();
+
+        $payload = array_filter($payload, fn ($v) => $v !== null && $v !== '');
+
+        Log::info('📥 TRACKING RECEIVED', $payload);
+
+        // ✅ DIRECT CALL (QUEUE YOK)
         $ok = $this->tracking->track($payload);
+
+        Log::info('📤 TRACKING RESULT', ['success' => $ok]);
 
         return response()->json([
             'success' => $ok,
@@ -55,17 +65,33 @@ class ButtonTrackingController extends Controller
             return response()->json(['error' => 'Invalid redirect'], 400);
         }
 
+        // 🔒 whitelist
+        $allowedDomains = [
+            'omerdogan.de',
+            'paypal.com',
+            'stripe.com',
+        ];
+
+        $host = parse_url($target, PHP_URL_HOST);
+
+        if ($host && !in_array($host, $allowedDomains)) {
+            return response()->json(['error' => 'Unauthorized redirect'], 403);
+        }
+
         $payload = [
             'event' => 'redirect_click',
             'button_id' => $validated['button_id'] ?? null,
             'button_label' => $validated['button_label'] ?? null,
-            'page' => $request->header('referer') ?? $request->fullUrl(),
+            'metadata' => [
+                'page' => $request->header('referer') ?? $request->fullUrl(),
+            ],
         ];
 
         $payload = array_filter($payload, fn ($v) => $v !== null && $v !== '');
 
-        Log::info('TRACK + REDIRECT', $payload);
+        Log::info('🔁 TRACK + REDIRECT', $payload);
 
+        // ✅ DIRECT CALL
         $this->tracking->track($payload);
 
         return redirect()->away($target);

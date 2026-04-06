@@ -38,8 +38,6 @@ export default function GiftVoucherForm({
     const [submitting, setSubmitting] = React.useState(false);
     const [submitError, setSubmitError] = React.useState("");
 
-    const API = "https://omerdogan.de/api/v1/button-tracking/track";
-
     const parsedCustom = Number(customAmount);
     const customValue = Number.isFinite(parsedCustom)
         ? Math.min(500, Math.max(10, parsedCustom))
@@ -108,51 +106,76 @@ export default function GiftVoucherForm({
         },
         [t],
     );
-    const getSessionId = () => {
-        let sessionId = localStorage.getItem("tracking_session_id");
 
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
-            localStorage.setItem("tracking_session_id", sessionId);
-        }
+    const sendTracking = React.useCallback(
+        async (payload) => {
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "";
 
-        return sessionId;
-    };
-
-    const sendTracking = React.useCallback((payload) => {
-        fetch("https://omerdogan.de/api/v1/button-tracking/track", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Tenant-ID": "test_werraparkde_69b90f95bde60",
-            },
-            body: JSON.stringify({
-                button_key: payload.button || payload.button_id || "unknown",
-                session_id: getSessionId(), // 💥 KRİTİK
-                variant: payload.variant || "default",
+            const requestBody = {
+                event: payload.event ?? "button_click",
+                button_id: payload.button_id ?? payload.button ?? "unknown",
+                button_label: payload.button_label ?? null,
+                button_name: payload.button_name ?? null,
                 page: window.location.href,
-                metadata: payload.metadata || {},
-            }),
-        })
-            .then((res) => res.json().catch(() => ({})))
-            .then((data) => {
-                console.log("✅ TRACKING RESPONSE:", data);
-            })
-            .catch((err) => {
+                url: url ?? window.location.href,
+                metadata: payload.metadata ?? {},
+            };
+
+            try {
+                const response = await fetch("/track-button", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                const responseText = await response.text();
+
+                let responseData = null;
+                try {
+                    responseData = responseText
+                        ? JSON.parse(responseText)
+                        : null;
+                } catch {
+                    responseData = responseText;
+                }
+
+                if (!response.ok) {
+                    console.error("🔴 TRACKING FAILED:", {
+                        status: response.status,
+                        data: responseData,
+                    });
+                }
+
+                return responseData;
+            } catch (err) {
                 console.error("❌ TRACKING ERROR:", err);
-            });
-    }, []);
+                return null;
+            }
+        },
+        [url],
+    );
+
     useEffect(() => {
         sendTracking({
-            button: "page_view",
-            variant: "default",
+            event: "page_view",
+            button_id: `page_view_gutschein_${paymentMethod || "unknown"}`,
+            button_label: methodTitle || paymentMethod || "unknown",
+            button_name: "gift_voucher_page_view",
             metadata: {
                 url,
                 locale,
                 payment_method: paymentMethod,
             },
         });
-    }, [url]);
+    }, [url, locale, paymentMethod, methodTitle, sendTracking]);
 
     const handleSubmit = async () => {
         if (!paymentReady || submitting) {
@@ -163,13 +186,16 @@ export default function GiftVoucherForm({
         const cleanEmail = recipientEmail.trim();
         const numericCompanyId = Number(companyId);
 
-        sendTracking({
-            button: "gift-voucher-submit",
-            variant: "default",
+        await sendTracking({
+            event: "submit_click",
+            button_id: "gift-voucher-submit",
+            button_label: submitLabel || t("giftVoucher.payNow"),
+            button_name: "gift_voucher_submit",
             metadata: {
                 amount,
                 quantity,
                 payment_method: paymentMethod,
+                company_id: numericCompanyId || null,
             },
         });
 
@@ -295,7 +321,6 @@ export default function GiftVoucherForm({
                                                 button_label: `${value} EUR`,
                                                 button_name:
                                                     "gift_voucher_amount_select",
-                                                page: window.location.href,
                                                 metadata: {
                                                     locale,
                                                     amount: value,
@@ -325,7 +350,6 @@ export default function GiftVoucherForm({
                                     button_id: "gift-voucher-custom-amount",
                                     button_label: "Custom Amount",
                                     button_name: "gift_voucher_custom_amount",
-                                    page: window.location.href,
                                     metadata: {
                                         locale,
                                         payment_method: paymentMethod,
@@ -344,7 +368,6 @@ export default function GiftVoucherForm({
                                         button_label: "Custom Amount",
                                         button_name:
                                             "gift_voucher_custom_amount",
-                                        page: window.location.href,
                                         metadata: {
                                             locale,
                                             payment_method: paymentMethod,

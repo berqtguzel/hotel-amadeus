@@ -4,57 +4,62 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ButtonTrackingService
 {
-    public function track(array $payload): bool
+    public function track(array $data): bool
     {
-        $base = rtrim(config('omr.base_url'), '/');
-        $endpoint = trim(config('omr.endpoint', ''), '/');
-        $tenant = config('omr.tenant_id');
-        $timeout = config('omr.timeout', 10);
-
-        if (!$tenant || !$base) {
-            Log::error('Tracking config missing', [
-                'base' => $base,
-                'tenant' => $tenant,
-                'endpoint' => $endpoint,
-            ]);
-            return false;
-        }
-
-        // ✅ DOĞRU URL BUILD
-        $url = "{$base}/{$endpoint}/button-tracking/track";
-
-        $data = array_merge([
-            'timestamp' => now()->toIso8601String(),
-            'url' => request()?->fullUrl(),
-        ], $payload);
-
         try {
-            $response = Http::timeout($timeout)
-                ->acceptJson()
-                ->withHeaders([
-                    'X-Tenant-ID' => $tenant,
-                ])
-                ->post($url, $data);
+            Log::info('🚀 ORIGINAL DATA', $data);
 
-            // 🔥 DEBUG LOG
-            Log::info('TRACKING RESPONSE', [
-                'url' => $url,
+            // ✅ SESSION ID (ZORUNLU)
+            $sessionId = $data['session_id'] ?? Str::uuid()->toString();
+
+            // ✅ PAYLOAD DÖNÜŞÜMÜ
+            $payload = [
+                'button_key' => $data['button_id']
+                    ?? $data['button_key']
+                    ?? 'unknown',
+
+                'session_id' => $sessionId,
+
+                'metadata' => [
+                    'event' => $data['event'] ?? null,
+                    'button_label' => $data['button_label'] ?? null,
+                    'button_name' => $data['button_name'] ?? null,
+                    'page' => $data['metadata']['page'] ?? null,
+                    'url' => $data['url'] ?? null,
+                    ...($data['metadata'] ?? []),
+                ],
+            ];
+
+            Log::info('📦 FINAL PAYLOAD TO API', $payload);
+
+            $response = Http::timeout(5)
+                ->withHeaders([
+                    'X-Tenant-ID' => config('services.tracking.tenant'),
+                ])
+                ->post(config('services.tracking.url'), $payload);
+
+            Log::info('📥 TRACKING API RESPONSE', [
                 'status' => $response->status(),
-                'success' => $response->successful(),
-                'payload' => $data,
-                'response' => $response->body(),
+                'body' => $response->body(),
             ]);
 
+            if ($response->failed()) {
+                Log::error('❌ TRACKING FAILED', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                return false;
+            }
 
-            return $response->successful();
+            return true;
+
         } catch (\Throwable $e) {
-            Log::error('TRACKING ERROR', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-                'payload' => $data,
+            Log::error('🔥 TRACKING EXCEPTION', [
+                'message' => $e->getMessage(),
             ]);
 
             return false;

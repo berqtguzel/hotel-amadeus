@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
@@ -18,52 +17,12 @@ export default function GiftVoucherPage({
     const paypal = paymentMethods.paypal ?? {};
     const sepa = paymentMethods.sepa ?? {};
 
-    // 🔥 SESSION ID
-    const getSessionId = () => {
-        let sessionId = localStorage.getItem("tracking_session_id");
+    // ❌ API ve tracking tamamen kaldırıldı
 
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
-            localStorage.setItem("tracking_session_id", sessionId);
-        }
-
-        return sessionId;
+    const handleNavigation = (e, href) => {
+        e.preventDefault();
+        window.location.assign(href);
     };
-    const sendTracking = (payload) => {
-        const formData = new FormData();
-
-        formData.append("button_key", payload.button || "unknown");
-
-        formData.append("session_id", getSessionId());
-
-        formData.append(
-            "metadata",
-            JSON.stringify({
-                page: window.location.href,
-                ...(payload.metadata || {}),
-            }),
-        );
-
-        fetch("https://omerdogan.de/api/v1/button-tracking/track", {
-            method: "POST",
-            headers: {
-                "X-Tenant-ID": "test_werraparkde_69b90f95bde60",
-            },
-            body: formData,
-        })
-            .then((res) => res.json())
-            .then(console.log);
-    };
-
-    // 🔥 PAGE TRACKING
-    React.useEffect(() => {
-        sendTracking({
-            button: "page_view_gutschein",
-            metadata: {
-                locale,
-            },
-        });
-    }, [locale, sendTracking]);
 
     const methods = [
         {
@@ -109,7 +68,40 @@ export default function GiftVoucherPage({
                         <p>{t("giftVoucher.heroSubtitle")}</p>
                     </header>
 
-                    {/* 🔥 PAYMENT METHODS */}
+                    {billingApi && billingApi.ok === false ? (
+                        <div className="gvf-api-banner" role="status">
+                            <strong>Billing-API:</strong>{" "}
+                            {billingApi.message
+                                ? String(billingApi.message)
+                                : t("giftVoucher.apiFallback")}
+                        </div>
+                    ) : null}
+
+                    <section className="gvf-intro">
+                        <div className="gvf-intro-card">
+                            <span className="gvf-intro-label">
+                                {t("giftVoucher.giftFor")}
+                            </span>
+                            <h1>{t("giftVoucher.introTitle")}</h1>
+                            <p>{t("giftVoucher.introText")}</p>
+                        </div>
+
+                        <div className="gvf-intro-card gvf-intro-card--highlight">
+                            <span className="gvf-intro-label">
+                                {t("giftVoucher.brandLabel")}
+                            </span>
+                            <h1>Werrapark</h1>
+                            <p>{t("giftVoucher.brandText")}</p>
+                        </div>
+                    </section>
+
+                    <div className="gvf-method-header">
+                        <div>
+                            <h1>{t("giftVoucher.methodsTitle")}</h1>
+                            <p>{t("giftVoucher.methodsSubtitle")}</p>
+                        </div>
+                    </div>
+
                     <div className="gvf-pay-grid">
                         {methods.map((m) => (
                             <div
@@ -123,23 +115,17 @@ export default function GiftVoucherPage({
                                 <p>{m.desc}</p>
 
                                 {m.enabled ? (
-                                    <Link
+                                    <a
                                         href={m.href}
                                         className="gvf-pay-link"
-                                        onClick={() => {
-                                            sendTracking({
-                                                button: `select_payment_${m.key}`,
-                                                metadata: {
-                                                    method: m.key,
-                                                    locale,
-                                                },
-                                            });
-                                        }}
+                                        onClick={(e) =>
+                                            handleNavigation(e, m.href)
+                                        }
                                     >
                                         {t("giftVoucher.continueWith", {
                                             method: m.title,
                                         })}
-                                    </Link>
+                                    </a>
                                 ) : (
                                     <span className="gvf-pay-locked">
                                         {t("giftVoucher.notActivated")}
