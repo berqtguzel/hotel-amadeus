@@ -22,30 +22,21 @@ use App\Services\HolidayThemeService;
 use App\Services\HotelService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/*
-|--------------------------------------------------------------------------
-| TRACKING ROUTES (NEW CLEAN SYSTEM)
-|--------------------------------------------------------------------------
-*/
-
-// ✅ React POST buraya atar
-Route::post('/track-button', [ButtonTrackingController::class, 'track'])
-    ->name('tracking.track');
-
-// ✅ Redirect + tracking (linkler için)
-Route::get('/track-redirect', [ButtonTrackingController::class, 'trackAndRedirect'])
-    ->name('tracking.redirect');
-
-/*
-|--------------------------------------------------------------------------
-| API ROUTES
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/api/hotels', [HotelController::class, 'index'])->name('api.hotels');
 
-Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit'])
-    ->name('contact.forms.submit');
+Route::get('/track', [ButtonTrackingController::class, 'trackAndRedirect'])->name('button-tracking.redirect');
+Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit'])->name('contact.forms.submit');
+Route::get('/robots.txt', function (SettingsService $settingsService) {
+    $seo = $settingsService->get('seo', 'de');
+    $content = trim((string) ($seo['robots_txt'] ?? $seo['robotsTxt'] ?? ''));
+
+    if ($content === '') {
+        $content = "User-agent: *\nAllow: /";
+    }
+
+    return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+});
 
 Route::prefix('api/settings')->group(function () {
     Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
@@ -62,49 +53,22 @@ Route::prefix('api/billing')->group(function () {
 });
 
 Route::prefix('api/reviews')->group(function () {
+    // 🔥 CRITERIA API (Öncelikli olması için en üste alındı!)
+    Route::get('/criteria', [ReviewsController::class, 'criteria'])->name('reviews.criteria');
+
+    // Diğer Reviews rotaları
     Route::get('/{locale}', [ReviewsController::class, 'index'])->name('reviews.index');
     Route::post('/', [ReviewsController::class, 'store'])->name('reviews.store');
-    Route::get('/criteria', [ReviewsController::class, 'criteria'])->name('reviews.criteria');
 });
 
-/*
-|--------------------------------------------------------------------------
-| STATIC & SEO
-|--------------------------------------------------------------------------
-*/
 
-Route::get('/robots.txt', function (SettingsService $settingsService) {
-    $seo = $settingsService->get('seo', 'de');
-    $content = trim((string) ($seo['robots_txt'] ?? $seo['robotsTxt'] ?? ''));
-
-    if ($content === '') {
-        $content = "User-agent: *\nAllow: /";
-    }
-
-    return response($content, 200)
-        ->header('Content-Type', 'text/plain; charset=UTF-8');
-});
-
-/*
-|--------------------------------------------------------------------------
-| FRONTEND ROUTES
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::get('/{locale}', [HomeController::class, 'index'])
     ->where(['locale' => 'de|en|tr'])
     ->name('home.locale');
 
-/*
-|--------------------------------------------------------------------------
-| HOTELS
-|--------------------------------------------------------------------------
-*/
-
 Route::get('/hotels', fn () => redirect('/de/hotels'));
-
 Route::get('/{locale}/hotels', [HotelController::class, 'listPage'])
     ->where(['locale' => 'de|en|tr'])
     ->name('hotels.index');
@@ -122,28 +86,20 @@ Route::get('/{locale}/hotels/{hotel}', function (string $locale, string $hotel, 
             || $nameSlug === (string) $hotel;
     });
 
-    if (!$exists) {
+    if (! $exists) {
         throw new NotFoundHttpException();
     }
 
-    return Inertia::render('Hotels/Show', [
-        'locale' => $locale,
-        'hotel' => $hotel
-    ]);
+    return Inertia::render('Hotels/Show', ['locale' => $locale, 'hotel' => $hotel]);
 })->where(['locale' => 'de|en|tr'])
   ->name('hotels.show');
 
 Route::get('/hotels/{hotel}', fn ($hotel) => redirect("/de/hotels/{$hotel}"));
 
-/*
-|--------------------------------------------------------------------------
-| ROOMS & OFFERS
-|--------------------------------------------------------------------------
-*/
-
 Route::get('/{locale}/rooms/{room}', [RoomPageController::class, 'show'])
     ->where(['locale' => 'de|en|tr'])
     ->name('rooms.show');
+
 
 Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer, HolidayThemeService $holidayThemeService) {
     $locale = strtolower($locale);
@@ -156,22 +112,12 @@ Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer, 
             || $slug === (string) $offer;
     });
 
-    if (!$exists) {
+    if (! $exists) {
         throw new NotFoundHttpException();
     }
 
-    return Inertia::render('Offers/Show', [
-        'locale' => $locale,
-        'offer' => $offer
-    ]);
-})->where(['locale' => 'de|en|tr'])
-  ->name('offers.show');
-
-/*
-|--------------------------------------------------------------------------
-| COUPONS
-|--------------------------------------------------------------------------
-*/
+    return Inertia::render('Offers/Show', ['locale' => $locale, 'offer' => $offer]);
+})->where(['locale' => 'de|en|tr'])->name('offers.show');
 
 Route::get('/{locale}/coupons', function (string $locale, CouponService $couponService) {
     $locale = strtolower($locale);
@@ -180,59 +126,30 @@ Route::get('/{locale}/coupons', function (string $locale, CouponService $couponS
         'locale' => $locale,
         'coupons' => $couponService->getCoupons(),
     ]);
-})->where(['locale' => 'de|en|tr'])
-  ->name('coupons.index');
-
-/*
-|--------------------------------------------------------------------------
-| THEMES
-|--------------------------------------------------------------------------
-*/
+})->where(['locale' => 'de|en|tr'])->name('coupons.index');
 
 Route::get('/{locale}/urlaubsthemen/{theme}', [ThemeController::class, 'show'])
     ->where(['locale' => 'de|en|tr'])
     ->name('themes.show');
 
-/*
-|--------------------------------------------------------------------------
-| ABOUT
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/{locale}/uber-uns', function (string $locale) {
     $locale = strtolower($locale);
-
     $page = app(ApiHealthService::class)->isAvailable()
-        ? app(PageService::class)->getPage('uber-uns', $locale)
-        : null;
+            ? app(PageService::class)->getPage('uber-uns', $locale)
+            : null;
 
     return Inertia::render('Home/UberUns', [
         'currentRoute' => 'uberuns',
         'locale' => $locale,
         'page' => $page,
     ]);
-})->where(['locale' => 'de|en|tr'])
-  ->name('uberuns.locale');
+})->where(['locale' => 'de|en|tr'])->name('uberuns.locale');
 
-/*
-|--------------------------------------------------------------------------
-| CONTACT
-|--------------------------------------------------------------------------
-*/
+// Kontakt
+Route::get('/{locale}/kontakt', [ContactController::class, 'index'])->where(['locale' => 'de|en|tr'])->name('contact.index');
+Route::post('/{locale}/kontakt', [ContactController::class, 'store'])->where(['locale' => 'de|en|tr'])->name('contact.store');
 
-Route::get('/{locale}/kontakt', [ContactController::class, 'index'])
-    ->where(['locale' => 'de|en|tr'])
-    ->name('contact.index');
-
-Route::post('/{locale}/kontakt', [ContactController::class, 'store'])
-    ->where(['locale' => 'de|en|tr'])
-    ->name('contact.store');
-
-/*
-|--------------------------------------------------------------------------
-| GIFT VOUCHER
-|--------------------------------------------------------------------------
-*/
 
 Route::prefix('/{locale}/gutschein')
     ->where(['locale' => 'de|en|tr'])
@@ -244,11 +161,6 @@ Route::prefix('/{locale}/gutschein')
         Route::get('/rechnung/{invoice}', [GiftVoucherController::class, 'invoicePage'])->name('gutschein.invoice');
     });
 
-/*
-|--------------------------------------------------------------------------
-| REVIEWS
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/{locale}/bewertungen', function (string $locale, ReviewsService $service) {
     $locale = strtolower($locale);
@@ -256,26 +168,20 @@ Route::get('/{locale}/bewertungen', function (string $locale, ReviewsService $se
     return Inertia::render('Reviews/Index', [
         'locale'   => $locale,
         'reviews'  => $service->getReviews($locale),
-        'criteria' => $service->getCriteriaList(),
-    ]);
-})->where(['locale' => 'de|en|tr'])
-  ->name('reviews.page');
 
-/*
-|--------------------------------------------------------------------------
-| CMS PAGES
-|--------------------------------------------------------------------------
-*/
+    ]);
+
+})->where(['locale' => 'de|en|tr'])->name('reviews.page');
 
 Route::controller(PageController::class)->group(function () {
     Route::get('/{locale}/{slug}', 'show')
         ->where([
             'locale' => 'de|en|tr',
-            'slug'   => '[a-z0-9\\-]+',
+            'slug'   => '[a-z0-9\-]+',
         ])
         ->name('page.show');
 
     Route::get('/{slug}', function ($slug) {
         return redirect("/de/{$slug}");
-    })->where(['slug' => '[a-z0-9\\-]+']);
+    })->where(['slug' => '[a-z0-9\-]+']);
 });

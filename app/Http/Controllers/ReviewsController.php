@@ -15,86 +15,44 @@ class ReviewsController extends Controller
         ]);
     }
 
-    public function criteria(ReviewsService $service): JsonResponse
+    // Eksik olan criteria metodunu ekledik
+    public function criteria(Request $request, ReviewsService $service): JsonResponse
     {
+        // İstekte dil parametresi yoksa varsayılanı kullan (örn: de)
+        $locale = $request->get('lang', app()->getLocale() ?? 'de');
+
         return response()->json([
-            'data' => $service->getCriteriaList()
+            'success' => true,
+            'data' => [
+                'criteria' => $service->getCriteria($locale)
+            ]
         ]);
     }
 
     public function store(Request $request, ReviewsService $service): JsonResponse
     {
         $validated = $request->validate([
-            'author_name'  => ['required', 'string', 'max:255'],
-            'author_email' => ['required', 'email'],
-            'content'      => ['required', 'string'],
-            'ratings'      => ['required', 'array'],
+            'author_name'        => ['required', 'string', 'max:255'],
+            'author_email'       => ['required', 'email'],
+            'content'            => ['required', 'string'],
+            'rating'             => ['nullable', 'integer', 'min:1', 'max:5'],
+            'criteria_ratings'   => ['nullable', 'array'],
+            'criteria_ratings.*' => ['integer', 'min:1', 'max:10'], // API 1-10 arası bekliyor
         ]);
 
-        $ratingsInput = $validated['ratings'];
-
-        // 🔥 MANUAL VALIDATION
-        foreach ($ratingsInput as $key => $value) {
-            if (!is_numeric($value) || $value < 1 || $value > 10) {
-                return response()->json([
-                    'message' => "Invalid rating for {$key}"
-                ], 422);
-            }
-        }
-
-        $criteriaMap = $service->getCriteriaMap();
-        $ratings = [];
-
-        foreach ($ratingsInput as $key => $value) {
-            $id = null;
-
-            if (isset($criteriaMap[$key])) {
-                $id = $criteriaMap[$key];
-            } else {
-                foreach ($criteriaMap as $name => $cid) {
-                    if (strtolower($name) === strtolower($key)) {
-                        $id = $cid;
-                        break;
-                    }
-                }
-            }
-
-            if ($id) {
-                $ratings[] = [
-                    'criteria_id' => $id,
-                    'rating' => (int)$value
-                ];
-            }
-        }
-
-        if (empty($ratings)) {
-            return response()->json([
-                'message' => 'No valid criteria found',
-                'debug' => $criteriaMap
-            ], 422);
-        }
-
-        $overall = round(collect($ratings)->avg('rating'));
-
-        $result = $service->createReview([
-            'author_name'  => $validated['author_name'],
-            'author_email' => $validated['author_email'],
-            'content'      => $validated['content'],
-            'rating'       => $overall,
-            'ratings'      => $ratings,
-        ]);
+        $result = $service->createReview($validated);
 
         if (isset($result['error'])) {
             return response()->json([
-                'message' => 'API Error',
-                'debug'   => $result
+                'message' => 'Hata oluştu: ' . $result['error'],
+                'debug'   => $result['details'] ?? null
             ], 422);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Review submitted successfully',
-            'data' => $result
+            'message' => 'Review submitted successfully. It will be published after approval.',
+            'data'    => $result['data'] ?? $result
         ]);
     }
 }

@@ -1,63 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "@/i18n";
 import "../../../css/reviews-page.css";
 import HotelReviews from "../Home/HotelReviews";
-import { usePage } from "@inertiajs/react";
 
 const Index = () => {
-    const { reviews, criteria = [] } = usePage().props;
     const { t } = useTranslation();
-
-    const buildInitialRatings = () => {
-        const obj = {};
-        criteria.forEach((c) => {
-            obj[c.name] = 0;
-        });
-        return obj;
-    };
-
     const [form, setForm] = useState({
         name: "",
         email: "",
         message: "",
-        ratings: buildInitialRatings(),
+        rating: 5, // Eğer hiç kriter yoksa fallback olarak kullanılacak genel puan
     });
+
+    // Kriterleri ve kriter puanlarını tutacağımız stateler
+    const [criteria, setCriteria] = useState([]);
+    const [criteriaRatings, setCriteriaRatings] = useState({});
+
+    // UI için hover state'i (Hem genel yıldızlar hem kriter yıldızları için)
+    const [hoverRating, setHoverRating] = useState(0);
+    const [hoverCriteria, setHoverCriteria] = useState({});
 
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState({ type: "", message: "" });
 
-    // 🔥 criteria değişirse resetle
+    // Sayfa yüklendiğinde kriterleri API'den çek
     useEffect(() => {
-        setForm((prev) => ({
-            ...prev,
-            ratings: buildInitialRatings(),
-        }));
-    }, [criteria]);
+        const fetchCriteria = async () => {
+            try {
+                // Aktif dili al (i18n sistemine göre ayarlanabilir, şimdilik varsayılanı kullanıyoruz)
+                const res = await fetch("/api/reviews/criteria");
+                if (res.ok) {
+                    const data = await res.json();
+                    const fetchedCriteria = data?.data?.criteria || [];
+                    setCriteria(fetchedCriteria);
+
+                    // Başlangıçta tüm kriterleri varsayılan olarak 5 yıldıza (API için 10 puan) ayarla
+                    if (fetchedCriteria.length > 0) {
+                        const initialRatings = {};
+                        fetchedCriteria.forEach((c) => {
+                            initialRatings[c.id] = 5; // UI'da 5 yıldız
+                        });
+                        setCriteriaRatings(initialRatings);
+                    }
+                }
+            } catch (error) {
+                console.error("Criteria fetch error:", error);
+            }
+        };
+
+        fetchCriteria();
+    }, []);
 
     const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleRating = (key, value) => {
-        setForm((prev) => ({
+    const handleCriteriaRatingChange = (criteriaId, starValue) => {
+        setCriteriaRatings((prev) => ({
             ...prev,
-            ratings: {
-                ...prev.ratings,
-                [key]: value,
-            },
+            [criteriaId]: starValue,
         }));
-    };
-
-    const getAverage = () => {
-        const values = Object.values(form.ratings);
-        const valid = values.filter((v) => v > 0);
-
-        if (!valid.length) return 0;
-
-        return Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
     };
 
     const handleSubmit = async (e) => {
@@ -65,17 +67,12 @@ const Index = () => {
         setLoading(true);
         setStatus({ type: "", message: "" });
 
-        const cleanRatings = Object.fromEntries(
-            Object.entries(form.ratings).filter(([_, v]) => v > 0),
-        );
-
-        if (Object.keys(cleanRatings).length === 0) {
-            setStatus({
-                type: "error",
-                message: "Lütfen en az bir değerlendirme seçin",
+        // API'ye gönderilecek kriter puanlarını 1-10 skalasına çevir (Yıldız x 2)
+        const formattedCriteriaRatings = {};
+        if (criteria.length > 0) {
+            Object.keys(criteriaRatings).forEach((key) => {
+                formattedCriteriaRatings[key] = criteriaRatings[key] * 2;
             });
-            setLoading(false);
-            return;
         }
 
         try {
@@ -91,28 +88,35 @@ const Index = () => {
                     author_name: form.name,
                     author_email: form.email,
                     content: form.message,
-                    ratings: cleanRatings,
+                    // Eğer kriter varsa kriterleri, yoksa genel puanı gönder
+                    ...(criteria.length > 0
+                        ? { criteria_ratings: formattedCriteriaRatings }
+                        : { rating: form.rating }),
                 }),
             });
-
-            const data = await res.json();
 
             if (res.ok) {
                 setStatus({
                     type: "success",
-                    message: data.message || t("reviews.success"),
+                    message: t("reviews.success"),
                 });
-
                 setForm({
                     name: "",
                     email: "",
                     message: "",
-                    ratings: buildInitialRatings(),
+                    rating: 5,
                 });
+
+                // Kriterleri tekrar sıfırla
+                if (criteria.length > 0) {
+                    const resetRatings = {};
+                    criteria.forEach((c) => (resetRatings[c.id] = 5));
+                    setCriteriaRatings(resetRatings);
+                }
             } else {
                 setStatus({
                     type: "error",
-                    message: data.message || t("reviews.error"),
+                    message: t("reviews.error"),
                 });
             }
         } catch (error) {
@@ -123,6 +127,13 @@ const Index = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    // İlgili dildeki kriter adını bulmak için yardımcı fonksiyon
+    const getCriteriaName = (criterion) => {
+        // İstersen burada güncel dile göre kontrol yapabilirsin.
+        // Şimdilik API'den gelen varsayılan name'i kullanıyoruz.
+        return criterion.name;
     };
 
     return (
@@ -165,80 +176,180 @@ const Index = () => {
                                 <h2>{t("reviews.formTitle")}</h2>
                                 <p>{t("reviews.formSubtitle")}</p>
                             </div>
-
-                            <div className="review-score-box">
-                                <span>{t("reviews.selectedScore")}</span>
-                                <strong>{getAverage()}.0</strong>
-                            </div>
                         </div>
 
                         <form onSubmit={handleSubmit} className="review-form">
                             <div className="review-form-grid">
                                 <div className="input-group">
-                                    <label>{t("reviews.labelName")}</label>
+                                    <label htmlFor="name">
+                                        {t("reviews.labelName")}
+                                    </label>
                                     <input
+                                        id="name"
                                         type="text"
                                         name="name"
                                         value={form.name}
                                         onChange={handleChange}
+                                        placeholder={t(
+                                            "reviews.placeholderName",
+                                        )}
                                         required
                                     />
                                 </div>
 
                                 <div className="input-group">
-                                    <label>{t("reviews.labelEmail")}</label>
+                                    <label htmlFor="email">
+                                        {t("reviews.labelEmail")}
+                                    </label>
                                     <input
+                                        id="email"
                                         type="email"
                                         name="email"
                                         value={form.email}
                                         onChange={handleChange}
+                                        placeholder={t(
+                                            "reviews.placeholderEmail",
+                                        )}
                                         required
                                     />
                                 </div>
                             </div>
 
-                            {/* 🔥 DYNAMIC CRITERIA */}
-                            {criteria.map((c) => (
-                                <div className="rating-panel" key={c.id}>
+                            {/* EĞER KRİTERLER VARSA ONLARI DÖNGÜYE AL, YOKSA TEK BİR GENEL YILDIZ GÖSTER */}
+                            {criteria.length > 0 ? (
+                                <div
+                                    className="criteria-ratings-panel"
+                                    style={{
+                                        marginTop: "20px",
+                                        marginBottom: "20px",
+                                    }}
+                                >
+                                    <h3
+                                        style={{
+                                            marginBottom: "15px",
+                                            fontSize: "1.1rem",
+                                        }}
+                                    >
+                                        {t("reviews.labelRating")}
+                                    </h3>
+                                    {criteria.map((criterion) => (
+                                        <div
+                                            key={criterion.id}
+                                            className="rating-panel"
+                                            style={{
+                                                marginBottom: "10px",
+                                                padding: "10px",
+                                                background: "rgba(0,0,0,0.02)",
+                                                borderRadius: "8px",
+                                            }}
+                                        >
+                                            <div className="rating-texts">
+                                                <span
+                                                    className="rating-title"
+                                                    style={{ fontSize: "1rem" }}
+                                                >
+                                                    {getCriteriaName(criterion)}
+                                                </span>
+                                            </div>
+                                            <div className="star-rating">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        type="button"
+                                                        key={star}
+                                                        className={`star ${
+                                                            star <=
+                                                            (hoverCriteria[
+                                                                criterion.id
+                                                            ] ||
+                                                                criteriaRatings[
+                                                                    criterion.id
+                                                                ])
+                                                                ? "filled"
+                                                                : ""
+                                                        }`}
+                                                        onClick={() =>
+                                                            handleCriteriaRatingChange(
+                                                                criterion.id,
+                                                                star,
+                                                            )
+                                                        }
+                                                        onMouseEnter={() =>
+                                                            setHoverCriteria({
+                                                                ...hoverCriteria,
+                                                                [criterion.id]:
+                                                                    star,
+                                                            })
+                                                        }
+                                                        onMouseLeave={() =>
+                                                            setHoverCriteria({
+                                                                ...hoverCriteria,
+                                                                [criterion.id]: 0,
+                                                            })
+                                                        }
+                                                        aria-label={`${star} ${t("reviews.ariaStars")}`}
+                                                    >
+                                                        ★
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="rating-panel">
                                     <div className="rating-texts">
                                         <span className="rating-title">
-                                            {c.name}
+                                            {t("reviews.labelRating")}
+                                        </span>
+                                        <span className="rating-subtitle">
+                                            {t("reviews.ratingInstruction")}
                                         </span>
                                     </div>
 
                                     <div className="star-rating">
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-                                            (num) => (
-                                                <button
-                                                    key={num}
-                                                    type="button"
-                                                    className={`star ${
-                                                        form.ratings[c.name] ===
-                                                        num
-                                                            ? "filled"
-                                                            : ""
-                                                    }`}
-                                                    onClick={() =>
-                                                        handleRating(
-                                                            c.name,
-                                                            num,
-                                                        )
-                                                    }
-                                                >
-                                                    {num}
-                                                </button>
-                                            ),
-                                        )}
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                type="button"
+                                                key={star}
+                                                className={`star ${
+                                                    star <=
+                                                    (hoverRating || form.rating)
+                                                        ? "filled"
+                                                        : ""
+                                                }`}
+                                                onClick={() =>
+                                                    setForm({
+                                                        ...form,
+                                                        rating: star,
+                                                    })
+                                                }
+                                                onMouseEnter={() =>
+                                                    setHoverRating(star)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setHoverRating(0)
+                                                }
+                                                aria-label={`${star} ${t("reviews.ariaStars")}`}
+                                            >
+                                                ★
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                            ))}
+                            )}
 
                             <div className="input-group textarea-group">
-                                <label>{t("reviews.labelMessage")}</label>
+                                <label htmlFor="message">
+                                    {t("reviews.labelMessage")}
+                                </label>
                                 <textarea
+                                    id="message"
                                     name="message"
                                     value={form.message}
                                     onChange={handleChange}
+                                    placeholder={t(
+                                        "reviews.placeholderMessage",
+                                    )}
                                     required
                                 />
                             </div>
@@ -249,9 +360,14 @@ const Index = () => {
                                     className={`submit-btn ${loading ? "loading" : ""}`}
                                     disabled={loading}
                                 >
-                                    {loading
-                                        ? "Sending..."
-                                        : t("reviews.btnSubmit")}
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner"></span>
+                                            {t("reviews.btnSending")}
+                                        </>
+                                    ) : (
+                                        t("reviews.btnSubmit")
+                                    )}
                                 </button>
                             </div>
 

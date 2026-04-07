@@ -330,5 +330,7 @@
     "whatsapp.heading": "WhatsApp Support",
     "whatsapp.text": "Schreiben Sie uns direkt – wir melden uns schnellstmöglich bei Ihnen.",
     "whatsapp.startChat": "Chat starten",
-    "whatsapp.defaultMessage": "Hallo Werrapark Team, ich möchte eine Anfrage stellen."
+    "whatsapp.defaultMessage": "Hallo Werrapark Team, ich möchte eine Anfrage stellen.",
+
+    "weekdaysShort": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
 }

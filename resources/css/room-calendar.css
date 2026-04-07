@@ -1,0 +1,270 @@
+.rux-calendar-panel {
+    border-radius: 16px;
+    border: 1px solid rgba(19, 124, 86, 0.15);
+    background: #fff;
+    padding: 14px;
+}
+
+/* HEADER */
+.rux-calendar-panel__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rux-calendar-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+}
+.rux-calendar-panel__title h1 {
+    font-size: 24px;
+    margin: 0;
+}
+/* NAV */
+.rux-calendar-nav {
+    display: flex;
+    gap: 8px;
+}
+
+/* BUTTON FIX */
+.rux-calendar-nav button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #166534;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* ICON FIX */
+.rux-calendar-nav button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* HOVER */
+.rux-calendar-nav button:hover {
+    background: #16a34a;
+    color: #ffffff;
+    border-color: #16a34a;
+
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+}
+
+/* DISABLED */
+.rux-calendar-nav button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* TOOLBAR */
+.rux-calendar-toolbar {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rux-calendar-month-pills,
+.rux-calendar-shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rux-calendar-pill,
+.rux-calendar-shortcuts button {
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.rux-calendar-pill:hover,
+.rux-calendar-shortcuts button:hover {
+    border-color: #16a34a;
+    color: #16a34a;
+}
+
+.rux-calendar-pill.is-active {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    border: none;
+}
+
+/* ========================= */
+/* 🔥 SENİN YENİ TASARIMIN 🔥 */
+/* ========================= */
+
+/* GRID */
+.rux-calendar-grid {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+/* CELL */
+.rux-calendar-cell {
+    position: relative;
+    height: 64px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.2s ease;
+}
+
+/* HOVER */
+.rux-calendar-cell:hover {
+    border-color: #16a34a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* DAY */
+.rux-day {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* PRICE */
+.rux-price {
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a;
+    margin-top: 4px;
+}
+
+/* SELECTED */
+.rux-calendar-cell.is-selected {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
+    border: none;
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+}
+
+.rux-calendar-cell.is-selected .rux-day,
+.rux-calendar-cell.is-selected .rux-price {
+    color: white;
+}
+
+/* CLOSED */
+.rux-calendar-cell.is-closed {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* EMPTY */
+.rux-calendar-cell.is-empty {
+    background: transparent;
+    border: none;
+}
+
+/* MONTH TITLE */
+.rux-calendar-month__head h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+/* DETAIL WRAPPER */
+.rux-calendar-detail {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid rgba(22, 163, 74, 0.15);
+}
+
+/* CENTER */
+.rux-calendar-detail__center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* DATE */
+.rux-detail-date {
+    font-size: 13px;
+    font-weight: 600;
+    color: #166534;
+}
+
+/* PRICE */
+.rux-detail-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #16a34a;
+}
+
+/* NAV BUTTON */
+.rux-detail-nav {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid #d1fae5;
+    background: #fff;
+    color: #22c55e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rux-detail-nav:hover {
+    background: #16a34a;
+    color: white;
+    border-color: #16a34a;
+}
+
+.rux-detail-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.rux-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-top: 10px;
+    margin-bottom: 6px;
+}
+
+.rux-calendar-weekdays span {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+}

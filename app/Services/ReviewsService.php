@@ -10,8 +10,6 @@ use Throwable;
 class ReviewsService
 {
     private const CACHE_KEY_PREFIX = 'omr_reviews_';
-    private const CRITERIA_LIST_CACHE_KEY = 'omr_review_criteria_list';
-    private const CRITERIA_MAP_CACHE_KEY  = 'omr_review_criteria_map';
 
     /**
      * Önbellekten veya API'den yorumları getirir.
@@ -27,48 +25,73 @@ class ReviewsService
     }
 
     /**
-     * Criteria listesini getirir.
+     * API'den aktif değerlendirme kriterlerini getirir.
      */
- public function getCriteriaList(): array
-{
-    return Cache::remember('review_criteria_list', now()->addHours(6), function () {
+    public function getCriteria(string $locale): array
+    {
+        $locale = strtolower($locale);
+        $cacheKey = $this->cacheKey($locale) . '_criteria';
 
-        $url = config('omr.base_url') . config('omr.endpoint') . '/criteria';
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
+            $base     = rtrim(config('omr.base_url'), '/');
+            $endpoint = rtrim(config('omr.endpoint'), '/');
+            $tenant   = config('omr.main_tenant') ?: config('omr.tenant_id');
 
-        try {
-            $res = Http::withHeaders([
-                'X-Tenant-ID' => config('omr.tenant_id')
-            ])->get($url);
+            if (!$tenant || !$base) {
+                return [];
+            }
 
-            return $res->json()['data'] ?? [];
+            $url = "{$base}{$endpoint}/reviews/criteria";
 
-        } catch (\Throwable $e) {
-            return [];
-        }
-    });
-}
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders(['X-Tenant-ID' => $tenant])
+                    ->get($url, [
+                        'lang' => $locale,
+                    ]);
 
-public function getCriteriaMap(): array
-{
-    return collect($this->getCriteriaList())
-        ->pluck('id', 'name')
-        ->toArray();
-}
+                if (!$response->successful()) {
+                    Log::debug('Reviews Criteria API failed', ['status' => $response->status()]);
+                    return [];
+                }
+
+                $json = $response->json();
+                return $json['data']['criteria'] ?? [];
+            } catch (Throwable $e) {
+                Log::debug('Reviews Criteria API error', ['error' => $e->getMessage()]);
+                return [];
+            }
+        });
+    }
 
     /**
-     * Yeni yorum oluşturur.
+     * Yeni bir yorum oluşturur (POST).
      */
     public function createReview(array $data): array
     {
-        $base     = rtrim(config('omr.base_url'), '/');
+        $base = rtrim(config('omr.base_url'), '/');
         $endpoint = rtrim(config('omr.endpoint'), '/');
-        $tenant   = config('omr.main_tenant') ?: config('omr.tenant_id');
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         if (!$tenant || !$base) {
             return ['error' => 'Config missing'];
         }
-
         $url = "{$base}{$endpoint}/reviews";
+
+        // Kriter puanları varsa API'ye gönderilecek formatı hazırlıyoruz
+        $payload = [
+            'author_name'  => $data['author_name'] ?? '',
+            'author_email' => $data['author_email'] ?? '',
+            'review_text'  => $data['content'] ?? '',
+            'stay_date'    => now()->format('Y-m-d'),
+        ];
+
+        if (!empty($data['criteria_ratings'])) {
+            $payload['criteria_ratings'] = $data['criteria_ratings'];
+        } else {
+            // Eğer kriter yoksa geriye dönük uyumluluk için genel puanı gönderiyoruz
+            $payload['rating'] = $data['rating'] ?? 5;
+        }
 
         try {
             $response = Http::timeout(10)
@@ -76,30 +99,20 @@ public function getCriteriaMap(): array
                     'X-Tenant-ID' => $tenant,
                     'Accept'      => 'application/json',
                 ])
-                ->post($url, [
-                    'author_name'  => $data['author_name'] ?? '',
-                    'author_email' => $data['author_email'] ?? '',
-                    'review_text'  => $data['content'] ?? '',
-                    'rating'       => $data['rating'] ?? 5,
-                    'ratings'      => $data['ratings'] ?? [],
-                    'stay_date'    => now()->format('Y-m-d'),
-                ]);
+                ->post($url, $payload);
 
             if (!$response->successful()) {
                 return [
                     'error'   => 'API_REJECTED',
-                    'details' => $response->json(),
+                    'details' => $response->json()
                 ];
             }
 
             $this->clearCache();
-
             return $response->json();
-        } catch (Throwable $e) {
-            return [
-                'error'   => 'EXCEPTION',
-                'message' => $e->getMessage(),
-            ];
+
+        } catch (\Throwable $e) {
+            return ['error' => 'EXCEPTION', 'message' => $e->getMessage()];
         }
     }
 
@@ -107,10 +120,8 @@ public function getCriteriaMap(): array
     {
         foreach (['de', 'en', 'tr'] as $locale) {
             Cache::forget($this->cacheKey($locale));
+            Cache::forget($this->cacheKey($locale) . '_criteria');
         }
-
-        Cache::forget(self::CRITERIA_LIST_CACHE_KEY);
-        Cache::forget(self::CRITERIA_MAP_CACHE_KEY);
     }
 
     private function fetch(string $locale): array
@@ -127,13 +138,9 @@ public function getCriteriaMap(): array
 
         try {
             $response = Http::timeout(10)
-                ->withHeaders([
-                    'X-Tenant-ID' => $tenant,
-                    'Accept'      => 'application/json',
-                ])
+                ->withHeaders(['X-Tenant-ID' => $tenant])
                 ->get($url, [
-                    'locale' => $locale,
-                    'lang'   => $locale,
+                    'lang' => $locale,
                 ]);
 
             if (!$response->successful()) {
@@ -153,6 +160,7 @@ public function getCriteriaMap(): array
             }
 
             return $this->normalizeReviews($data, $locale);
+
         } catch (Throwable $e) {
             Log::debug('Reviews API error', ['error' => $e->getMessage()]);
             return [];
@@ -164,36 +172,29 @@ public function getCriteriaMap(): array
         $out = [];
 
         foreach ($data as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
+            if (!is_array($item)) continue;
 
             $attrs = $item['attributes'] ?? $item;
 
-            if (isset($attrs['status']) && !in_array($attrs['status'], ['approved', 'active'], true)) {
+            if (isset($attrs['status']) && $attrs['status'] !== 'approved') {
                 continue;
             }
 
-            $ratingRaw = $attrs['rating'] ?? $attrs['stars'] ?? 5;
-            $rating = is_numeric($ratingRaw) ? (float) $ratingRaw : 5.0;
-
-            if ($rating > 5) {
-                $rating = round($rating / 2, 1);
-            }
-
+            $ratingRaw = $attrs['overall_rating_stars'] ?? $attrs['rating'] ?? $attrs['stars'] ?? 5;
+            $rating = is_numeric($ratingRaw) ? (float)$ratingRaw : 5.0;
             $rating = max(1, min(5, (int) round($rating)));
 
             $stayDate = $attrs['stay_date'] ?? $attrs['stay'] ?? $attrs['period'] ?? null;
             $stayFormatted = $stayDate ? $this->formatStayDate($stayDate, $locale) : '';
 
             $out[] = [
-                'id'       => $attrs['id'] ?? uniqid('r'),
-                'name'     => $attrs['author_name'] ?? $attrs['name'] ?? 'Anonymous',
-                'location' => $attrs['location'] ?? $attrs['city'] ?? '',
-                'rating'   => $rating,
-                'text'     => $attrs['content'] ?? $attrs['comment'] ?? '',
-                'stay'     => $stayFormatted,
-                'ratings'  => $attrs['ratings'] ?? [],
+                'id'               => $attrs['id'] ?? uniqid('r'),
+                'name'             => $attrs['author_name'] ?? $attrs['name'] ?? 'Anonymous',
+                'location'         => $attrs['location'] ?? $attrs['city'] ?? '',
+                'rating'           => $rating,
+                'text'             => $attrs['content'] ?? $attrs['comment'] ?? '',
+                'stay'             => $stayFormatted,
+                'criteria_ratings' => $attrs['criteria_ratings'] ?? [], // Kriterleri frontend'e iletiyoruz
             ];
         }
 
@@ -204,7 +205,6 @@ public function getCriteriaMap(): array
     {
         try {
             $dt = new \DateTimeImmutable($date);
-
             $formatter = new \IntlDateFormatter(
                 $locale === 'de' ? 'de_DE' : ($locale === 'tr' ? 'tr_TR' : 'en_US'),
                 \IntlDateFormatter::MEDIUM,
@@ -223,7 +223,6 @@ public function getCriteriaMap(): array
     private function cacheKey(string $locale): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-
         return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

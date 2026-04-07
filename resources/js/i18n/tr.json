@@ -330,5 +330,7 @@
     "whatsapp.heading": "WhatsApp Destek",
     "whatsapp.text": "Bize doğrudan yazın – size en kısa sürede dönüş yapacağız.",
     "whatsapp.startChat": "Sohbeti Başlat",
-    "whatsapp.defaultMessage": "Merhaba Werrapark ekibi, bir talepte bulunmak istiyorum."
+    "whatsapp.defaultMessage": "Merhaba Werrapark ekibi, bir talepte bulunmak istiyorum.",
+
+    "weekdaysShort": ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
 }

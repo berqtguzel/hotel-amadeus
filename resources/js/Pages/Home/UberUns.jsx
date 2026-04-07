@@ -38,7 +38,7 @@ export default function UberUns({ currentRoute = "uberuns" }) {
                     />
 
                     <div className="uu-shell uu-hero__inner">
-                        <span className="uu-eyebrow">Werrapark</span>
+                        <span className="eyebrow">Werrapark</span>
                         <h1 className="uu-title">{title}</h1>
                         <p className="uu-sub">{subtitle}</p>
                     </div>
@@ -105,7 +105,7 @@ export default function UberUns({ currentRoute = "uberuns" }) {
                 </section>
 
                 <section className="uu-shell uu-timeline">
-                    <h2 className="uu-h2">{t("about.timelineTitle")}</h2>
+                    <h1 className="uu-h2">{t("about.timelineTitle")}</h1>
 
                     <ol className="uu-steps">
                         <li className="uu-step">
@@ -154,13 +154,9 @@ export default function UberUns({ currentRoute = "uberuns" }) {
                     </ol>
                 </section>
 
-                <section className="uu-team">
-                    <TeamGrid />
-                </section>
-
                 <section className="uu-cta">
                     <div className="uu-shell uu-cta__inner">
-                        <h2 className="uu-cta__title">{t("about.ctaTitle")}</h2>
+                        <h1 className="uu-cta__title">{t("about.ctaTitle")}</h1>
 
                         <p className="uu-cta__text">{t("about.ctaText")}</p>
 

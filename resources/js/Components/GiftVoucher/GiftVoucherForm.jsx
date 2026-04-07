@@ -114,13 +114,16 @@ export default function GiftVoucherForm({
                     .querySelector('meta[name="csrf-token"]')
                     ?.getAttribute("content") ?? "";
 
+            const sessionId = localStorage.getItem("werrapark_analytics_sid");
+
             const requestBody = {
                 event: payload.event ?? "button_click",
+                session_id: sessionId,
                 button_id: payload.button_id ?? payload.button ?? "unknown",
                 button_label: payload.button_label ?? null,
                 button_name: payload.button_name ?? null,
                 page: window.location.href,
-                url: url ?? window.location.href,
+                url: window.location.pathname, // API URL'i değil temiz path gönderiyoruz
                 metadata: payload.metadata ?? {},
             };
 
@@ -136,8 +139,8 @@ export default function GiftVoucherForm({
                     body: JSON.stringify(requestBody),
                 });
 
+                // Geri kalan hata kontrolleri aynı kalabilir...
                 const responseText = await response.text();
-
                 let responseData = null;
                 try {
                     responseData = responseText
@@ -146,21 +149,13 @@ export default function GiftVoucherForm({
                 } catch {
                     responseData = responseText;
                 }
-
-                if (!response.ok) {
-                    console.error("🔴 TRACKING FAILED:", {
-                        status: response.status,
-                        data: responseData,
-                    });
-                }
-
                 return responseData;
             } catch (err) {
                 console.error("❌ TRACKING ERROR:", err);
                 return null;
             }
         },
-        [url],
+        [url], // url bağımlılığı zaten var
     );
 
     useEffect(() => {

@@ -105,7 +105,9 @@ function useFooterData() {
 
         const bottomMenu =
             menu.find((m) => Number(m?.id) === 3) ??
-            menu.find((m) => ["bottom", "legal"].includes(m.location ?? m.type ?? m.slug)) ??
+            menu.find((m) =>
+                ["bottom", "legal"].includes(m.location ?? m.type ?? m.slug),
+            ) ??
             null;
         const bottomItems = normalizeMenuLinks(
             bottomMenu?.items ?? bottomMenu?.children ?? [],

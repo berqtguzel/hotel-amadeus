@@ -280,7 +280,9 @@ a {
 
 .page-transition-loader.is-exiting {
     opacity: 0;
-    transition: opacity 360ms ease, visibility 360ms ease;
+    transition:
+        opacity 360ms ease,
+        visibility 360ms ease;
 }
 
 .page-transition-loader__backdrop {

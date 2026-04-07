@@ -330,5 +330,7 @@
     "whatsapp.heading": "WhatsApp Support",
     "whatsapp.text": "Write to us directly – we will get back to you as soon as possible.",
     "whatsapp.startChat": "Start Chat",
-    "whatsapp.defaultMessage": "Hello Werrapark team, I would like to make an inquiry."
+    "whatsapp.defaultMessage": "Hello Werrapark team, I would like to make an inquiry.",
+
+    "weekdaysShort": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 }
