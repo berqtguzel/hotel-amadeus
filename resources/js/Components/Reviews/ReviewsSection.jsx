@@ -232,68 +232,83 @@ const Index = () => {
                                     >
                                         {t("reviews.labelRating")}
                                     </h3>
-                                    {criteria.map((criterion) => (
-                                        <div
-                                            key={criterion.id}
-                                            className="rating-panel"
-                                            style={{
-                                                marginBottom: "10px",
-                                                padding: "10px",
-                                                background: "rgba(0,0,0,0.02)",
-                                                borderRadius: "8px",
-                                            }}
-                                        >
-                                            <div className="rating-texts">
-                                                <span
-                                                    className="rating-title"
-                                                    style={{ fontSize: "1rem" }}
-                                                >
-                                                    {getCriteriaName(criterion)}
-                                                </span>
-                                            </div>
-                                            <div className="star-rating">
-                                                {[1, 2, 3, 4, 5].map((star) => (
-                                                    <button
-                                                        type="button"
-                                                        key={star}
-                                                        className={`star ${
-                                                            star <=
-                                                            (hoverCriteria[
-                                                                criterion.id
-                                                            ] ||
-                                                                criteriaRatings[
-                                                                    criterion.id
-                                                                ])
-                                                                ? "filled"
-                                                                : ""
-                                                        }`}
-                                                        onClick={() =>
-                                                            handleCriteriaRatingChange(
-                                                                criterion.id,
-                                                                star,
-                                                            )
-                                                        }
-                                                        onMouseEnter={() =>
-                                                            setHoverCriteria({
-                                                                ...hoverCriteria,
-                                                                [criterion.id]:
-                                                                    star,
-                                                            })
-                                                        }
-                                                        onMouseLeave={() =>
-                                                            setHoverCriteria({
-                                                                ...hoverCriteria,
-                                                                [criterion.id]: 0,
-                                                            })
-                                                        }
-                                                        aria-label={`${star} ${t("reviews.ariaStars")}`}
+                                    <div>
+                                        {criteria.map((criterion) => (
+                                            <div
+                                                key={criterion.id}
+                                                className="rating-panel"
+                                                style={{
+                                                    marginBottom: "10px",
+                                                    padding: "10px",
+                                                    background:
+                                                        "rgba(0,0,0,0.02)",
+                                                    borderRadius: "8px",
+                                                }}
+                                            >
+                                                <div className="rating-texts">
+                                                    <span
+                                                        className="rating-title"
+                                                        style={{
+                                                            fontSize: "1rem",
+                                                        }}
                                                     >
-                                                        ★
-                                                    </button>
-                                                ))}
+                                                        {getCriteriaName(
+                                                            criterion,
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <div className="star-rating">
+                                                    {[1, 2, 3, 4, 5].map(
+                                                        (star) => (
+                                                            <button
+                                                                type="button"
+                                                                key={star}
+                                                                className={`star ${
+                                                                    star <=
+                                                                    (hoverCriteria[
+                                                                        criterion
+                                                                            .id
+                                                                    ] ||
+                                                                        criteriaRatings[
+                                                                            criterion
+                                                                                .id
+                                                                        ])
+                                                                        ? "filled"
+                                                                        : ""
+                                                                }`}
+                                                                onClick={() =>
+                                                                    handleCriteriaRatingChange(
+                                                                        criterion.id,
+                                                                        star,
+                                                                    )
+                                                                }
+                                                                onMouseEnter={() =>
+                                                                    setHoverCriteria(
+                                                                        {
+                                                                            ...hoverCriteria,
+                                                                            [criterion.id]:
+                                                                                star,
+                                                                        },
+                                                                    )
+                                                                }
+                                                                onMouseLeave={() =>
+                                                                    setHoverCriteria(
+                                                                        {
+                                                                            ...hoverCriteria,
+                                                                            [criterion.id]: 0,
+                                                                        },
+                                                                    )
+                                                                }
+                                                                aria-label={`${star} ${t("reviews.ariaStars")}`}
+                                                            >
+                                                                ★
+                                                            </button>
+                                                        ),
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="rating-panel">

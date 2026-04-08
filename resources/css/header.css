@@ -695,6 +695,9 @@ html.dark .wh-hamburger span,
         gap: 10px;
         font-size: 12px;
     }
+    .wh-nav-desktop {
+        display: none;
+    }
 }
 
 .wh-nav-item {
