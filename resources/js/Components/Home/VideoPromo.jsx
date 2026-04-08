@@ -3,7 +3,7 @@ import "../../../css/video-promo.css";
 import { useTranslation } from "@/i18n";
 
 export default function VideoPromo({
-    poster = "/public/images/Thumbnail2.webp",
+    poster = "/images/Thumbnail2.webp",
     videoId = "dQw4w9WgXcQ",
 }) {
     const { t, locale } = useTranslation();
@@ -69,7 +69,9 @@ export default function VideoPromo({
                             <span className="vp-meta" aria-hidden="true">
                                 {t("videoPromo.meta")}
                             </span>
-                            <span className="vp-cta">{t("videoPromo.cta")}</span>
+                            <span className="vp-cta">
+                                {t("videoPromo.cta")}
+                            </span>
                         </button>
                     )}
                 </div>
