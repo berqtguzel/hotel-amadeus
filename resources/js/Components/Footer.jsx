@@ -1,10 +1,177 @@
 import React, { useMemo } from "react";
 import { usePage } from "@inertiajs/react";
+import { useTranslation } from "@/i18n";
 import { ensureLocaleInUrl } from "@/utils/url";
 
 import { Facebook, Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
 
 import "../../css/Footer.css";
+
+const TREE_IMG = "/images/Logo/tree.png";
+
+const TREE_LAYERS = [
+    { key: "a", className: "wh-tree wh-tree--a", alt: "" },
+    { key: "b", className: "wh-tree wh-tree--b", alt: "" },
+    { key: "c", className: "wh-tree wh-tree--c", alt: "" },
+    { key: "d", className: "wh-tree wh-tree--d", alt: "" },
+];
+
+const LEAVES = [
+    {
+        id: 1,
+        style: {
+            "--leaf-left": "6%",
+            "--leaf-size": "9px",
+            "--leaf-duration": "11.2s",
+            "--leaf-delay": "0s",
+            "--leaf-rotation": "1.05",
+            "--leaf-drift": "-22px",
+        },
+    },
+    {
+        id: 2,
+        style: {
+            "--leaf-left": "16%",
+            "--leaf-size": "11px",
+            "--leaf-duration": "13.6s",
+            "--leaf-delay": "-2.1s",
+            "--leaf-rotation": "1.18",
+            "--leaf-drift": "14px",
+        },
+    },
+    {
+        id: 3,
+        style: {
+            "--leaf-left": "28%",
+            "--leaf-size": "8px",
+            "--leaf-duration": "10.4s",
+            "--leaf-delay": "-4s",
+            "--leaf-rotation": "0.92",
+            "--leaf-drift": "-30px",
+        },
+    },
+    {
+        id: 4,
+        style: {
+            "--leaf-left": "42%",
+            "--leaf-size": "12px",
+            "--leaf-duration": "14.8s",
+            "--leaf-delay": "-1.3s",
+            "--leaf-rotation": "1.22",
+            "--leaf-drift": "26px",
+        },
+    },
+    {
+        id: 5,
+        style: {
+            "--leaf-left": "55%",
+            "--leaf-size": "7px",
+            "--leaf-duration": "9.6s",
+            "--leaf-delay": "-5.5s",
+            "--leaf-rotation": "0.88",
+            "--leaf-drift": "-12px",
+        },
+    },
+    {
+        id: 6,
+        style: {
+            "--leaf-left": "68%",
+            "--leaf-size": "10px",
+            "--leaf-duration": "12.5s",
+            "--leaf-delay": "-3.2s",
+            "--leaf-rotation": "1.1",
+            "--leaf-drift": "18px",
+        },
+    },
+    {
+        id: 7,
+        style: {
+            "--leaf-left": "78%",
+            "--leaf-size": "9px",
+            "--leaf-duration": "11s",
+            "--leaf-delay": "-6.4s",
+            "--leaf-rotation": "1",
+            "--leaf-drift": "-24px",
+        },
+    },
+    {
+        id: 8,
+        style: {
+            "--leaf-left": "88%",
+            "--leaf-size": "11px",
+            "--leaf-duration": "15.2s",
+            "--leaf-delay": "-2.8s",
+            "--leaf-rotation": "1.15",
+            "--leaf-drift": "20px",
+        },
+    },
+    {
+        id: 9,
+        style: {
+            "--leaf-left": "12%",
+            "--leaf-size": "8px",
+            "--leaf-duration": "10.8s",
+            "--leaf-delay": "-7.2s",
+            "--leaf-rotation": "0.95",
+            "--leaf-drift": "8px",
+        },
+    },
+    {
+        id: 10,
+        style: {
+            "--leaf-left": "36%",
+            "--leaf-size": "10px",
+            "--leaf-duration": "12.9s",
+            "--leaf-delay": "-0.6s",
+            "--leaf-rotation": "1.08",
+            "--leaf-drift": "-16px",
+        },
+    },
+    {
+        id: 11,
+        style: {
+            "--leaf-left": "62%",
+            "--leaf-size": "9px",
+            "--leaf-duration": "11.6s",
+            "--leaf-delay": "-4.4s",
+            "--leaf-rotation": "1.02",
+            "--leaf-drift": "12px",
+        },
+    },
+    {
+        id: 12,
+        style: {
+            "--leaf-left": "74%",
+            "--leaf-size": "7px",
+            "--leaf-duration": "9.2s",
+            "--leaf-delay": "-8.1s",
+            "--leaf-rotation": "0.9",
+            "--leaf-drift": "-8px",
+        },
+    },
+    {
+        id: 13,
+        style: {
+            "--leaf-left": "48%",
+            "--leaf-size": "11px",
+            "--leaf-duration": "13.2s",
+            "--leaf-delay": "-1.9s",
+            "--leaf-rotation": "1.2",
+            "--leaf-drift": "28px",
+        },
+    },
+    {
+        id: 14,
+        style: {
+            "--leaf-left": "92%",
+            "--leaf-size": "8px",
+            "--leaf-duration": "10.1s",
+            "--leaf-delay": "-3.7s",
+            "--leaf-rotation": "0.98",
+            "--leaf-drift": "-20px",
+        },
+    },
+];
 
 function flattenMenuItems(items) {
     if (!Array.isArray(items)) return [];
@@ -193,12 +360,13 @@ function SocialLink({ item }) {
             target="_blank"
             rel="noopener noreferrer"
         >
-            <Icon size={18} strokeWidth={1.8} />
+            <Icon size={15} strokeWidth={1.8} />
         </a>
     );
 }
 
 function ContactBlock({ address, email, phone, website, mapUrl }) {
+    const { t } = useTranslation();
     const lines = (address || "").split("\n").filter(Boolean);
     const hasLinks = phone || email || website || mapUrl;
     if (!lines.length && !hasLinks) return null;
@@ -216,79 +384,116 @@ function ContactBlock({ address, email, phone, website, mapUrl }) {
                 </address>
             )}
             {hasLinks && (
-                <div className="wh-foot-links">
+                <ul className="wh-foot-links">
                     {phone && (
-                        <a
-                            href={`tel:${phone.replace(/\s/g, "")}`}
-                            className="wh-foot-link"
-                        >
-                            {phone}
-                        </a>
+                        <li key="phone">
+                            <a
+                                href={`tel:${phone.replace(/\s/g, "")}`}
+                                className="wh-foot-link"
+                            >
+                                {phone}
+                            </a>
+                        </li>
                     )}
                     {email && (
-                        <a href={`mailto:${email}`} className="wh-foot-link">
-                            {email}
-                        </a>
+                        <li key="email">
+                            <a
+                                href={`mailto:${email}`}
+                                className="wh-foot-link"
+                            >
+                                {email}
+                            </a>
+                        </li>
                     )}
                     {website && (
-                        <a
-                            href={website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="wh-foot-link"
-                        >
-                            {website
-                                .replace(/^https?:\/\//, "")
-                                .replace(/\/$/, "")}
-                        </a>
+                        <li key="website">
+                            <a
+                                href={website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="wh-foot-link"
+                            >
+                                {website
+                                    .replace(/^https?:\/\//, "")
+                                    .replace(/\/$/, "")}
+                            </a>
+                        </li>
                     )}
                     {mapUrl && (
-                        <a
-                            href={mapUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="wh-foot-link"
-                        >
-                            Karte anzeigen
-                        </a>
+                        <li key="map">
+                            <a
+                                href={mapUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="wh-foot-link"
+                            >
+                                {t("footer.viewOnMap")}
+                            </a>
+                        </li>
                     )}
-                </div>
+                </ul>
             )}
         </div>
     );
 }
 
 export default function Footer() {
+    const { t } = useTranslation();
     const d = useFooterData();
     const year = new Date().getFullYear();
 
-    const hasCta = d.ctaTitle && d.ctaLabel && d.ctaHref;
+    const ctaTitleText = d.ctaTitle ?? t("footer.ctaTitle");
+    const ctaLabelText = d.ctaLabel ?? t("footer.planYourStay");
+    const ctaHrefResolved =
+        d.ctaHref ?? ensureLocaleInUrl("/hotels", d.locale);
+
     const hasBrand = d.logo || d.description || d.social.length > 0;
     const hasNav = d.navItems.length > 0;
     const hasContact = d.address || d.email || d.phone || d.website || d.mapUrl;
 
     return (
         <footer className="wh-foot" role="contentinfo">
-            {hasCta && (
-                <div className="wh-foot-cta">
-                    <div className="wh-container wh-foot-cta__inner">
-                        <h3>{d.ctaTitle}</h3>
-                        <a
-                            href={`/track?${new URLSearchParams({
-                                redirect: ensureLocaleInUrl(
-                                    d.ctaHref,
-                                    d.locale,
-                                ),
-                                button_id: "footer-cta",
-                                button_label: d.ctaLabel || "",
-                            }).toString()}`}
-                            className="wh-btn wh-btn--invert"
-                        >
-                            {d.ctaLabel}
-                        </a>
-                    </div>
+            <div className="wh-foot-ambient" aria-hidden="true" />
+            <div className="wh-nature-layer" aria-hidden="true">
+                {TREE_LAYERS.map((layer) => (
+                    <img
+                        key={layer.key}
+                        src={TREE_IMG}
+                        alt={layer.alt}
+                        className={layer.className}
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ))}
+                <div className="wh-leaves">
+                    {LEAVES.map((leaf) => (
+                        <span
+                            key={leaf.id}
+                            className="wh-leaf"
+                            style={leaf.style}
+                            aria-hidden="true"
+                        />
+                    ))}
                 </div>
-            )}
+            </div>
+            <div className="wh-foot-cta">
+                <div className="wh-container wh-foot-cta__inner">
+                    <h2 id="footer-cta-title">{ctaTitleText}</h2>
+                    <a
+                        href={`/track?${new URLSearchParams({
+                            redirect: ensureLocaleInUrl(
+                                ctaHrefResolved,
+                                d.locale,
+                            ),
+                            button_id: "footer-cta",
+                            button_label: ctaLabelText,
+                        }).toString()}`}
+                        className="wh-btn wh-btn--primary"
+                    >
+                        {ctaLabelText}
+                    </a>
+                </div>
+            </div>
 
             {(hasBrand || hasNav || hasContact) && (
                 <div className="wh-foot-main">
@@ -338,7 +543,9 @@ export default function Footer() {
 
                         {hasContact && (
                             <div className="wh-foot-col">
-                                <h4 className="wh-foot-title">Kontakt</h4>
+                                <h4 className="wh-foot-title">
+                                    {t("footer.contact")}
+                                </h4>
                                 <ContactBlock
                                     address={d.address}
                                     email={d.email}
@@ -357,7 +564,8 @@ export default function Footer() {
                     <div className="wh-container wh-foot-bottom__inner">
                         {d.siteName && (
                             <p className="wh-foot-copy">
-                                &copy; {year} {d.siteName}
+                                &copy; {year} {d.siteName}.{" "}
+                                {t("footer.rightsReserved")}
                             </p>
                         )}
                         {d.legalLinks.length > 0 && (

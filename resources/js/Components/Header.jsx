@@ -122,6 +122,10 @@ export default function Header({ currentRoute }) {
 
     const [open, setOpen] = React.useState(false);
     const [mobileSub, setMobileSub] = React.useState(null);
+    const navRowRef = React.useRef(null);
+    const navFitWrapRef = React.useRef(null);
+    const navDesktopRef = React.useRef(null);
+    const [navFontPx, setNavFontPx] = React.useState(12);
 
     React.useEffect(() => {
         document.body.style.overflow = open ? "hidden" : "";
@@ -137,6 +141,96 @@ export default function Header({ currentRoute }) {
     const mobileNav = navFromApi ?? [];
     const groupBookingLabel = t("header.groupBooking");
     const bestPriceLabel = t("header.bestPriceBooking");
+
+    React.useLayoutEffect(() => {
+        const row = navRowRef.current;
+        const wrap = navFitWrapRef.current;
+        const nav = navDesktopRef.current;
+        if (!row || !wrap || !nav || desktopNav.length === 0) {
+            setNavFontPx(12);
+            return;
+        }
+
+        const fit = () => {
+            const desktopMq = window.matchMedia("(min-width: 1024px)");
+            if (!desktopMq.matches) {
+                setNavFontPx(12);
+                return;
+            }
+
+            const brand = row.querySelector(".wh-brand");
+            const ctas = row.querySelector(".wh-nav-ctas");
+            const cs = getComputedStyle(row);
+            const gapPx = parseFloat(cs.gap) || 0;
+            /* Grid: logo | nav | CTA — iki aralık; CTA genişliği ölçülemezse taşma olur */
+            const reserved = 44;
+            let cw =
+                row.clientWidth -
+                (brand?.offsetWidth ?? 0) -
+                (ctas?.offsetWidth ?? 0) -
+                2 * gapPx -
+                reserved;
+            cw = Math.max(32, Math.floor(cw));
+
+            if (cw < 40) {
+                setNavFontPx(12);
+                return;
+            }
+
+            const pad = 6;
+
+            const maxFs = 11.5;
+            const minFs = 6;
+            let lo = minFs;
+            let hi = maxFs;
+            let best = minFs;
+
+            for (let i = 0; i < 30; i++) {
+                const mid = (lo + hi) / 2;
+                nav.style.fontSize = `${mid}px`;
+                const sw = nav.scrollWidth;
+                if (sw <= cw - pad) {
+                    best = mid;
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+                if (hi - lo < 0.09) break;
+            }
+
+            nav.style.fontSize = `${best}px`;
+            let guard = 0;
+            while (
+                nav.scrollWidth > cw - pad + 1 &&
+                best > 5.85 &&
+                guard < 64
+            ) {
+                best -= 0.1;
+                nav.style.fontSize = `${best}px`;
+                guard += 1;
+            }
+
+            nav.style.fontSize = "";
+            setNavFontPx(Math.round(best * 100) / 100);
+        };
+
+        fit();
+
+        const ro = new ResizeObserver(() =>
+            requestAnimationFrame(fit),
+        );
+        ro.observe(row);
+        ro.observe(wrap);
+
+        const mq = window.matchMedia("(min-width: 1024px)");
+        const onMq = () => requestAnimationFrame(fit);
+        mq.addEventListener("change", onMq);
+
+        return () => {
+            ro.disconnect();
+            mq.removeEventListener("change", onMq);
+        };
+    }, [apiMenu, locale, navFromApi]);
 
     return (
         <header className="wh-header">
@@ -169,7 +263,7 @@ export default function Header({ currentRoute }) {
             </div>
 
             <div className="wh-navwrap">
-                <div className="wh-container wh-nav__inner">
+                <div className="wh-container wh-nav__inner" ref={navRowRef}>
                     <Link href="/" className="wh-brand">
                         <img
                             src={logoLight}
@@ -192,7 +286,13 @@ export default function Header({ currentRoute }) {
                         />
                     </Link>
 
-                    <nav className="wh-nav-desktop">
+                    <div className="wh-nav-fit" ref={navFitWrapRef}>
+                        <nav
+                            className="wh-nav-desktop"
+                            ref={navDesktopRef}
+                            style={{ fontSize: `${navFontPx}px` }}
+                            aria-label="Main navigation"
+                        >
                         {desktopNav.map((n, i) => {
                             const hasChildren = n.children?.length;
 
@@ -202,7 +302,9 @@ export default function Header({ currentRoute }) {
                                         href={n.url}
                                         className={`wh-link ${currentRoute === n.key ? "is-active" : ""}`}
                                     >
-                                        {n.name}
+                                        <span className="wh-link__label">
+                                            {n.name}
+                                        </span>
 
                                         {hasChildren && (
                                             <span className="wh-arrow">▾</span>
@@ -225,7 +327,8 @@ export default function Header({ currentRoute }) {
                                 </div>
                             );
                         })}
-                    </nav>
+                        </nav>
+                    </div>
 
                     <div className="wh-nav-ctas wh-ctas-desktop">
                         <a
@@ -275,8 +378,10 @@ export default function Header({ currentRoute }) {
                         </a>
                     </div>
                     <button
+                        type="button"
                         className="wh-hamburger"
                         onClick={() => setOpen(true)}
+                        aria-label="Menu"
                     >
                         <span />
                         <span />
@@ -287,8 +392,10 @@ export default function Header({ currentRoute }) {
 
             <div className={`wh-drawer ${open ? "is-open" : ""}`}>
                 <button
+                    type="button"
                     className="wh-drawer__backdrop"
                     onClick={() => setOpen(false)}
+                    aria-label="Close menu"
                 />
 
                 <aside className="wh-drawer__panel">
@@ -309,7 +416,7 @@ export default function Header({ currentRoute }) {
                             />
 
                             <img
-                                src={logoLight}
+                                src={logoDark}
                                 alt={
                                     branding.site_name ??
                                     branding.siteName ??
@@ -320,57 +427,82 @@ export default function Header({ currentRoute }) {
                         </Link>
 
                         <button
+                            type="button"
                             className="wh-close"
                             onClick={() => setOpen(false)}
+                            aria-label="Close"
                         >
                             ×
                         </button>
                     </div>
 
                     <div className="wh-drawer__body">
-                        {mobileNav.map((n, i) => {
-                            const hasChildren = n.children?.length;
+                        <nav
+                            className="wh-m-nav"
+                            aria-label="Mobil menü"
+                        >
+                            {mobileNav.map((n, i) => {
+                                const hasChildren = n.children?.length;
 
-                            return (
-                                <div key={i}>
-                                    <button
-                                        className="wh-m-link"
-                                        onClick={() =>
-                                            hasChildren
-                                                ? setMobileSub(
-                                                      mobileSub === i
-                                                          ? null
-                                                          : i,
-                                                  )
-                                                : setOpen(false)
-                                        }
-                                    >
-                                        {n.name}
-
-                                        {hasChildren && <span>▾</span>}
-                                    </button>
-
-                                    {hasChildren && mobileSub === i && (
-                                        <div className="wh-m-sub">
-                                            {n.children.map((c, j) => (
-                                                <Link
-                                                    key={j}
-                                                    href={c.url}
-                                                    className="wh-m-sublink"
-                                                    onClick={() =>
-                                                        setOpen(false)
-                                                    }
+                                return (
+                                    <div key={i} className="wh-m-item">
+                                        {hasChildren ? (
+                                            <button
+                                                type="button"
+                                                className="wh-m-link"
+                                                aria-expanded={
+                                                    mobileSub === i
+                                                }
+                                                onClick={() =>
+                                                    setMobileSub(
+                                                        mobileSub === i
+                                                            ? null
+                                                            : i,
+                                                    )
+                                                }
+                                            >
+                                                <span>{n.name}</span>
+                                                <span
+                                                    className={`wh-m-chevron ${mobileSub === i ? "is-open" : ""}`}
+                                                    aria-hidden
                                                 >
-                                                    {c.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                                    ▾
+                                                </span>
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                href={n.url}
+                                                className="wh-m-link wh-m-link--leaf"
+                                                onClick={() => setOpen(false)}
+                                            >
+                                                <span>{n.name}</span>
+                                            </Link>
+                                        )}
+
+                                        {hasChildren && mobileSub === i && (
+                                            <div className="wh-m-sub">
+                                                {n.children.map((c, j) => (
+                                                    <Link
+                                                        key={j}
+                                                        href={c.url}
+                                                        className="wh-m-sublink"
+                                                        onClick={() =>
+                                                            setOpen(false)
+                                                        }
+                                                    >
+                                                        {c.name}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </nav>
                         <div className="wh-m-ctas">
-                            <LanguageSwitcher locale={locale} />
+                            <div className="wh-m-lang">
+                                <LanguageSwitcher locale={locale} />
+                            </div>
                             <a
                                 href="https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0"
                                 className="wh-btn wh-btn--light wh-btn--block"
@@ -421,11 +553,11 @@ export default function Header({ currentRoute }) {
                                 {bestPriceLabel}
                             </a>
 
-                            <div className="wh-topbar__left">
+                            <div className="wh-m-contact-block">
                                 {contactEmail ? (
                                     <a
                                         href={`mailto:${contactEmail}`}
-                                        className="wh-toplink"
+                                        className="wh-m-contact-link"
                                     >
                                         {contactEmail}
                                     </a>
@@ -434,7 +566,7 @@ export default function Header({ currentRoute }) {
                                 {contactPhone ? (
                                     <a
                                         href={`tel:${contactPhone.replace(/\s/g, "")}`}
-                                        className="wh-toplink"
+                                        className="wh-m-contact-link"
                                     >
                                         {contactPhone}
                                     </a>

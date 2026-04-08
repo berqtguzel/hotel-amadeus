@@ -296,6 +296,7 @@ html[data-theme="dark"] .of-list,
 .of-pdf-cta-title {
     font-family: var(--font-sans);
     font-size: var(--text-base);
+    color: white;
     font-weight: var(--font-extrabold);
     letter-spacing: 0.04em;
     text-transform: uppercase;

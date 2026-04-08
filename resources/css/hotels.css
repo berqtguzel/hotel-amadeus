@@ -57,6 +57,7 @@
     line-height: var(--leading-relaxed);
     margin: -20px auto 28px;
     max-width: 780px;
+    color: white;
     text-align: center;
 }
 

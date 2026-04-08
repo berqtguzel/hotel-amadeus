@@ -2,6 +2,12 @@
     "header.groupBooking": "Grup rezervasyon",
     "header.bestPriceBooking": "En iyi fiyat",
 
+    "footer.ctaTitle": "Bir sonraki doğa kaçamağınıza hazır mısınız?",
+    "footer.planYourStay": "Konaklamanızı planlayın",
+    "footer.contact": "İletişim",
+    "footer.viewOnMap": "Haritada görüntüle",
+    "footer.rightsReserved": "Tüm hakları saklıdır.",
+
     "hotels.title": "Otellerimiz",
     "hotels.subtitle": "Thüringen Ormanı'ndaki otellerimizi keşfedin – konforlu, doğayla iç içe ve samimi bir misafirperverlik anlayışıyla.",
     "hotels.cta": "Otele Git",
