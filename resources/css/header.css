@@ -35,8 +35,6 @@
     --wp-radius-lg: 16px;
 }
 
-/* Theme tokens: light = panel (parlak yeşil) + yüksek kontrast; dark = önceki premium koyu orman (.wh-foot ile aynı şablon, header kapsamı) */
-
 html.light .wh-header,
 html:not(.dark) .wh-header {
     --wh-ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
@@ -296,17 +294,6 @@ html:not(.dark) .wh-header .wh-social:hover {
     box-sizing: border-box;
 }
 
-.wh-nav-fit {
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
 .wh-brand {
     display: flex;
     align-items: center;
@@ -333,12 +320,6 @@ html.dark .wh-brand__logo--light {
 
 html.dark .wh-brand__logo--dark {
     display: block;
-}
-
-.wh-nav-desktop {
-    display: none;
-    align-items: center;
-    gap: 30px;
 }
 
 @media (min-width: 1024px) {

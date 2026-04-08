@@ -216,9 +216,7 @@ export default function Header({ currentRoute }) {
 
         fit();
 
-        const ro = new ResizeObserver(() =>
-            requestAnimationFrame(fit),
-        );
+        const ro = new ResizeObserver(() => requestAnimationFrame(fit));
         ro.observe(row);
         ro.observe(wrap);
 
@@ -286,13 +284,12 @@ export default function Header({ currentRoute }) {
                         />
                     </Link>
 
-                    <div className="wh-nav-fit" ref={navFitWrapRef}>
-                        <nav
-                            className="wh-nav-desktop"
-                            ref={navDesktopRef}
-                            style={{ fontSize: `${navFontPx}px` }}
-                            aria-label="Main navigation"
-                        >
+                    <nav
+                        className="wh-nav-desktop"
+                        ref={navDesktopRef}
+                        style={{ fontSize: `${navFontPx}px` }}
+                        aria-label="Main navigation"
+                    >
                         {desktopNav.map((n, i) => {
                             const hasChildren = n.children?.length;
 
@@ -327,8 +324,7 @@ export default function Header({ currentRoute }) {
                                 </div>
                             );
                         })}
-                        </nav>
-                    </div>
+                    </nav>
 
                     <div className="wh-nav-ctas wh-ctas-desktop">
                         <a
@@ -437,10 +433,7 @@ export default function Header({ currentRoute }) {
                     </div>
 
                     <div className="wh-drawer__body">
-                        <nav
-                            className="wh-m-nav"
-                            aria-label="Mobil menü"
-                        >
+                        <nav className="wh-m-nav" aria-label="Mobil menü">
                             {mobileNav.map((n, i) => {
                                 const hasChildren = n.children?.length;
 
@@ -450,9 +443,7 @@ export default function Header({ currentRoute }) {
                                             <button
                                                 type="button"
                                                 className="wh-m-link"
-                                                aria-expanded={
-                                                    mobileSub === i
-                                                }
+                                                aria-expanded={mobileSub === i}
                                                 onClick={() =>
                                                     setMobileSub(
                                                         mobileSub === i
