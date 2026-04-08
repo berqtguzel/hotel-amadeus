@@ -706,6 +706,68 @@ export default function RoomShow() {
                             />
                             <div className="rux-overlay" />
 
+                            {hotelFacts[0] ? (
+                                <div className="rd-hotel-float rd-hotel-float--left">
+                                    <span>{hotelFacts[0].label}</span>
+                                    <strong>{hotelFacts[0].value}</strong>
+                                </div>
+                            ) : null}
+
+                            {hotelFacts[1] ? (
+                                <div className="rd-hotel-float rd-hotel-float--right">
+                                    <span>{hotelFacts[1].label}</span>
+                                    <strong>{hotelFacts[1].value}</strong>
+                                </div>
+                            ) : null}
+
+                            {data.hotel?.stars ? (
+                                <div className="rd-hotel-float rd-hotel-float--stars">
+                                    <span>{t("roomDetail.hotelStarsLabel")}</span>
+                                    <div className="rd-stars-row" aria-hidden="true">
+                                        {Array.from(
+                                            { length: Number(data.hotel.stars) },
+                                            (_, index) => (
+                                                <Star key={index} size={12} />
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+                            ) : null}
+
+                            {boardPriceItems.length > 0 ? (
+                                <div className="rd-price-float">
+                                    <span className="rd-price-float__title">
+                                        {t("roomDetail.boardPriceTitle")}
+                                    </span>
+                                    <div className="rd-price-float__list">
+                                        {boardPriceItems
+                                            .slice(0, 2)
+                                            .map((item, index) => (
+                                                <p
+                                                    key={
+                                                        item.id ??
+                                                        `${item.name}-${index}`
+                                                    }
+                                                >
+                                                    <strong>
+                                                        {item.name ||
+                                                            item.code ||
+                                                            "Basis"}
+                                                    </strong>
+                                                    <em>
+                                                        {item.price != null
+                                                            ? formatMoney(
+                                                                  item.price,
+                                                                  locale,
+                                                              )
+                                                            : "—"}
+                                                    </em>
+                                                </p>
+                                            ))}
+                                    </div>
+                                </div>
+                            ) : null}
+
                             {images.length > 1 && (
                                 <>
                                     <button
@@ -728,28 +790,68 @@ export default function RoomShow() {
                             )}
                         </figure>
 
-                        <div className="rux-thumbs">
-                            {images.map((image, index) => (
-                                <button
-                                    key={`${image.url}-${index}`}
-                                    type="button"
-                                    className={`rux-thumb ${index === activeIndex ? "is-active" : ""}`}
-                                    onClick={() => setActiveIndex(index)}
-                                    aria-label={t("roomDetail.imageN", {
-                                        n: index + 1,
-                                    })}
-                                >
-                                    <img
-                                        src={image.url}
-                                        alt={image.alt || ""}
-                                        aria-hidden="true"
-                                    />
-                                </button>
-                            ))}
+                        <div className="rux-thumbs rux-thumbs--single">
+                            <button
+                                type="button"
+                                className="rux-thumb-nav"
+                                onClick={goPrev}
+                                aria-label={t("roomDetail.prevImage")}
+                                disabled={images.length <= 1}
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+
+                            <button
+                                type="button"
+                                className="rux-thumb rux-thumb--single is-active"
+                                onClick={goNext}
+                                aria-label={t("roomDetail.nextImage")}
+                                disabled={images.length <= 1}
+                            >
+                                <img
+                                    src={activeImage.url}
+                                    alt={activeImage.alt || ""}
+                                    aria-hidden="true"
+                                />
+                            </button>
+
+                            <button
+                                type="button"
+                                className="rux-thumb-nav"
+                                onClick={goNext}
+                                aria-label={t("roomDetail.nextImage")}
+                                disabled={images.length <= 1}
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+
+                            <span className="rux-thumb-counter" aria-live="polite">
+                                {activeIndex + 1}/{images.length}
+                            </span>
                         </div>
+
+                        {hotelFacts.length > 0 && (
+                            <section className="rd-hotel-strip">
+                                <header className="rd-hotel-strip__head">
+                                    <Hotel size={15} />
+                                    <h3>{t("roomDetail.hotelInfoTitle")}</h3>
+                                </header>
+                                <div className="rd-hotel-strip__grid">
+                                    {hotelFacts.map((fact, i) => (
+                                        <article key={i} className="rd-hotel-chip">
+                                            <div className="rd-hotel-chip__label">
+                                                {fact.icon}
+                                                <span>{fact.label}</span>
+                                            </div>
+                                            <strong>{fact.value}</strong>
+                                        </article>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
                     </article>
 
-                    <aside className="rux-aside">
+                    <aside className="rux-aside rux-aside--compact">
                         <p className="rux-eyebrow">{t("roomDetail.eyebrow")}</p>
                         <h1 id="rux-title" className="rux-title">
                             {data.name}
@@ -761,29 +863,6 @@ export default function RoomShow() {
                                 <span>{data.viewType}</span>
                             </p>
                         ) : null}
-
-                        {hotelFacts.length > 0 && (
-                            <article className="rux-hotel-card">
-                                <div className="rux-hotel-card__head">
-                                    <Hotel size={16} />
-                                    <h2>{t("roomDetail.hotelInfoTitle")}</h2>
-                                </div>
-                                <div className="rux-hotel-card__body">
-                                    {hotelFacts.map((fact, i) => (
-                                        <article
-                                            key={i}
-                                            className="rux-hotel-card__item"
-                                        >
-                                            <div className="rux-hotel-card__label">
-                                                {fact.icon}
-                                                <span>{fact.label}</span>
-                                            </div>
-                                            <strong>{fact.value}</strong>
-                                        </article>
-                                    ))}
-                                </div>
-                            </article>
-                        )}
 
                         <RoomCalendar
                             t={t}
@@ -804,16 +883,6 @@ export default function RoomShow() {
                             getFirstSelectableDay={getFirstSelectableDay}
                         />
 
-                        {data.introLines.length > 0 ? (
-                            <div className="rux-intro">
-                                {data.introLines.map((line, index) => (
-                                    <p key={index}>{line}</p>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="rux-intro">{data.description}</p>
-                        )}
-
                         {quickFacts.length > 0 && (
                             <div className="rux-facts rux-facts--grid">
                                 {quickFacts.map((fact, i) => (
@@ -827,149 +896,145 @@ export default function RoomShow() {
                                 ))}
                             </div>
                         )}
-
-                        <article className="rux-cta">
-                            <p className="rux-kicker">
-                                {t("roomDetail.idealFor")}
-                            </p>
-                            <h2>
-                                {[data.roomType, data.viewType]
-                                    .filter(Boolean)
-                                    .join(" · ") || data.name}
-                            </h2>
-                            <p>{t("roomDetail.bookingText")}</p>
-                            <div className="rux-actions">
-                                <a
-                                    href={`/${locale}/kontakt`}
-                                    className="rux-btn rux-btn--primary"
-                                >
-                                    {t("roomDetail.requestBtn")}
-                                </a>
-                                <a
-                                    href={locale === "de" ? "/" : `/${locale}`}
-                                    className="rux-btn rux-btn--ghost"
-                                >
-                                    {t("roomDetail.homeBtn")}
-                                </a>
-                            </div>
-                        </article>
                     </aside>
                 </div>
 
                 <div className="rux-bottom">
-                    {data.descriptionSections.length > 0 && (
-                        <article className="rux-panel rux-panel--sections">
-                            <div className="rux-panel-head">
-                                <ScrollText size={17} />
-                                <h3>{t("roomDetail.detailsTitle")}</h3>
-                            </div>
-                            <div className="rux-section-grid">
-                                {data.descriptionSections.map(
-                                    (section, index) => {
-                                        const Icon = sectionIcon(section.title);
-
-                                        return (
-                                            <section
-                                                className="rux-subpanel"
-                                                key={`${section.title}-${index}`}
-                                            >
-                                                <div className="rux-subpanel__head">
-                                                    <Icon size={16} />
-                                                    <h4>{section.title}</h4>
-                                                </div>
-                                                <ul className="rux-list">
-                                                    {section.items.map(
-                                                        (item, itemIndex) => (
-                                                            <li
-                                                                key={`${item}-${itemIndex}`}
-                                                            >
-                                                                <CheckCircle2
-                                                                    size={16}
-                                                                />
-                                                                <span>
-                                                                    {item}
-                                                                </span>
-                                                            </li>
-                                                        ),
-                                                    )}
-                                                </ul>
-                                            </section>
-                                        );
-                                    },
-                                )}
-                            </div>
+                    {(data.introLines.length > 0 || data.description) && (
+                        <article className="rux-panel rux-panel--collapse rux-panel--sections">
+                            <details className="rux-collapse">
+                                <summary className="rux-collapse__summary">
+                                    <div className="rux-panel-head">
+                                        <ScrollText size={17} />
+                                        <h3>Room Story</h3>
+                                    </div>
+                                </summary>
+                                <div className="rux-collapse__content">
+                                    {data.introLines.length > 0 ? (
+                                        <div className="rux-intro">
+                                            {data.introLines.map(
+                                                (line, index) => (
+                                                    <p key={index}>{line}</p>
+                                                ),
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className="rux-intro">
+                                            {data.description}
+                                        </p>
+                                    )}
+                                </div>
+                            </details>
                         </article>
                     )}
 
-                    {boardPriceItems.length > 0 && (
-                        <article className="rux-panel">
-                            <div className="rux-panel-head">
-                                <BedDouble size={17} />
-                                <h3>{t("roomDetail.boardPriceTitle")}</h3>
-                            </div>
-                            <ul className="rux-list">
-                                {boardPriceItems.map((item) => (
-                                    <li
-                                        key={
-                                            item.id ??
-                                            `${item.name}-${item.code}`
-                                        }
-                                    >
-                                        <CheckCircle2 size={16} />
-                                        <span>
-                                            {[
-                                                item.name,
-                                                item.code,
-                                                item.description,
-                                                item.price != null
-                                                    ? formatMoney(
-                                                          item.price,
-                                                          locale,
-                                                      )
-                                                    : null,
-                                            ]
-                                                .filter(Boolean)
-                                                .join(" · ")}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
+                    {data.descriptionSections.length > 0 && (
+                        <article className="rux-panel rux-panel--sections rux-panel--collapse">
+                            <details className="rux-collapse" open>
+                                <summary className="rux-collapse__summary">
+                                    <div className="rux-panel-head">
+                                        <ScrollText size={17} />
+                                        <h3>{t("roomDetail.detailsTitle")}</h3>
+                                    </div>
+                                </summary>
+                                <div className="rux-collapse__content">
+                                    <div className="rux-section-grid">
+                                        {data.descriptionSections.map(
+                                            (section, index) => {
+                                                const Icon =
+                                                    sectionIcon(section.title);
+
+                                                return (
+                                                    <section
+                                                        className="rux-subpanel"
+                                                        key={`${section.title}-${index}`}
+                                                    >
+                                                        <div className="rux-subpanel__head">
+                                                            <Icon size={16} />
+                                                            <h4>{section.title}</h4>
+                                                        </div>
+                                                        <ul className="rux-list">
+                                                            {section.items.map(
+                                                                (
+                                                                    item,
+                                                                    itemIndex,
+                                                                ) => (
+                                                                    <li
+                                                                        key={`${item}-${itemIndex}`}
+                                                                    >
+                                                                        <CheckCircle2
+                                                                            size={16}
+                                                                        />
+                                                                        <span>
+                                                                            {item}
+                                                                        </span>
+                                                                    </li>
+                                                                ),
+                                                            )}
+                                                        </ul>
+                                                    </section>
+                                                );
+                                            },
+                                        )}
+                                    </div>
+                                </div>
+                            </details>
                         </article>
                     )}
 
                     {data.features.length > 0 && (
-                        <article className="rux-panel rux-panel--amenities">
-                            <div className="rux-panel-head">
-                                <Sparkles size={17} />
-                                <h3>{t("roomDetail.amenities")}</h3>
-                            </div>
-                            <div className="rux-chip-grid">
-                                {data.features.map((item) => (
-                                    <span className="rux-chip" key={item.id}>
-                                        {item.name}
-                                    </span>
-                                ))}
-                            </div>
+                        <article className="rux-panel rux-panel--amenities rux-panel--collapse">
+                            <details className="rux-collapse">
+                                <summary className="rux-collapse__summary">
+                                    <div className="rux-panel-head">
+                                        <Sparkles size={17} />
+                                        <h3>{t("roomDetail.amenities")}</h3>
+                                    </div>
+                                </summary>
+                                <div className="rux-collapse__content">
+                                    <div className="rux-chip-grid">
+                                        {data.features.map((item) => (
+                                            <span className="rux-chip" key={item.id}>
+                                                {item.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </details>
                         </article>
                     )}
 
                     {data.amenities.length > 0 &&
                         data.features.length === 0 && (
-                            <article className="rux-panel rux-panel--amenities">
-                                <div className="rux-panel-head">
-                                    <Sparkles size={17} />
-                                    <h3>{t("roomDetail.amenities")}</h3>
-                                </div>
-                                <div className="rux-chip-grid">
-                                    {data.amenities.map((item) => (
-                                        <span className="rux-chip" key={item}>
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
+                            <article className="rux-panel rux-panel--amenities rux-panel--collapse">
+                                <details className="rux-collapse">
+                                    <summary className="rux-collapse__summary">
+                                        <div className="rux-panel-head">
+                                            <Sparkles size={17} />
+                                            <h3>{t("roomDetail.amenities")}</h3>
+                                        </div>
+                                    </summary>
+                                    <div className="rux-collapse__content">
+                                        <div className="rux-chip-grid">
+                                            {data.amenities.map((item) => (
+                                                <span className="rux-chip" key={item}>
+                                                    {item}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </details>
                             </article>
                         )}
                 </div>
+
+                <a
+                    href={`/${locale}/kontakt`}
+                    className="rux-contact-fab"
+                    aria-label="Kontakt sayfasına git"
+                >
+                    Kontakt
+                </a>
             </section>
         </AppLayout>
     );
