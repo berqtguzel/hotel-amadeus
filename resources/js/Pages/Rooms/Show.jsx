@@ -752,7 +752,7 @@ export default function RoomShow() {
                                                     <strong>
                                                         {item.name ||
                                                             item.code ||
-                                                            "Basis"}
+                                                            t("roomDetail.baseRateLabel")}
                                                     </strong>
                                                     <em>
                                                         {item.price != null
@@ -760,7 +760,7 @@ export default function RoomShow() {
                                                                   item.price,
                                                                   locale,
                                                               )
-                                                            : "—"}
+                                                            : t("roomDetail.notAvailableShort")}
                                                     </em>
                                                 </p>
                                             ))}
@@ -906,7 +906,7 @@ export default function RoomShow() {
                                 <summary className="rux-collapse__summary">
                                     <div className="rux-panel-head">
                                         <ScrollText size={17} />
-                                        <h3>Room Story</h3>
+                                        <h3>{t("roomDetail.storyTitle")}</h3>
                                     </div>
                                 </summary>
                                 <div className="rux-collapse__content">
@@ -1031,9 +1031,9 @@ export default function RoomShow() {
                 <a
                     href={`/${locale}/kontakt`}
                     className="rux-contact-fab"
-                    aria-label="Kontakt sayfasına git"
+                    aria-label={t("roomDetail.contactFabAria")}
                 >
-                    Kontakt
+                    {t("roomDetail.contactFabLabel")}
                 </a>
             </section>
         </AppLayout>

@@ -1,4 +1,7 @@
 {
+    "header.groupBooking": "Group booking",
+    "header.bestPriceBooking": "Book best rate",
+
     "hotels.title": "Our Hotels",
     "hotels.subtitle": "Discover our properties in the Thuringian Forest – comfortable, close to nature, and with warm hospitality.",
     "hotels.cta": "To Hotel",
@@ -95,6 +98,11 @@
     "roomDetail.homeBtn": "Back to Home",
     "roomDetail.roomCategories": "Room Categories",
     "roomDetail.boardPriceTitle": "Board & Base Prices",
+    "roomDetail.baseRateLabel": "Base",
+    "roomDetail.notAvailableShort": "—",
+    "roomDetail.storyTitle": "About the Room",
+    "roomDetail.contactFabLabel": "Contact",
+    "roomDetail.contactFabAria": "Go to contact page",
     "roomDetail.amenities": "Amenities",
     "roomDetail.roomTypeLabel": "Room Type",
     "roomDetail.capacityLabel": "Capacity",

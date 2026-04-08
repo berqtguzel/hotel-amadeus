@@ -1,4 +1,7 @@
 {
+    "header.groupBooking": "Grup rezervasyon",
+    "header.bestPriceBooking": "En iyi fiyat",
+
     "hotels.title": "Otellerimiz",
     "hotels.subtitle": "Thüringen Ormanı'ndaki otellerimizi keşfedin – konforlu, doğayla iç içe ve samimi bir misafirperverlik anlayışıyla.",
     "hotels.cta": "Otele Git",
@@ -95,6 +98,11 @@
     "roomDetail.homeBtn": "Ana Sayfaya Dön",
     "roomDetail.roomCategories": "Oda Kategorileri",
     "roomDetail.boardPriceTitle": "Yemek Servisi & Baz Fiyatlar",
+    "roomDetail.baseRateLabel": "Temel",
+    "roomDetail.notAvailableShort": "—",
+    "roomDetail.storyTitle": "Oda Hakkında",
+    "roomDetail.contactFabLabel": "İletişim",
+    "roomDetail.contactFabAria": "İletişim sayfasına git",
     "roomDetail.amenities": "Donanım",
     "roomDetail.roomTypeLabel": "Oda Tipi",
     "roomDetail.capacityLabel": "Kapasite",

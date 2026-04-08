@@ -2,6 +2,7 @@ import React from "react";
 import { Link, usePage } from "@inertiajs/react";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "@/i18n";
 import { ensureLocaleInUrl } from "@/utils/url";
 import {
     filterLegalItems,
@@ -97,6 +98,7 @@ const DEFAULT_LOGO_DARK = "/images/Logo/werrapark-logo.png";
 
 export default function Header({ currentRoute }) {
     const { props } = usePage();
+    const { t } = useTranslation();
     const locale = props?.locale ?? "de";
     const apiMenu = props?.global?.menu;
     const branding = props?.global?.settings?.branding ?? {};
@@ -133,6 +135,8 @@ export default function Header({ currentRoute }) {
 
     const desktopNav = navFromApi ?? [];
     const mobileNav = navFromApi ?? [];
+    const groupBookingLabel = t("header.groupBooking");
+    const bestPriceLabel = t("header.bestPriceBooking");
 
     return (
         <header className="wh-header">
@@ -234,7 +238,7 @@ export default function Header({ currentRoute }) {
 
                                 sendTracking({
                                     button_id: "header_gruppenbuchung",
-                                    button_label: "Gruppenbuchung",
+                                    button_label: groupBookingLabel,
                                     metadata: { location: "header" },
                                 });
 
@@ -244,7 +248,7 @@ export default function Header({ currentRoute }) {
                                 );
                             }}
                         >
-                            Gruppenbuchung
+                            {groupBookingLabel}
                         </a>
 
                         <a
@@ -257,7 +261,7 @@ export default function Header({ currentRoute }) {
 
                                 sendTracking({
                                     button_id: "header_bestpreis",
-                                    button_label: "Bestpreis buchen",
+                                    button_label: bestPriceLabel,
                                     metadata: { location: "header" },
                                 });
 
@@ -267,7 +271,7 @@ export default function Header({ currentRoute }) {
                                 );
                             }}
                         >
-                            Bestpreis buchen
+                            {bestPriceLabel}
                         </a>
                     </div>
                     <button
@@ -377,7 +381,7 @@ export default function Header({ currentRoute }) {
 
                                     sendTracking({
                                         button_id: "mobile_gruppenbuchung",
-                                        button_label: "Gruppenbuchung",
+                                        button_label: groupBookingLabel,
                                         metadata: { location: "mobile" },
                                     });
 
@@ -389,7 +393,7 @@ export default function Header({ currentRoute }) {
                                     );
                                 }}
                             >
-                                Gruppenbuchung
+                                {groupBookingLabel}
                             </a>
 
                             <a
@@ -402,7 +406,7 @@ export default function Header({ currentRoute }) {
 
                                     sendTracking({
                                         button_id: "mobile_bestpreis",
-                                        button_label: "Bestpreis buchen",
+                                        button_label: bestPriceLabel,
                                         metadata: { location: "mobile" },
                                     });
 
@@ -414,7 +418,7 @@ export default function Header({ currentRoute }) {
                                     );
                                 }}
                             >
-                                Bestpreis buchen
+                                {bestPriceLabel}
                             </a>
 
                             <div className="wh-topbar__left">

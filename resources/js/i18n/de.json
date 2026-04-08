@@ -1,4 +1,7 @@
 {
+    "header.groupBooking": "Gruppenbuchung",
+    "header.bestPriceBooking": "Bestpreis buchen",
+
     "hotels.title": "Unsere Hotels",
     "hotels.subtitle": "Entdecken Sie unsere Häuser im Thüringer Wald – komfortabel, naturverbunden und mit herzlicher Gastfreundschaft.",
     "hotels.cta": "Zum Hotel",
@@ -95,6 +98,11 @@
     "roomDetail.homeBtn": "Zur Startseite",
     "roomDetail.roomCategories": "Zimmerkategorien",
     "roomDetail.boardPriceTitle": "Verpflegung & Basispreise",
+    "roomDetail.baseRateLabel": "Basis",
+    "roomDetail.notAvailableShort": "—",
+    "roomDetail.storyTitle": "Über den Raum",
+    "roomDetail.contactFabLabel": "Kontakt",
+    "roomDetail.contactFabAria": "Zur Kontaktseite wechseln",
     "roomDetail.amenities": "Ausstattung",
     "roomDetail.roomTypeLabel": "Zimmertyp",
     "roomDetail.capacityLabel": "Kapazität",
