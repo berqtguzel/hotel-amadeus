@@ -48,6 +48,7 @@ function RoomCard({ hotel, locale, t }) {
         .slice(0, 3);
     const detailList = normalizeList(hotel.items).slice(0, 3);
     const cardSummary = summarizeText(hotel.description, 132);
+
     const factItems = [
         hotel.capacity
             ? {
@@ -73,7 +74,21 @@ function RoomCard({ hotel, locale, t }) {
     ].filter(Boolean);
 
     return (
-        <article className="rsm-card" aria-labelledby={`room-card-${hotel.id}`}>
+        /* TASARIMI BOZMAMAK İÇİN:
+           Article yerine Link kullanıyoruz, 'as="article"' ile CSS sınıflarını koruyoruz.
+           textDecoration: 'none' ve color: 'inherit' ile linkin varsayılan mavi rengini engelliyoruz.
+        */
+        <Link
+            href={href}
+            className="rsm-card"
+            as="article"
+            aria-labelledby={`room-card-${hotel.id}`}
+            style={{
+                textDecoration: "none",
+                color: "inherit",
+                cursor: "pointer",
+            }}
+        >
             <div className="rsm-media">
                 <div className="rsm-media__frame">
                     <img
@@ -98,10 +113,10 @@ function RoomCard({ hotel, locale, t }) {
 
                 {factItems.length ? (
                     <div className="rsm-facts">
-                        {factItems.map((fact) => (
+                        {factItems.map((fact, idx) => (
                             <div
                                 className="rsm-fact"
-                                key={`${fact.label}-${fact.value}`}
+                                key={`${fact.label}-${idx}`}
                             >
                                 <span className="rsm-fact__icon">
                                     {fact.icon}
@@ -119,8 +134,8 @@ function RoomCard({ hotel, locale, t }) {
 
                 {featureSummary.length ? (
                     <div className="rsm-chips">
-                        {featureSummary.map((item) => (
-                            <span className="rsm-chip" key={item}>
+                        {featureSummary.map((item, idx) => (
+                            <span className="rsm-chip" key={idx}>
                                 {item}
                             </span>
                         ))}
@@ -129,8 +144,8 @@ function RoomCard({ hotel, locale, t }) {
 
                 {detailList.length ? (
                     <ul className="rsm-points">
-                        {detailList.map((item) => (
-                            <li key={item}>
+                        {detailList.map((item, idx) => (
+                            <li key={idx}>
                                 <FiCheck aria-hidden />
                                 <span>{item}</span>
                             </li>
@@ -138,12 +153,15 @@ function RoomCard({ hotel, locale, t }) {
                     </ul>
                 ) : null}
 
-                <Link className="rsm-cta" href={href}>
+                {/* Burada 'Link' yerine 'div' kullanıyoruz çünkü en dıştaki Link zaten tüm kartı kapsıyor.
+                   Tasarım (rsm-cta sınıfı) aynı kalıyor.
+                */}
+                <div className="rsm-cta">
                     <span>{t("rooms.explore")}</span>
                     <FiChevronRight aria-hidden />
-                </Link>
+                </div>
             </div>
-        </article>
+        </Link>
     );
 }
 

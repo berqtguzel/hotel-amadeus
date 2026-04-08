@@ -4,8 +4,7 @@ import { useTranslation } from "@/i18n";
 import "../../../css/map-section.css";
 
 const WERRAPARK_POSITION = [50.5167, 10.7833];
-const GERMANY_CENTER = [51.1657, 10.4515];
-const DEFAULT_ZOOM = 6;
+const DEFAULT_ZOOM = 15;
 
 const DEFAULTS = {
     markerAddress: "R.-Breitscheid-Straße 41–45, 98574 Masserberg",
@@ -14,23 +13,33 @@ const DEFAULTS = {
 function getContactFromSettings(contact) {
     if (!contact) return null;
     const infos = contact.contact_infos ?? [];
-    if (!infos.length) return null;
     const primary = infos.find((c) => c?.is_primary) ?? infos[0];
     return primary;
 }
 
-function buildMapHref(mapUrl, markerPosition, markerAddress) {
-    if (typeof mapUrl === "string" && mapUrl.trim() !== "") {
-        return mapUrl.trim();
-    }
-
+// Google Maps ana sayfasına yönlendiren link
+function buildMapHref(markerPosition, markerAddress) {
     const [lat, lng] = Array.isArray(markerPosition) ? markerPosition : [];
-    if (typeof lat === "number" && typeof lng === "number") {
-        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-    }
-
-    const query = encodeURIComponent(markerAddress || DEFAULTS.markerAddress);
+    const query =
+        lat && lng
+            ? `${lat},${lng}`
+            : encodeURIComponent(markerAddress || DEFAULTS.markerAddress);
     return `https://www.google.com/maps/search/?api=1&query=${query}`;
+}
+
+// iframe için Google Embed URL
+function buildGoogleEmbedUrl(
+    markerPosition,
+    markerAddress,
+    zoom = DEFAULT_ZOOM,
+) {
+    const [lat, lng] = Array.isArray(markerPosition) ? markerPosition : [];
+    const query =
+        lat && lng
+            ? `${lat},${lng}`
+            : encodeURIComponent(markerAddress || DEFAULTS.markerAddress);
+    // q= parametresi marker'ın görünmesini sağlar
+    return `https://www.google.com/maps?q=${query}&z=${zoom}&output=embed&hl=de`;
 }
 
 export default function MapSection({
@@ -62,67 +71,42 @@ export default function MapSection({
             markerTitle: info.title ?? markerTitle,
             markerAddress:
                 addr || (markerAddressProp ?? DEFAULTS.markerAddress),
-            mapUrl: info.map,
         };
     }, [props?.global?.settings?.contact, markerTitle, markerAddressProp]);
 
     const markerPosition = contactData?.markerPosition ?? WERRAPARK_POSITION;
-    const titleResolved = title ?? t("map.title");
-    const subtitleResolved = subtitle ?? t("map.subtitle");
-    const markerTitleResolved =
-        contactData?.markerTitle ?? markerTitle ?? t("map.markerTitle");
     const markerAddressResolved =
         contactData?.markerAddress ??
         markerAddressProp ??
         DEFAULTS.markerAddress;
-    const mapHref = buildMapHref(
-        contactData?.mapUrl,
+
+    const mapHref = buildMapHref(markerPosition, markerAddressResolved);
+    const mapEmbedUrl = buildGoogleEmbedUrl(
         markerPosition,
         markerAddressResolved,
     );
 
     useEffect(() => {
         setIsClient(true);
+        import("./MapSectionClient").then((m) =>
+            setMapSectionClient(() => m.default),
+        );
     }, []);
-
-    useEffect(() => {
-        if (!isClient) return;
-
-        let isMounted = true;
-
-        import("./MapSectionClient").then((module) => {
-            if (isMounted) {
-                setMapSectionClient(() => module.default);
-            }
-        });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [isClient]);
 
     if (!isClient || !MapSectionClient) {
         return (
-            <section className="mp-section" aria-label={t("map.openMap")}>
-                <div className="mp-placeholder">
-                    <div className="mp-placeholder-inner">
-                        <span className="mp-placeholder-icon">🗺️</span>
-                        <p>{t("map.loading")}</p>
-                    </div>
-                </div>
+            <section className="mp-section loading">
+                <div className="mp-placeholder">{t("map.loading")}</div>
             </section>
         );
     }
 
     return (
         <MapSectionClient
-            titleResolved={titleResolved}
-            subtitleResolved={subtitleResolved}
-            markerTitleResolved={markerTitleResolved}
-            markerAddressResolved={markerAddressResolved}
-            markerPosition={markerPosition}
+            titleResolved={title ?? t("map.title")}
+            subtitleResolved={subtitle ?? t("map.subtitle")}
             mapHref={mapHref}
-            defaultZoom={DEFAULT_ZOOM}
+            mapEmbedUrl={mapEmbedUrl}
             openMapLabel={t("map.openMap")}
             eyebrowLabel={t("map.eyebrow")}
         />
