@@ -51,6 +51,8 @@ export default function SeoHead({
     const seo = settings?.seo ?? {};
     const branding = settings?.branding ?? {};
     const general = settings?.general ?? {};
+    const pageMeta = props?.page?.meta ?? {};
+    const mergedMeta = { ...pageMeta, ...meta };
 
     let origin = null;
     let currentUrl = null;
@@ -72,25 +74,25 @@ export default function SeoHead({
 
     const defaultTitle = pickFirst(seo.meta_title, seo.title, siteName, "Werrapark");
     const finalTitle = pickFirst(
-        meta?.title,
-        meta?.meta_title,
-        meta?.metaTitle,
+        mergedMeta?.title,
+        mergedMeta?.meta_title,
+        mergedMeta?.metaTitle,
         title,
         defaultTitle,
     );
     const finalDescription = pickFirst(
-        meta?.description,
-        meta?.meta_description,
-        meta?.metaDescription,
+        mergedMeta?.description,
+        mergedMeta?.meta_description,
+        mergedMeta?.metaDescription,
         description,
         seo.meta_description,
         seo.description,
     );
     const finalKeywords = normalizeKeywords(
         pickFirst(
-            meta?.keywords,
-            meta?.meta_keywords,
-            meta?.metaKeywords,
+            mergedMeta?.keywords,
+            mergedMeta?.meta_keywords,
+            mergedMeta?.metaKeywords,
             keywords,
             seo.meta_keywords,
             seo.keywords,
@@ -99,8 +101,8 @@ export default function SeoHead({
 
     const resolvedCanonical = toAbsoluteUrl(
         pickFirst(
-            meta?.canonical_url,
-            meta?.canonicalUrl,
+            mergedMeta?.canonical_url,
+            mergedMeta?.canonicalUrl,
             canonical,
             currentUrl,
         ),
@@ -109,10 +111,10 @@ export default function SeoHead({
 
     const resolvedImage = toAbsoluteUrl(
         pickFirst(
-            meta?.og_image,
-            meta?.ogImage,
-            meta?.twitter_image,
-            meta?.twitterImage,
+            mergedMeta?.og_image,
+            mergedMeta?.ogImage,
+            mergedMeta?.twitter_image,
+            mergedMeta?.twitterImage,
             image,
             seo.og_image,
             seo.ogImage,
@@ -128,31 +130,40 @@ export default function SeoHead({
 
     const robots = noIndex
         ? "noindex,nofollow"
-        : pickFirst(meta?.robots, meta?.robots_content, seo.robots, seo.robots_content);
-    const ogTitle = pickFirst(meta?.og_title, meta?.ogTitle, finalTitle);
+        : pickFirst(
+              mergedMeta?.robots,
+              mergedMeta?.robots_content,
+              seo.robots,
+              seo.robots_content,
+          );
+    const ogTitle = pickFirst(mergedMeta?.og_title, mergedMeta?.ogTitle, finalTitle);
     const ogDescription = pickFirst(
-        meta?.og_description,
-        meta?.ogDescription,
+        mergedMeta?.og_description,
+        mergedMeta?.ogDescription,
         finalDescription,
     );
-    const ogType = pickFirst(meta?.og_type, meta?.ogType, type, "website");
+    const ogType = pickFirst(mergedMeta?.og_type, mergedMeta?.ogType, type, "website");
     const twitterCard = pickFirst(
-        meta?.twitter_card,
-        meta?.twitterCard,
+        mergedMeta?.twitter_card,
+        mergedMeta?.twitterCard,
         "summary_large_image",
     );
     const twitterTitle = pickFirst(
-        meta?.twitter_title,
-        meta?.twitterTitle,
+        mergedMeta?.twitter_title,
+        mergedMeta?.twitterTitle,
         ogTitle,
     );
     const twitterDescription = pickFirst(
-        meta?.twitter_description,
-        meta?.twitterDescription,
+        mergedMeta?.twitter_description,
+        mergedMeta?.twitterDescription,
         ogDescription,
     );
     const twitterImage = toAbsoluteUrl(
-        pickFirst(meta?.twitter_image, meta?.twitterImage, resolvedImage),
+        pickFirst(
+            mergedMeta?.twitter_image,
+            mergedMeta?.twitterImage,
+            resolvedImage,
+        ),
         origin,
     );
     const favicon = toAbsoluteUrl(

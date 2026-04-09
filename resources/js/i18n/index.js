@@ -21,22 +21,27 @@ function getLocaleFromUrl() {
 
 export function I18nProvider({ children, initialLocale = null }) {
     const [locale, setLocale] = useState(() =>
-        normalizeLocale(initialLocale || getLocaleFromUrl()),
+        normalizeLocale(initialLocale || "de"),
     );
 
     useEffect(() => {
-        if (!initialLocale) return;
-        setLocale(normalizeLocale(initialLocale));
-    }, [initialLocale]);
+        if (!initialLocale) {
+            setLocale(normalizeLocale(getLocaleFromUrl()));
+        }
+    }, []);
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
+
         const off = router.on("navigate", (event) => {
             const nextLocale =
                 event?.detail?.page?.props?.locale ??
                 event?.detail?.page?.props?.global?.locale ??
                 getLocaleFromUrl();
+
             setLocale(normalizeLocale(nextLocale));
         });
+
         return off;
     }, []);
 
@@ -57,7 +62,6 @@ export function I18nProvider({ children, initialLocale = null }) {
 
     return createElement(I18nContext.Provider, { value: { t, locale } }, children);
 }
-
 export function useTranslation() {
     return useContext(I18nContext);
 }

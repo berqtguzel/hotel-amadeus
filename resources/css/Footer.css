@@ -56,7 +56,6 @@ html.dark .wh-foot,
 }
 
 .wh-container {
-    width: min(100% - 2rem, 1120px);
     margin-inline: auto;
 }
 
@@ -266,7 +265,7 @@ html:not(.dark) .wh-tree--d {
 
 .wh-foot-cta__inner h2 {
     margin: 0;
-    max-width: 28ch;
+    max-width: 34ch;
     font-size: clamp(1.05rem, 1.85vw, 1.55rem);
     line-height: 1.25;
     font-weight: 600;
@@ -286,8 +285,7 @@ html:not(.dark) .wh-foot-cta__inner h2 {
 
 .wh-foot-grid {
     display: grid;
-    grid-template-columns:
-        minmax(200px, 1.25fr) repeat(2, minmax(160px, 1fr));
+    grid-template-columns: minmax(200px, 1.25fr) repeat(2, minmax(160px, 1fr));
     gap: 1.35rem;
     align-items: start;
 }

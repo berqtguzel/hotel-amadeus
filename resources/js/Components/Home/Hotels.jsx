@@ -26,6 +26,7 @@ export default function Hotels() {
 
     return (
         <section
+            id="hotels"
             className="hotels-section relative overflow-hidden"
             aria-labelledby="hotels-heading"
         >

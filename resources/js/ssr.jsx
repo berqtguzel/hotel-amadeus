@@ -1,33 +1,15 @@
-import ReactDOMServer from 'react-dom/server';
-import { createInertiaApp } from '@inertiajs/react';
-import createServer from '@inertiajs/react/server';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import route from '../../vendor/tightenco/ziggy/dist/index.m';
-import { I18nProvider } from './i18n';
+import { createInertiaApp } from "@inertiajs/react";
+import createServer from "@inertiajs/react/server";
+import { renderToString } from "react-dom/server";
 
 createServer((page) =>
     createInertiaApp({
         page,
-        render: ReactDOMServer.renderToString,
-        title: (title) => title || 'Werrapark',
-        resolve: (name) => resolvePageComponent(`./Pages/${name}.jsx`, import.meta.glob('./Pages/**/*.jsx')),
-        setup: ({ App, props }) => {
-            global.route = (name, params, absolute) =>
-                route(name, params, absolute, {
-                    ...page.props.ziggy,
-                    location: new URL(page.props.ziggy.location),
-                });
-
-            const initialLocale =
-                page?.props?.locale ??
-                page?.props?.global?.locale ??
-                'de';
-
-            return (
-                <I18nProvider initialLocale={initialLocale}>
-                    <App {...props} />
-                </I18nProvider>
-            );
+        render: renderToString,
+        resolve: (name) => {
+            const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true });
+            return pages[`./Pages/${name}.jsx`];
         },
-    })
+        setup: ({ App, props }) => <App {...props} />,
+    }),
 );

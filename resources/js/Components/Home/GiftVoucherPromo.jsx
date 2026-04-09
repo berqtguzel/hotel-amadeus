@@ -11,6 +11,7 @@ export default function GiftVoucherPromo() {
 
     return (
         <section
+            id="gift-voucher-promo"
             className="gvp-wrap"
             aria-label={t("giftVoucherPromo.ariaLabel")}
         >

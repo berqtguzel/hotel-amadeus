@@ -1,6 +1,9 @@
-import { useLayoutEffect, useRef, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import Lenis from "lenis";
 import "../../../../css/ReactBits/Components/ScrollStack.css";
+
+const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export const ScrollStackItem = ({ children, itemClassName = "" }) => (
     <div className={`scroll-stack-card ${itemClassName}`.trim()}>
@@ -205,6 +208,7 @@ const ScrollStack = ({
     }, [updateCardTransforms]);
 
     const setupLenis = useCallback(() => {
+        if (typeof window === "undefined") return;
         if (useWindowScroll) {
             const lenis = new Lenis({
                 duration: 1.2,
@@ -263,7 +267,8 @@ const ScrollStack = ({
         }
     }, [handleScroll, useWindowScroll]);
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
+        if (typeof window === "undefined") return;
         const scroller = scrollerRef.current;
         if (!scroller) return;
 

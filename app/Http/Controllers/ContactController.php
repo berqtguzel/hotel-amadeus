@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\ContactFormController;
 use App\Mail\ContactFormMail;
+use App\Services\ApiHealthService;
+use App\Services\PageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -12,16 +14,33 @@ use Inertia\Inertia;
 
 class ContactController extends Controller
 {
+    public function __construct(
+        private PageService $pageService,
+        private ApiHealthService $apiHealthService,
+    ) {}
+
     public function index(string $locale = 'de')
     {
         $locale = strtolower($locale);
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-        $cacheKey = "contact_page:{$tenant}:{$locale}";
+        $cacheKey = "contact_page:v2:{$tenant}:{$locale}";
 
         $payload = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
+            $page = null;
+
+            if ($this->apiHealthService->isAvailable()) {
+                foreach (['kontakt', 'contact', 'iletisim'] as $slug) {
+                    $page = $this->pageService->getPage($slug, $locale);
+                    if ($page) {
+                        break;
+                    }
+                }
+            }
+
             return [
                 'currentRoute' => 'kontakt',
                 'locale'       => $locale,
+                'page'         => $page,
             ];
         });
 

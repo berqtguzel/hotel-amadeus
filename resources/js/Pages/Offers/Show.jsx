@@ -170,16 +170,6 @@ export default function OfferShow({ offer: offerId }) {
                                 >
                                     {t("offerDetail.requestBtn")}
                                 </a>
-                                {file ? (
-                                    <a
-                                        href={file}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="of-btn of-btn--ghost"
-                                    >
-                                        {t("offerDetail.moreOffersBtn")}
-                                    </a>
-                                ) : null}
                             </div>
                         </div>
                     </aside>

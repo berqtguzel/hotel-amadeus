@@ -29,7 +29,7 @@
 
     --wp-ring: rgba(31, 129, 85, 0.28);
 
-    --wp-container: 1600px !important;
+    --wp-container: 1650px !important;
 
     --wp-radius: 12px;
     --wp-radius-lg: 16px;
@@ -116,6 +116,7 @@ html.dark .wh-header,
 
 .wh-header {
     position: fixed;
+
     top: 0;
     left: 0;
     width: 100%;
@@ -326,7 +327,7 @@ html.dark .wh-brand__logo--dark {
     .wh-nav-desktop {
         display: flex;
         flex-wrap: nowrap;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         align-content: center;
         gap: clamp(4px, 0.65vw, 10px);
@@ -708,6 +709,7 @@ html.dark .wh-hamburger span,
 
 .wh-nav-item > .wh-link {
     max-width: 100%;
+    font-size: 1rem;
 }
 
 .wh-dropdown {

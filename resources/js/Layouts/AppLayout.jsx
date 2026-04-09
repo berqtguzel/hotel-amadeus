@@ -4,7 +4,10 @@ import Footer from "@/Components/Footer";
 import CookieConsent from "@/Components/CookieConsent";
 import WhatsAppWidget from "@/Components/WhatsAppWidget";
 import { ThemeProvider } from "@/Context/ThemeContext";
-import TargetCursor from "@/Components/ReactBits/Animations/TargetCursor";
+import { lazy, Suspense } from "react";
+const TargetCursor = lazy(
+    () => import("@/Components/ReactBits/Animations/TargetCursor"),
+);
 
 export default function AppLayout({ children, currentRoute }) {
     const [isClient, setIsClient] = useState(false);
@@ -22,29 +25,35 @@ export default function AppLayout({ children, currentRoute }) {
                     flexDirection: "column",
                 }}
             >
-                {isClient ? (
-                    <TargetCursor
-                        targetSelector="a, button, [role='button'], input, textarea, select, summary, .cursor-target"
-                        spinDuration={2.2}
-                        hoverDuration={0.22}
-                        parallaxOn
-                        hideDefaultCursor
-                    />
-                ) : null}
-                <Header currentRoute={currentRoute} />
+                {isClient && (
+                    <Suspense fallback={null}>
+                        <TargetCursor
+                            targetSelector="a, button, [role='button'], input, textarea, select, summary, .cursor-target"
+                            spinDuration={2.2}
+                            hoverDuration={0.22}
+                            parallaxOn
+                            hideDefaultCursor
+                        />
+                    </Suspense>
+                )}
+                {isClient && <Header currentRoute={currentRoute} />}
 
                 <main
                     style={{
                         flex: 1,
-                        paddingTop: "150px",
+                        paddingTop: isClient ? "150px" : "0px",
                     }}
                 >
                     {children}
                 </main>
 
-                <Footer />
-                <WhatsAppWidget />
-                <CookieConsent />
+                {isClient && (
+                    <>
+                        <Footer />
+                        <WhatsAppWidget />
+                        <CookieConsent />
+                    </>
+                )}
             </div>
         </ThemeProvider>
     );

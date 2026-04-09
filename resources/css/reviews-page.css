@@ -60,14 +60,12 @@ body {
 }
 
 .review-container {
-    position: relative;
     z-index: 2;
     max-width: 1380px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1.02fr 1fr;
-    gap: 40px;
-    align-items: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .review-bg-shape {
@@ -187,6 +185,7 @@ body {
 .review-card {
     position: relative;
     z-index: 2;
+    width: 120vh;
     border-radius: var(--radius-xl);
     background: linear-gradient(
         180deg,
@@ -575,8 +574,9 @@ body {
         font-size: 1.6rem;
     }
 }
-.rating-container {
+
+.ratings-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 sütun → 3x3 = 9 */
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     gap: 15px;
 }

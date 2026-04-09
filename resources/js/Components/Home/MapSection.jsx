@@ -4,7 +4,7 @@ import { useTranslation } from "@/i18n";
 import "../../../css/map-section.css";
 
 const WERRAPARK_POSITION = [50.5167, 10.7833];
-const DEFAULT_ZOOM = 15;
+const DEFAULT_ZOOM = 16;
 
 const DEFAULTS = {
     markerAddress: "R.-Breitscheid-Straße 41–45, 98574 Masserberg",
@@ -32,6 +32,7 @@ function buildGoogleEmbedUrl(
     markerPosition,
     markerAddress,
     zoom = DEFAULT_ZOOM,
+    locale = "de",
 ) {
     const [lat, lng] = Array.isArray(markerPosition) ? markerPosition : [];
     const query =
@@ -39,7 +40,8 @@ function buildGoogleEmbedUrl(
             ? `${lat},${lng}`
             : encodeURIComponent(markerAddress || DEFAULTS.markerAddress);
     // q= parametresi marker'ın görünmesini sağlar
-    return `https://www.google.com/maps?q=${query}&z=${zoom}&output=embed&hl=de`;
+    const hl = ["de", "en", "tr"].includes(String(locale)) ? locale : "de";
+    return `https://www.google.com/maps?q=${query}&z=${zoom}&output=embed&hl=${hl}`;
 }
 
 export default function MapSection({
@@ -48,7 +50,7 @@ export default function MapSection({
     markerTitle,
     markerAddress: markerAddressProp,
 }) {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const { props } = usePage();
     const [isClient, setIsClient] = useState(false);
     const [MapSectionClient, setMapSectionClient] = useState(null);
@@ -84,6 +86,8 @@ export default function MapSection({
     const mapEmbedUrl = buildGoogleEmbedUrl(
         markerPosition,
         markerAddressResolved,
+        DEFAULT_ZOOM,
+        locale,
     );
 
     useEffect(() => {

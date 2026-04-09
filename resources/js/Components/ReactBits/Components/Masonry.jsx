@@ -1,13 +1,22 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 
+const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 const useMedia = (queries, values, defaultValue) => {
-    const get = () =>
-        values[queries.findIndex((q) => matchMedia(q).matches)] ?? defaultValue;
+    const get = () => {
+        if (typeof window === "undefined") return defaultValue;
+        return (
+            values[queries.findIndex((q) => matchMedia(q).matches)] ??
+            defaultValue
+        );
+    };
 
     const [value, setValue] = useState(get);
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
         const handler = () => setValue(get);
         queries.forEach((q) =>
             matchMedia(q).addEventListener("change", handler)
@@ -26,7 +35,8 @@ const useMeasure = () => {
     const ref = useRef(null);
     const [size, setSize] = useState({ width: 0, height: 0 });
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
+        if (typeof window === "undefined") return;
         if (!ref.current) return;
         const ro = new ResizeObserver(([entry]) => {
             const { width, height } = entry.contentRect;
@@ -40,6 +50,7 @@ const useMeasure = () => {
 };
 
 const preloadImages = async (urls) => {
+    if (typeof window === "undefined") return;
     await Promise.all(
         urls.map(
             (src) =>
@@ -63,6 +74,7 @@ const Masonry = ({
     blurToFocus = true,
     colorShiftOnHover = false,
 }) => {
+    const isClient = typeof window !== "undefined";
     const columns = useMedia(
         [
             "(min-width:1500px)",
@@ -78,6 +90,7 @@ const Masonry = ({
     const [imagesReady, setImagesReady] = useState(false);
 
     const getInitialPosition = (item) => {
+        if (!isClient) return { x: item.x, y: item.y };
         const containerRect = containerRef.current?.getBoundingClientRect();
         if (!containerRect) return { x: item.x, y: item.y };
 
@@ -109,6 +122,7 @@ const Masonry = ({
     };
 
     useEffect(() => {
+        if (!isClient) return;
         preloadImages(items.map((i) => i.img)).then(() => setImagesReady(true));
     }, [items]);
 
@@ -132,7 +146,8 @@ const Masonry = ({
 
     const hasMounted = useRef(false);
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
+        if (!isClient) return;
         if (!imagesReady) return;
 
         grid.forEach((item, index) => {
@@ -231,9 +246,10 @@ const Masonry = ({
                         key={item.id}
                         data-key={item.id}
                         className="item-wrapper"
-                        onClick={() =>
-                            window.open(item.url, "_blank", "noopener")
-                        }
+                        onClick={() => {
+                            if (!isClient) return;
+                            window.open(item.url, "_blank", "noopener");
+                        }}
                         onMouseEnter={(e) => handleMouseEnter(e, item)}
                         onMouseLeave={(e) => handleMouseLeave(e, item)}
                     >

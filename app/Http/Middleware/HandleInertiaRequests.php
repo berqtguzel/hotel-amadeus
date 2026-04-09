@@ -98,7 +98,9 @@ class HandleInertiaRequests extends Middleware
                     : null,
             ],
 
-            'ziggy' => fn() => array_merge(
+            // SSR için zorunlu: Closure/LazyProp JSON'a çevrilemez, SSR gateway POST'u patlatır.
+            // Ziggy payload'ı doğrudan array olarak paylaşıyoruz.
+            'ziggy' => array_merge(
                 (new Ziggy)->toArray(),
                 ['location' => $request->url()]
             ),
@@ -141,4 +143,9 @@ class HandleInertiaRequests extends Middleware
             'forms'      => [],
         ];
     }
+
+    public function rootView(Request $request)
+{
+    return 'app';
+}
 }

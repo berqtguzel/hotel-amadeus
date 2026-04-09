@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -142,7 +142,7 @@ export default function Header({ currentRoute }) {
     const groupBookingLabel = t("header.groupBooking");
     const bestPriceLabel = t("header.bestPriceBooking");
 
-    React.useLayoutEffect(() => {
+    useEffect(() => {
         const row = navRowRef.current;
         const wrap = navFitWrapRef.current;
         const nav = navDesktopRef.current;

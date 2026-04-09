@@ -444,8 +444,7 @@ export default function Footer() {
 
     const ctaTitleText = d.ctaTitle ?? t("footer.ctaTitle");
     const ctaLabelText = d.ctaLabel ?? t("footer.planYourStay");
-    const ctaHrefResolved =
-        d.ctaHref ?? ensureLocaleInUrl("/hotels", d.locale);
+    const ctaHrefResolved = d.ctaHref ?? ensureLocaleInUrl("/hotels", d.locale);
 
     const hasBrand = d.logo || d.description || d.social.length > 0;
     const hasNav = d.navItems.length > 0;
@@ -480,14 +479,7 @@ export default function Footer() {
                 <div className="wh-container wh-foot-cta__inner">
                     <h2 id="footer-cta-title">{ctaTitleText}</h2>
                     <a
-                        href={`/track?${new URLSearchParams({
-                            redirect: ensureLocaleInUrl(
-                                ctaHrefResolved,
-                                d.locale,
-                            ),
-                            button_id: "footer-cta",
-                            button_label: ctaLabelText,
-                        }).toString()}`}
+                        href="#gift-voucher-promo"
                         className="wh-btn wh-btn--primary"
                     >
                         {ctaLabelText}
@@ -564,10 +556,18 @@ export default function Footer() {
                     <div className="wh-container wh-foot-bottom__inner">
                         {d.siteName && (
                             <p className="wh-foot-copy">
-                                &copy; {year} {d.siteName}.{" "}
-                                {t("footer.rightsReserved")}
+                                &copy; {year}{" "}
+                                <a
+                                    href="http://omer-dogan.company/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="wh-foot-link"
+                                >
+                                    {d.siteName}
+                                </a>
+                                . {t("footer.rightsReserved")}
                             </p>
-                        )}
+                        )}{" "}
                         {d.legalLinks.length > 0 && (
                             <ul className="wh-foot-mini">
                                 {d.legalLinks.map((l) => (
