@@ -43,7 +43,7 @@ export default function GiftVoucherForm({
         ? Math.min(500, Math.max(10, parsedCustom))
         : 0;
 
-    const amount = useCustom ? customValue || 10 : selectedAmount;
+    const amount = useCustom ? customValue || 100 : selectedAmount;
     const total = amount * Math.max(1, quantity);
     const back = backHref ?? `/${locale}/gutschein`;
 
