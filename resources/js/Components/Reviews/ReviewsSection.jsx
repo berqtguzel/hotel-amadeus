@@ -112,6 +112,13 @@ const Index = () => {
                     criteria.forEach((c) => (resetRatings[c.id] = 5));
                     setCriteriaRatings(resetRatings);
                 }
+
+                // Başarılı gönderimden sonra sayfayı yenile
+                window.setTimeout(() => {
+                    if (typeof window !== "undefined") {
+                        window.location.reload();
+                    }
+                }, 800);
             } else {
                 setStatus({
                     type: "error",

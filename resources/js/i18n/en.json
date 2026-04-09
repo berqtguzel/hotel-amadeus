@@ -203,6 +203,11 @@
     "reviews.labelMessage": "Your Review",
     "reviews.placeholderMessage": "Write your experience in detail...",
     "reviews.btnSubmit": "Submit Review",
+    "reviews.btnSending": "Sending...",
+    "reviews.success": "Thank you! Your review has been sent successfully.",
+    "reviews.error": "Your review could not be sent. Please try again.",
+    "reviews.serverError": "Server error. Please try again later.",
+    "reviews.ariaStars": "stars",
 
     "contact.title": "Contact",
     "contact.subtitle": "You can reach us through any desired channel. We look forward to your message.",

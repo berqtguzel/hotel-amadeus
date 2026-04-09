@@ -203,6 +203,11 @@
     "reviews.labelMessage": "Yorumunuz",
     "reviews.placeholderMessage": "Deneyiminizi detaylı şekilde yazabilirsiniz...",
     "reviews.btnSubmit": "Yorumu Gönder",
+    "reviews.btnSending": "Gönderiliyor...",
+    "reviews.success": "Teşekkürler! Yorumunuz başarıyla gönderildi.",
+    "reviews.error": "Yorum gönderilemedi. Lütfen tekrar deneyin.",
+    "reviews.serverError": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
+    "reviews.ariaStars": "yıldız",
 
     "contact.title": "İletişim",
     "contact.subtitle": "Bize istediğiniz kanaldan ulaşabilirsiniz. Mesajınızı bekliyoruz.",

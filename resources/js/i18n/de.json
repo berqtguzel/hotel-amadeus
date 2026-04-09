@@ -203,6 +203,11 @@
     "reviews.labelMessage": "Ihre Nachricht",
     "reviews.placeholderMessage": "Ihre Nachricht an uns...",
     "reviews.btnSubmit": "Bewertung Absenden",
+    "reviews.btnSending": "Wird gesendet...",
+    "reviews.success": "Vielen Dank! Ihre Bewertung wurde erfolgreich gesendet.",
+    "reviews.error": "Bewertung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "reviews.serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "reviews.ariaStars": "Sterne",
 
     "contact.title": "Kontakt",
     "contact.subtitle": "Sie können uns über jeden gewünschten Kanal erreichen. Wir freuen uns auf Ihre Nachricht.",
