@@ -606,7 +606,11 @@
     flex-wrap: wrap;
     gap: 8px;
 }
-
+@media (max-width: 980px) {
+    .rux-contact-fab {
+        display: none;
+    }
+}
 .rux-contact-fab {
     position: fixed;
     left: 16px;
@@ -910,6 +914,7 @@
         right: 12px;
         bottom: 12px;
         min-height: 42px;
+        display: none;
     }
 }
 
