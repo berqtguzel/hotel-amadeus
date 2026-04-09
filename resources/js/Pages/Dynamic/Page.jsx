@@ -7,10 +7,29 @@ import "../../../css/dynamic-page.css";
 export default function DynamicPage({ currentRoute = "page" }) {
     const { props } = usePage();
     const page = props?.page ?? {};
+    const rawGalleries = Array.isArray(props?.galleries) ? props.galleries : [];
 
     const { title = "Seite", subtitle = "", blocks = [], content = "" } = page;
 
     const hasBlocks = Array.isArray(blocks) && blocks.length > 0;
+    const isGalleryPage = ["galerie", "gallery"].includes(
+        String(page?.slug || "").toLowerCase(),
+    );
+
+    const galleryImages = React.useMemo(() => {
+        return rawGalleries.flatMap((gallery, galleryIndex) => {
+            const images = Array.isArray(gallery?.images) ? gallery.images : [];
+            return images
+                .filter((image) => Boolean(image?.url))
+                .map((image, imageIndex) => ({
+                    id:
+                        image.id ??
+                        `${gallery?.id ?? `gallery-${galleryIndex}`}-${imageIndex}`,
+                    url: image.url,
+                    alt: gallery?.name || title,
+                }));
+        });
+    }, [rawGalleries, title]);
 
     const heroSrc = page.heroImage || "/images/template1.webp";
 
@@ -41,83 +60,110 @@ export default function DynamicPage({ currentRoute = "page" }) {
                     </div>
                 </section>
 
-                <section className="dp-content">
-                    <div className="dp-container">
-                        {!hasBlocks && content && (
-                            <div
-                                className="dp-card dp-richtext"
-                                dangerouslySetInnerHTML={{ __html: content }}
-                            />
-                        )}
-
-                        {!hasBlocks && !content && (
-                            <div className="dp-card dp-empty">
-                                <p>
-                                    Diese Seite wird aktuell vorbereitet. Bald
-                                    finden Sie hier spannende Inhalte rund um{" "}
-                                    {title}.
-                                </p>
-                            </div>
-                        )}
-
-                        {hasBlocks &&
-                            blocks.map((b, i) => {
-                                if (b.type === "text") {
-                                    return (
-                                        <div key={i} className="dp-card">
-                                            {b.heading && <h2>{b.heading}</h2>}
-                                            {b.html ? (
-                                                <div
-                                                    className="dp-richtext"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: b.html,
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div className="dp-richtext">
-                                                    {b.content}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                }
-
-                                if (b.type === "image") {
-                                    return (
-                                        <div
-                                            key={i}
-                                            className="dp-card dp-image"
+                {isGalleryPage ? (
+                    <section className="dp-content dp-content--gallery">
+                        <div className="dp-container dp-container--gallery">
+                            {galleryImages.length === 0 ? (
+                                <div className="dp-card dp-empty">
+                                    <p>Galerie görselleri bulunamadı.</p>
+                                </div>
+                            ) : (
+                                <div className="dp-gallery-grid">
+                                    {galleryImages.map((image) => (
+                                        <figure
+                                            className="dp-gallery-card"
+                                            key={image.id}
                                         >
                                             <img
-                                                src={b.src}
-                                                alt={b.alt || ""}
+                                                src={image.url}
+                                                alt={image.alt}
                                                 loading="lazy"
                                             />
-                                        </div>
-                                    );
-                                }
+                                        </figure>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                ) : (
+                    <section className="dp-content">
+                        <div className="dp-container">
+                            {!hasBlocks && content && (
+                                <div
+                                    className="dp-card dp-richtext"
+                                    dangerouslySetInnerHTML={{ __html: content }}
+                                />
+                            )}
 
-                                if (b.type === "list") {
-                                    return (
-                                        <div key={i} className="dp-card">
-                                            {b.heading && <h2>{b.heading}</h2>}
-                                            <ul>
-                                                {(b.items || []).map(
-                                                    (item, idx) => (
-                                                        <li key={idx}>
-                                                            {item}
-                                                        </li>
-                                                    ),
+                            {!hasBlocks && !content && (
+                                <div className="dp-card dp-empty">
+                                    <p>
+                                        Diese Seite wird aktuell vorbereitet.
+                                        Bald finden Sie hier spannende Inhalte
+                                        rund um {title}.
+                                    </p>
+                                </div>
+                            )}
+
+                            {hasBlocks &&
+                                blocks.map((b, i) => {
+                                    if (b.type === "text") {
+                                        return (
+                                            <div key={i} className="dp-card">
+                                                {b.heading && <h2>{b.heading}</h2>}
+                                                {b.html ? (
+                                                    <div
+                                                        className="dp-richtext"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: b.html,
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="dp-richtext">
+                                                        {b.content}
+                                                    </div>
                                                 )}
-                                            </ul>
-                                        </div>
-                                    );
-                                }
+                                            </div>
+                                        );
+                                    }
 
-                                return null;
-                            })}
-                    </div>
-                </section>
+                                    if (b.type === "image") {
+                                        return (
+                                            <div
+                                                key={i}
+                                                className="dp-card dp-image"
+                                            >
+                                                <img
+                                                    src={b.src}
+                                                    alt={b.alt || ""}
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                        );
+                                    }
+
+                                    if (b.type === "list") {
+                                        return (
+                                            <div key={i} className="dp-card">
+                                                {b.heading && <h2>{b.heading}</h2>}
+                                                <ul>
+                                                    {(b.items || []).map(
+                                                        (item, idx) => (
+                                                            <li key={idx}>
+                                                                {item}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        );
+                                    }
+
+                                    return null;
+                                })}
+                        </div>
+                    </section>
+                )}
             </div>
         </AppLayout>
     );

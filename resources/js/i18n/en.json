@@ -36,6 +36,13 @@
     "themes.bestPrice": "Best Price Booking",
     "themes.readMore": "Read more",
     "themes.discover": "Discover",
+    "themeDetail.eyebrow": "Holiday Theme",
+    "themeDetail.mainTitle": "What awaits you",
+    "themeDetail.asideAria": "Booking & Contact",
+    "themeDetail.asideTitle": "Request an offer",
+    "themeDetail.asideText": "Interested in this holiday theme? Get in touch and we'll create an individual offer for you.",
+    "themeDetail.contactBtn": "Contact us",
+    "themeDetail.openFileBtn": "Open file",
 
     "offers.eyebrow": "Special Offers",
     "offers.title": "Information on Offers",

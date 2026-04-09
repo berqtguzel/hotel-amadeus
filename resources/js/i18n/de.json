@@ -36,6 +36,13 @@
     "themes.bestPrice": "Bestpreis Buchung",
     "themes.readMore": "Mehr lesen",
     "themes.discover": "Entdecken",
+    "themeDetail.eyebrow": "Urlaubsthema",
+    "themeDetail.mainTitle": "Das erwartet Sie",
+    "themeDetail.asideAria": "Buchung & Kontakt",
+    "themeDetail.asideTitle": "Angebot anfragen",
+    "themeDetail.asideText": "Sie möchten dieses Urlaubsthema für Ihren Aufenthalt nutzen? Schreiben Sie uns - wir erstellen Ihnen gern ein individuelles Angebot.",
+    "themeDetail.contactBtn": "Kontakt aufnehmen",
+    "themeDetail.openFileBtn": "Datei öffnen",
 
     "offers.eyebrow": "Sonderangebote",
     "offers.title": "Information zu den Angeboten",

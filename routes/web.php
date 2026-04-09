@@ -68,7 +68,7 @@ Route::get('/{locale}', [HomeController::class, 'index'])
     ->where(['locale' => 'de|en|tr'])
     ->name('home.locale');
 
-Route::get('/hotels', fn () => redirect('/de/hotels'));
+Route::get('/hotels', fn() => redirect('/de/hotels'));
 Route::get('/{locale}/hotels', [HotelController::class, 'listPage'])
     ->where(['locale' => 'de|en|tr'])
     ->name('hotels.index');
@@ -92,9 +92,9 @@ Route::get('/{locale}/hotels/{hotel}', function (string $locale, string $hotel, 
 
     return Inertia::render('Hotels/Show', ['locale' => $locale, 'hotel' => $hotel]);
 })->where(['locale' => 'de|en|tr'])
-  ->name('hotels.show');
+    ->name('hotels.show');
 
-Route::get('/hotels/{hotel}', fn ($hotel) => redirect("/de/hotels/{$hotel}"));
+Route::get('/hotels/{hotel}', fn($hotel) => redirect("/de/hotels/{$hotel}"));
 
 Route::get('/{locale}/rooms/{room}', [RoomPageController::class, 'show'])
     ->where(['locale' => 'de|en|tr'])
@@ -136,8 +136,8 @@ Route::get('/{locale}/urlaubsthemen/{theme}', [ThemeController::class, 'show'])
 Route::get('/{locale}/uber-uns', function (string $locale) {
     $locale = strtolower($locale);
     $page = app(ApiHealthService::class)->isAvailable()
-            ? app(PageService::class)->getPage('uber-uns', $locale)
-            : null;
+        ? app(PageService::class)->getPage('uber-uns', $locale)
+        : null;
 
     return Inertia::render('Home/UberUns', [
         'currentRoute' => 'uberuns',
@@ -170,7 +170,6 @@ Route::get('/{locale}/bewertungen', function (string $locale, ReviewsService $se
         'reviews'  => $service->getReviews($locale),
 
     ]);
-
 })->where(['locale' => 'de|en|tr'])->name('reviews.page');
 
 Route::controller(PageController::class)->group(function () {
