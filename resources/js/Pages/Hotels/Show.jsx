@@ -23,6 +23,25 @@ const slugifyHotel = (value = "") =>
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
+const splitToChips = (value) => {
+    if (Array.isArray(value)) {
+        return value
+            .flatMap((item) => splitToChips(item))
+            .filter(Boolean);
+    }
+
+    if (value == null) return [];
+
+    if (typeof value === "object") {
+        return splitToChips(Object.values(value));
+    }
+
+    return String(value)
+        .split(/[\r\n,;|•]+/g)
+        .map((item) => item.trim())
+        .filter(Boolean);
+};
+
 export default function HotelShow({ hotel: hotelParam }) {
     const { props } = usePage();
     const { t } = useTranslation();
@@ -55,12 +74,21 @@ export default function HotelShow({ hotel: hotelParam }) {
         );
     }
 
-    const amenities = data.services
-        ? data.services
-              .split(",")
-              .map((item) => item.trim())
-              .filter(Boolean)
-        : data.amenities || ["WiFi", "TV", "Spa"];
+    const amenities = React.useMemo(() => {
+        const serviceItems = splitToChips(data.services);
+        const amenityItems = splitToChips(data.amenities);
+        const raw = serviceItems.length > 0 ? serviceItems : amenityItems;
+
+        if (raw.length === 0) return ["WiFi", "TV", "Spa"];
+
+        const seen = new Set();
+        return raw.filter((item) => {
+            const key = item.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }, [data.services, data.amenities]);
     const descriptionParagraphs = String(data.description || "")
         .split(/\r?\n/)
         .map((item) => item.trim())

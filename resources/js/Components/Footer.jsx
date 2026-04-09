@@ -479,7 +479,7 @@ export default function Footer() {
                 <div className="wh-container wh-foot-cta__inner">
                     <h2 id="footer-cta-title">{ctaTitleText}</h2>
                     <a
-                        href="#gift-voucher-promo"
+                        href="/#gift-voucher-promo"
                         className="wh-btn wh-btn--primary"
                     >
                         {ctaLabelText}

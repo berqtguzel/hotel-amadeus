@@ -21,13 +21,45 @@ export default function RoomCalendar({
 }) {
     const { t } = useTranslation();
 
-    if (!currentCalendarMonth) return null;
-
     /* ✅ WEEKDAYS SAFE */
     const weekdaysRaw = t("weekdaysShort");
     const weekdays = Array.isArray(weekdaysRaw)
         ? weekdaysRaw
         : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    if (!currentCalendarMonth) {
+        return (
+            <article className="rux-calendar-panel">
+                <header className="rux-calendar-panel__head">
+                    <div className="rux-calendar-panel__title">
+                        <CalendarDays size={16} />
+                        <h1>{t("roomDetail.dailyPriceTitle")}</h1>
+                    </div>
+                </header>
+
+                <div className="rux-calendar-month">
+                    <header className="rux-calendar-month__head">
+                        <h4>{t("roomDetail.calendarPendingTitle")}</h4>
+                    </header>
+
+                    <div className="rux-calendar-weekdays">
+                        {weekdays.map((day, i) => (
+                            <span key={i}>{day}</span>
+                        ))}
+                    </div>
+
+                    <div className="rux-calendar-grid">
+                        {Array.from({ length: 35 }).map((_, index) => (
+                            <div
+                                key={`pending-${index}`}
+                                className="rux-calendar-cell is-empty"
+                            />
+                        ))}
+                    </div>
+                </div>
+            </article>
+        );
+    }
 
     return (
         <article className="rux-calendar-panel">

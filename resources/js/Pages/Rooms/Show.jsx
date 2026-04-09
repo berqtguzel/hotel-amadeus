@@ -348,6 +348,59 @@ function buildPriceCalendar(items, locale) {
         });
 }
 
+function buildFallbackCalendar(locale, monthsAhead = 12) {
+    const now = new Date();
+    const startYear = now.getUTCFullYear();
+    const startMonth = now.getUTCMonth() + 1;
+    const result = [];
+
+    for (let offset = 0; offset < monthsAhead; offset += 1) {
+        const totalMonthIndex = startMonth - 1 + offset;
+        const year = startYear + Math.floor(totalMonthIndex / 12);
+        const month = (totalMonthIndex % 12) + 1;
+        const key = `${year}-${String(month).padStart(2, "0")}`;
+        const firstDay = createUtcDate(year, month, 1);
+        const firstWeekday = (firstDay.getUTCDay() + 6) % 7;
+        const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+        const days = [];
+
+        for (let i = 0; i < firstWeekday; i += 1) {
+            days.push({
+                type: "empty",
+                key: `empty-start-${key}-${i}`,
+            });
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+            days.push({
+                type: "plain",
+                key: `${key}-${day}`,
+                day,
+                item: null,
+            });
+        }
+
+        while (days.length % 7 !== 0) {
+            days.push({
+                type: "empty",
+                key: `empty-end-${key}-${days.length}`,
+            });
+        }
+
+        result.push({
+            key,
+            year,
+            month,
+            label: formatMonthLabel(year, month, locale),
+            items: [],
+            days,
+            minPrice: null,
+        });
+    }
+
+    return result;
+}
+
 function getFirstSelectableDay(months) {
     for (const month of months) {
         const match = month.days.find(
@@ -601,8 +654,25 @@ export default function RoomShow() {
               : data.boardTypes
           ).filter(Boolean)
         : [];
+    const lowestBoardPrice = React.useMemo(() => {
+        const prices = boardPriceItems
+            .filter(
+                (item) =>
+                    item?.price != null && !Number.isNaN(Number(item.price)),
+            )
+            .map((item) => Number(item.price));
+
+        if (prices.length === 0) return null;
+        return Math.min(...prices);
+    }, [boardPriceItems]);
+    const lowestBoardPriceLabel =
+        lowestBoardPrice != null ? formatMoney(lowestBoardPrice, locale) : null;
     const calendarMonths = React.useMemo(
-        () => buildPriceCalendar(data?.roomPrices ?? [], locale),
+        () => {
+            const built = buildPriceCalendar(data?.roomPrices ?? [], locale);
+            if (built.length > 0) return built;
+            return buildFallbackCalendar(locale, 12);
+        },
         [data?.roomPrices, locale],
     );
     const weekdays = React.useMemo(() => weekdayLabels(locale), [locale]);
@@ -722,10 +792,19 @@ export default function RoomShow() {
 
                             {data.hotel?.stars ? (
                                 <div className="rd-hotel-float rd-hotel-float--stars">
-                                    <span>{t("roomDetail.hotelStarsLabel")}</span>
-                                    <div className="rd-stars-row" aria-hidden="true">
+                                    <span>
+                                        {t("roomDetail.hotelStarsLabel")}
+                                    </span>
+                                    <div
+                                        className="rd-stars-row"
+                                        aria-hidden="true"
+                                    >
                                         {Array.from(
-                                            { length: Number(data.hotel.stars) },
+                                            {
+                                                length: Number(
+                                                    data.hotel.stars,
+                                                ),
+                                            },
                                             (_, index) => (
                                                 <Star key={index} size={12} />
                                             ),
@@ -741,7 +820,7 @@ export default function RoomShow() {
                                     </span>
                                     <div className="rd-price-float__list">
                                         {boardPriceItems
-                                            .slice(0, 2)
+                                            .slice(0, 5)
                                             .map((item, index) => (
                                                 <p
                                                     key={
@@ -752,7 +831,9 @@ export default function RoomShow() {
                                                     <strong>
                                                         {item.name ||
                                                             item.code ||
-                                                            t("roomDetail.baseRateLabel")}
+                                                            t(
+                                                                "roomDetail.baseRateLabel",
+                                                            )}
                                                     </strong>
                                                     <em>
                                                         {item.price != null
@@ -760,7 +841,9 @@ export default function RoomShow() {
                                                                   item.price,
                                                                   locale,
                                                               )
-                                                            : t("roomDetail.notAvailableShort")}
+                                                            : t(
+                                                                  "roomDetail.notAvailableShort",
+                                                              )}
                                                     </em>
                                                 </p>
                                             ))}
@@ -825,7 +908,10 @@ export default function RoomShow() {
                                 <ChevronRight size={16} />
                             </button>
 
-                            <span className="rux-thumb-counter" aria-live="polite">
+                            <span
+                                className="rux-thumb-counter"
+                                aria-live="polite"
+                            >
                                 {activeIndex + 1}/{images.length}
                             </span>
                         </div>
@@ -838,7 +924,10 @@ export default function RoomShow() {
                                 </header>
                                 <div className="rd-hotel-strip__grid">
                                     {hotelFacts.map((fact, i) => (
-                                        <article key={i} className="rd-hotel-chip">
+                                        <article
+                                            key={i}
+                                            className="rd-hotel-chip"
+                                        >
                                             <div className="rd-hotel-chip__label">
                                                 {fact.icon}
                                                 <span>{fact.label}</span>
@@ -861,6 +950,16 @@ export default function RoomShow() {
                             <p className="rux-loc">
                                 <MapPin size={15} />
                                 <span>{data.viewType}</span>
+                            </p>
+                        ) : null}
+                        {lowestBoardPriceLabel ? (
+                            <p className="rux-loc rux-loc--price">
+                                <CalendarDays size={15} />
+                                <span>
+                                    {t("roomDetail.startingFromLabel", {
+                                        value: lowestBoardPriceLabel,
+                                    })}
+                                </span>
                             </p>
                         ) : null}
 
@@ -941,8 +1040,9 @@ export default function RoomShow() {
                                     <div className="rux-section-grid">
                                         {data.descriptionSections.map(
                                             (section, index) => {
-                                                const Icon =
-                                                    sectionIcon(section.title);
+                                                const Icon = sectionIcon(
+                                                    section.title,
+                                                );
 
                                                 return (
                                                     <section
@@ -951,7 +1051,9 @@ export default function RoomShow() {
                                                     >
                                                         <div className="rux-subpanel__head">
                                                             <Icon size={16} />
-                                                            <h4>{section.title}</h4>
+                                                            <h4>
+                                                                {section.title}
+                                                            </h4>
                                                         </div>
                                                         <ul className="rux-list">
                                                             {section.items.map(
@@ -963,10 +1065,14 @@ export default function RoomShow() {
                                                                         key={`${item}-${itemIndex}`}
                                                                     >
                                                                         <CheckCircle2
-                                                                            size={16}
+                                                                            size={
+                                                                                16
+                                                                            }
                                                                         />
                                                                         <span>
-                                                                            {item}
+                                                                            {
+                                                                                item
+                                                                            }
                                                                         </span>
                                                                     </li>
                                                                 ),
@@ -994,7 +1100,10 @@ export default function RoomShow() {
                                 <div className="rux-collapse__content">
                                     <div className="rux-chip-grid">
                                         {data.features.map((item) => (
-                                            <span className="rux-chip" key={item.id}>
+                                            <span
+                                                className="rux-chip"
+                                                key={item.id}
+                                            >
                                                 {item.name}
                                             </span>
                                         ))}
@@ -1017,7 +1126,10 @@ export default function RoomShow() {
                                     <div className="rux-collapse__content">
                                         <div className="rux-chip-grid">
                                             {data.amenities.map((item) => (
-                                                <span className="rux-chip" key={item}>
+                                                <span
+                                                    className="rux-chip"
+                                                    key={item}
+                                                >
                                                     {item}
                                                 </span>
                                             ))}

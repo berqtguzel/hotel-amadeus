@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ApiHealthService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Inertia\Inertia;
 
@@ -79,17 +80,77 @@ class RoomPageController extends Controller
 
     private function fetchRoom(string $locale, string $room): ?array
     {
-        $url = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $room;
-        $response = $this->apiRequest($url, $this->langQuery(strtolower($locale)));
-
-        if (!$response || !$response->successful()) {
+        $identifier = trim((string) $room);
+        if ($identifier === '') {
             return null;
         }
 
-        $json = $response->json();
-        $data = $json['data'] ?? null;
+        $url = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $identifier;
+        $response = $this->apiRequest($url, $this->langQuery(strtolower($locale)));
 
-        return is_array($data) ? $data : null;
+        if ($response && $response->successful()) {
+            $json = $response->json();
+            $data = $json['data'] ?? null;
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+
+        // Fallback: bazı API kurulumlarında /rooms/{slug} desteklenmez.
+        // Bu durumda listeyi çekip id/slug/name üzerinden eşleştiriyoruz.
+        $listUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms';
+        foreach ($this->localeFallbackChain($locale) as $lang) {
+            $items = $this->fetchPaginatedItems($listUrl, $this->langQuery($lang));
+            $matched = $this->findRoomByIdentifier($items, $identifier);
+            if ($matched) {
+                return $matched;
+            }
+        }
+
+        $items = $this->fetchPaginatedItems($listUrl);
+        return $this->findRoomByIdentifier($items, $identifier);
+    }
+
+    private function findRoomByIdentifier(array $items, string $identifier): ?array
+    {
+        $needle = Str::lower(trim($identifier));
+        if ($needle === '') {
+            return null;
+        }
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $id = Str::lower((string) ($item['id'] ?? ''));
+            $slug = Str::lower((string) ($item['slug'] ?? ''));
+            $name = Str::lower((string) ($item['name'] ?? ''));
+            $nameSlug = Str::slug((string) ($item['name'] ?? ''));
+
+            if ($needle === $id || $needle === $slug || $needle === $name || $needle === $nameSlug) {
+                return $item;
+            }
+
+            $translations = $item['translations'] ?? [];
+            if (! is_array($translations)) {
+                continue;
+            }
+
+            foreach ($translations as $translation) {
+                if (! is_array($translation)) {
+                    continue;
+                }
+
+                $translatedName = Str::lower((string) ($translation['name'] ?? ''));
+                $translatedSlug = Str::slug((string) ($translation['name'] ?? ''));
+                if ($needle === $translatedName || $needle === $translatedSlug) {
+                    return $item;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

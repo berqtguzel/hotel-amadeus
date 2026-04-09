@@ -36,8 +36,19 @@ function normalizeList(items) {
         .filter(Boolean);
 }
 
+function slugifyRoom(value = "") {
+    return String(value)
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
 function RoomCard({ hotel, locale, t }) {
-    const href = `/${locale}/rooms/${hotel.slug ?? hotel.id}`;
+    const roomIdentifier = hotel.slug || slugifyRoom(hotel.name) || hotel.id;
+    const href = `/${locale}/rooms/${roomIdentifier}`;
     const boardSummary = (hotel.boardTypes || [])
         .map((item) => item?.description ?? item?.name ?? item?.code)
         .filter(Boolean)
