@@ -100,6 +100,9 @@ Route::get('/{locale}/rooms/{room}', [RoomPageController::class, 'show'])
     ->where(['locale' => 'de|en|tr'])
     ->name('rooms.show');
 
+// Allow locale-less room links like /rooms/deluxe-suite → /de/rooms/deluxe-suite
+Route::get('/rooms/{room}', fn($room) => redirect("/de/rooms/{$room}"));
+
 
 Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer, HolidayThemeService $holidayThemeService) {
     $locale = strtolower($locale);

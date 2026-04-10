@@ -70,6 +70,16 @@ class RoomPageController extends Controller
             throw new NotFoundHttpException();
         }
 
+        if ($roomData && !$error) {
+            $canonicalSlug = $this->resolveCanonicalSlug($roomData, $locale);
+            if (
+                $canonicalSlug !== ''
+                && Str::lower($canonicalSlug) !== Str::lower($room)
+            ) {
+                return redirect("/{$locale}/rooms/{$canonicalSlug}", 301);
+            }
+        }
+
         return Inertia::render('Rooms/Show', [
             'locale' => $locale,
             'roomSlug' => $room,
@@ -96,8 +106,7 @@ class RoomPageController extends Controller
             }
         }
 
-        // Fallback: bazı API kurulumlarında /rooms/{slug} desteklenmez.
-        // Bu durumda listeyi çekip id/slug/name üzerinden eşleştiriyoruz.
+
         $listUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms';
         foreach ($this->localeFallbackChain($locale) as $lang) {
             $items = $this->fetchPaginatedItems($listUrl, $this->langQuery($lang));
@@ -151,6 +160,37 @@ class RoomPageController extends Controller
         }
 
         return null;
+    }
+
+    private function resolveCanonicalSlug(array $room, string $locale): string
+    {
+        $slug = trim((string) ($room['slug'] ?? ''));
+        if ($slug !== '') {
+            return Str::slug($slug);
+        }
+
+        $name = trim((string) ($room['name'] ?? ''));
+
+        $translations = $room['translations'] ?? [];
+        if (is_array($translations) && $translations !== []) {
+            $target = Str::lower($locale);
+            foreach ($translations as $translation) {
+                if (! is_array($translation)) {
+                    continue;
+                }
+                $code = Str::lower((string) ($translation['language_code'] ?? $translation['locale'] ?? ''));
+                if ($code !== '' && $code === $target) {
+                    $name = trim((string) ($translation['name'] ?? $name));
+                    break;
+                }
+            }
+
+            if ($name === '' && isset($translations[0]) && is_array($translations[0])) {
+                $name = trim((string) ($translations[0]['name'] ?? ''));
+            }
+        }
+
+        return Str::slug($name);
     }
 
     /**

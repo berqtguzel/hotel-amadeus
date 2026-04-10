@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ApiHealthService;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
@@ -47,7 +48,7 @@ class HomeController extends Controller
                     $json = $response->json();
                     $data = $json['data'] ?? [];
 
-                    return $this->normalizeRooms($data);
+                    return $this->normalizeRooms($data, $locale);
                 }
             } catch (\Throwable $e) {
                 //
@@ -57,13 +58,39 @@ class HomeController extends Controller
         });
     }
 
-    private function normalizeRooms(array $rooms): array
+    private function normalizeRooms(array $rooms, string $locale): array
     {
         $list = $this->unwrapRoomsPayload($rooms);
 
-        $normalized = array_map(function ($room) {
+        $normalized = array_map(function ($room) use ($locale) {
             if (!is_array($room)) {
                 return null;
+            }
+
+            $name = (string) ($room['name'] ?? '');
+            if ($name === '' && isset($room['translations']) && is_array($room['translations'])) {
+                $target = strtolower($locale);
+                foreach ($room['translations'] as $tr) {
+                    if (!is_array($tr)) {
+                        continue;
+                    }
+                    $code = strtolower((string) ($tr['language_code'] ?? $tr['locale'] ?? ''));
+                    if ($code !== '' && $code === $target) {
+                        $name = (string) ($tr['name'] ?? $name);
+                        break;
+                    }
+                }
+                if ($name === '' && isset($room['translations'][0]) && is_array($room['translations'][0])) {
+                    $name = (string) ($room['translations'][0]['name'] ?? $name);
+                }
+            }
+
+            $slug = (string) ($room['slug'] ?? '');
+            if ($slug === '') {
+                $slug = Str::slug($name);
+            }
+            if ($slug === '') {
+                $slug = (string) ($room['id'] ?? '');
             }
 
             $features = collect($room['features'] ?? [])
@@ -95,8 +122,8 @@ class HomeController extends Controller
 
             return [
                 'id' => $room['id'] ?? null,
-                'slug' => $room['slug'] ?? (string) ($room['id'] ?? ''),
-                'name' => $room['name'] ?? '',
+                'slug' => $slug,
+                'name' => $name,
                 'description' => $room['description'] ?? '',
                 'capacity' => isset($room['capacity']) ? (int) $room['capacity'] : null,
                 'status' => $room['status'] ?? 'active',
