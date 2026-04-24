@@ -249,11 +249,10 @@ export default function RoomsShowcase() {
         setActiveIndex(index);
     }, []);
 
+    // Sınırsız döngü için güncellendi
     const scroll = (direction) => {
-        const next = Math.max(
-            0,
-            Math.min(activeIndex + direction, cards.length - 1),
-        );
+        if (!cards.length) return;
+        const next = (activeIndex + direction + cards.length) % cards.length;
         scrollToIndex(next);
     };
 
@@ -425,7 +424,7 @@ export default function RoomsShowcase() {
 
                 {/* Slider Alanı ve Yan Oklar */}
                 <div style={{ position: "relative" }}>
-                    {/* Sol Ok (Masaüstü) - Kart gridinin solunda ortalanır */}
+                    {/* Sol Ok (Masaüstü) */}
                     <div
                         className="rsm-controls--desktop"
                         style={{
@@ -441,13 +440,12 @@ export default function RoomsShowcase() {
                             className="rsm-nav"
                             onClick={() => scroll(-1)}
                             aria-label={t("rooms.previous", "Previous room")}
-                            disabled={activeIndex <= 0}
                         >
                             <FiArrowLeft />
                         </button>
                     </div>
 
-                    {/* Sağ Ok (Masaüstü) - Kart gridinin sağında ortalanır */}
+                    {/* Sağ Ok (Masaüstü) */}
                     <div
                         className="rsm-controls--desktop"
                         style={{
@@ -463,7 +461,6 @@ export default function RoomsShowcase() {
                             className="rsm-nav"
                             onClick={() => scroll(1)}
                             aria-label={t("rooms.next", "Next room")}
-                            disabled={activeIndex >= cards.length - 1}
                         >
                             <FiArrowRight />
                         </button>
@@ -493,7 +490,6 @@ export default function RoomsShowcase() {
                                         t={t}
                                         featured={i === activeIndex}
                                         onClick={(e) => {
-                                            // Kart aktif değilse yönlendirmeyi iptal et ve kartı ortala
                                             if (i !== activeIndex) {
                                                 e.preventDefault();
                                                 scrollToIndex(i);
@@ -514,7 +510,6 @@ export default function RoomsShowcase() {
                             className="rsm-nav"
                             onClick={() => scroll(-1)}
                             aria-label={t("rooms.previous", "Previous room")}
-                            disabled={activeIndex <= 0}
                         >
                             <FiArrowLeft />
                         </button>
@@ -524,7 +519,6 @@ export default function RoomsShowcase() {
                             className="rsm-nav"
                             onClick={() => scroll(1)}
                             aria-label={t("rooms.next", "Next room")}
-                            disabled={activeIndex >= cards.length - 1}
                         >
                             <FiArrowRight />
                         </button>

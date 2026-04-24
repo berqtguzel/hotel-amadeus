@@ -10,6 +10,8 @@ import OffersGrid from "@/Components/Home/OffersGrid";
 import GiftVoucherPromo from "@/Components/Home/GiftVoucherPromo";
 import ExperienceHero from "@/Components/Home/ExperienceHero";
 import RoomsShowcase from "@/Components/Home/RoomsShowcase";
+import Partners from "@/Components/Home/Partners";
+
 import TravelThemes from "@/Components/Home/TravelThemes";
 import HotelReviews from "@/Components/Home/HotelReviews";
 import MapSection from "@/Components/Home/MapSection";
@@ -33,6 +35,7 @@ export default function HomeIndex({ currentRoute = "home" }) {
             {/* <OffersGrid /> */}
             <ExperienceHero />
             <RoomsShowcase />
+            <Partners />
             {/* <TravelThemes /> */}
             <HotelReviews />
             <MapSection />

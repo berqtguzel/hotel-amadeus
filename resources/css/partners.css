@@ -1,0 +1,198 @@
+/* GENEL ALAN (Görseldeki gibi koyu ton) */
+.ptn-wrap {
+    position: relative;
+    padding: 80px 20px;
+    background: #f8efda; /* Siyah arkaplan */
+    overflow: hidden;
+    color: #fff;
+}
+.dark .ptn-wrap {
+    background: #614316; /* Siyah arkaplan */
+    color: #fff; /* Beyaz metin */
+}
+
+/* BAŞLIK KISMI */
+.ptn-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.ptn-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: #c59c5d; /* Altın sarısı */
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.ptn-heading {
+    font-family: "Playfair Display", serif;
+    font-size: 38px;
+    font-weight: 400;
+    margin: 0;
+    color: #b99c70;
+    letter-spacing: 0.02em;
+}
+
+/* 3D SLIDER KONTEYNERİ */
+.ptn-slider-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 480px; /* Kartlar ve yansımalar için yeterli alan */
+    perspective: 1200px; /* 3 Boyut derinliği (Bu değer kameranın uzaklığıdır) */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.ptn-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-style: preserve-3d;
+}
+
+/* HER BİR KART GRUBU (Kart + Yansıma) */
+.ptn-item {
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    transition:
+        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.6s ease,
+        z-index 0s;
+    cursor: pointer;
+}
+
+/* BEYAZ LOGO KARTI */
+.ptn-card {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.ptn-card img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.ptn-fallback-text {
+    font-family: sans-serif;
+    color: #000;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+/* ALT YANSIMA (REFLECTION) MANTIĞI */
+.ptn-reflection {
+    position: absolute;
+    top: 100%; /* Kartın hemen bittiği yer */
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleY(-1); /* Kartı baş aşağı çevir */
+    opacity: 0.35; /* Yansıma şeffaflığı */
+
+    /* Gittikçe kaybolan (fade out) yansıma maskesi */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 30%,
+        rgba(0, 0, 0, 1) 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 30%,
+        rgba(0, 0, 0, 1) 100%
+    );
+}
+
+/* ----------------------------------------------------
+   3D POZİSYONLANDIRMA VE AÇILAR (Coverflow)
+   ---------------------------------------------------- */
+
+/* MERKEZ (Aktif) */
+.is-active {
+    transform: translateX(0) translateZ(80px) rotateY(0deg);
+    z-index: 10;
+    opacity: 1;
+}
+
+/* SOL 1. KART */
+.is-prev-1 {
+    transform: translateX(-55%) translateZ(-150px) rotateY(45deg);
+    z-index: 5;
+    opacity: 0.85;
+}
+
+/* SAĞ 1. KART */
+.is-next-1 {
+    transform: translateX(55%) translateZ(-150px) rotateY(-45deg);
+    z-index: 5;
+    opacity: 0.85;
+}
+
+/* SOL 2. KART (Daha Arkada) */
+.is-prev-2 {
+    transform: translateX(-100%) translateZ(-350px) rotateY(55deg);
+    z-index: 2;
+    opacity: 0.3;
+}
+
+/* SAĞ 2. KART (Daha Arkada) */
+.is-next-2 {
+    transform: translateX(100%) translateZ(-350px) rotateY(-55deg);
+    z-index: 2;
+    opacity: 0.3;
+}
+
+/* DİĞERLERİ (Saklı) */
+.is-hidden {
+    transform: translateX(0) translateZ(-600px) rotateY(0deg);
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* MOBİL UYUM */
+@media (max-width: 768px) {
+    .ptn-slider-container {
+        height: 350px;
+    }
+
+    .ptn-item {
+        width: 180px;
+        height: 180px;
+    }
+
+    .ptn-card {
+        padding: 20px;
+    }
+
+    /* Mobilde 2. kartları gizlemek görüntüyü temizler */
+    .is-prev-2,
+    .is-next-2 {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .is-prev-1 {
+        transform: translateX(-60%) translateZ(-150px) rotateY(40deg);
+    }
+
+    .is-next-1 {
+        transform: translateX(60%) translateZ(-150px) rotateY(-40deg);
+    }
+}

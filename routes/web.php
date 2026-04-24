@@ -13,6 +13,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\ReviewsController;
+use App\Http\Controllers\PartnerController;
 use App\Services\CouponService;
 use App\Services\PageService;
 use App\Services\ReviewsService;
@@ -61,6 +62,10 @@ Route::prefix('api/reviews')->group(function () {
     Route::post('/', [ReviewsController::class, 'store'])->name('reviews.store');
 });
 
+Route::prefix('api/partners')->group(function () {
+    Route::get('/', [PartnerController::class, 'index'])->name('partners.index');
+    Route::get('/{identifier}', [PartnerController::class, 'show'])->name('partners.show');
+});
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');

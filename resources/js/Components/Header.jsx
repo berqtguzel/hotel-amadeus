@@ -226,7 +226,7 @@ export default function Header({ currentRoute }) {
 
     const desktopNav = navFromApi ?? [];
     const mobileNav = navFromApi ?? [];
-    const groupBookingLabel = t("header.groupBooking");
+    const restaraunt = t("header.restaurant");
     const bestPriceLabel = t("header.bestPriceBooking");
 
     useEffect(() => {
@@ -421,7 +421,7 @@ export default function Header({ currentRoute }) {
 
                     <div className="wh-nav-ctas wh-ctas-desktop">
                         <a
-                            href="https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0"
+                            href="https://www.secure-hotel-booking.com/d-edge/Hotel-Amadeus-Dresden-Neustadt/J1FA/de-DE/DateSelection?invalidateEngineCache=true&_gl=1*1tzxwy6*_gcl_au*ODU1OTg2NjA1LjE3NzYwNjQzNDA."
                             className="wh-btn wh-btn--light"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -430,21 +430,21 @@ export default function Header({ currentRoute }) {
 
                                 sendTracking({
                                     button_id: "header_gruppenbuchung",
-                                    button_label: groupBookingLabel,
+                                    button_label: restaraunt,
                                     metadata: { location: "header" },
                                 });
 
                                 window.open(
-                                    "https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0",
+                                    "https://www.secure-hotel-booking.com/d-edge/Hotel-Amadeus-Dresden-Neustadt/J1FA/de-DE/DateSelection?invalidateEngineCache=true&_gl=1*1tzxwy6*_gcl_au*ODU1OTg2NjA1LjE3NzYwNjQzNDA.",
                                     "_blank",
                                 );
                             }}
                         >
-                            {groupBookingLabel}
+                            {restaraunt}
                         </a>
 
                         <a
-                            href="https://www.secure-hotel-booking.com/d-edge/Hotel Amadeus-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
+                            href="https://www.secure-hotel-booking.com/d-edge/Hotel-Amadeus-Dresden-Neustadt/J1FA/de-DE/DateSelection?invalidateEngineCache=true&_gl=1*lc3xdg*_gcl_au*ODU1OTg2NjA1LjE3NzYwNjQzNDA."
                             className="wh-btn wh-btn--light"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -458,7 +458,7 @@ export default function Header({ currentRoute }) {
                                 });
 
                                 window.open(
-                                    "https://www.secure-hotel-booking.com/d-edge/Hotel Amadeus-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
+                                    "https://www.secure-hotel-booking.com/d-edge/Hotel-Amadeus-Dresden-Neustadt/J1FA/de-DE/DateSelection?invalidateEngineCache=true&_gl=1*lc3xdg*_gcl_au*ODU1OTg2NjA1LjE3NzYwNjQzNDA.",
                                     "_blank",
                                 );
                             }}
@@ -597,7 +597,7 @@ export default function Header({ currentRoute }) {
 
                                     sendTracking({
                                         button_id: "mobile_gruppenbuchung",
-                                        button_label: groupBookingLabel,
+                                        button_label: restaraunt,
                                         metadata: { location: "mobile" },
                                     });
 
@@ -609,7 +609,7 @@ export default function Header({ currentRoute }) {
                                     );
                                 }}
                             >
-                                {groupBookingLabel}
+                                {restaraunt}
                             </a>
 
                             <a
