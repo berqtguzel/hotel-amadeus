@@ -128,6 +128,8 @@ class HomeController extends Controller
                 'capacity' => isset($room['capacity']) ? (int) $room['capacity'] : null,
                 'status' => $room['status'] ?? 'active',
                 'image' => $room['image'] ?? $room['hero_image'] ?? '/images/template2.png',
+                'images' => $room['images'] ?? [],
+                'gallery' => $room['gallery'] ?? [],
                 'price' => $room['price'] ?? null,
                 'order' => isset($room['order']) ? (int) $room['order'] : 9999,
                 'features' => $features,

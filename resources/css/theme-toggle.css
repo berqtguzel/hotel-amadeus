@@ -1,116 +1,131 @@
 .ttgl {
-  --ttgl-bg: linear-gradient(180deg, #ffffff, #f3f7f5);
-  --ttgl-border: rgba(12, 45, 32, 0.16);
-  --ttgl-text: #0f2c1f;
-  --ttgl-track-bg: #e8f3ed;
-  --ttgl-thumb-bg: #ffffff;
-  --ttgl-thumb-ring: rgba(16, 185, 129, 0.28);
-  --ttgl-icon-muted: rgba(15, 44, 31, 0.45);
-  --ttgl-shadow: 0 10px 24px rgba(7, 28, 19, 0.18);
-
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--ttgl-border);
-  background: var(--ttgl-bg);
-  color: var(--ttgl-text);
-  border-radius: 999px;
-  padding: 5px 10px 5px 6px;
-  min-height: 38px;
-  cursor: pointer;
-  box-shadow: var(--ttgl-shadow);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    --ttgl-bg: linear-gradient(180deg, #ffffff, #f7f7f3);
+    --ttgl-border: rgba(12, 45, 32, 0.16);
+    --ttgl-text: #2c290f;
+    --ttgl-track-bg: #fff7e9;
+    --ttgl-thumb-bg: #ffffff;
+    --ttgl-thumb-ring: rgba(168, 185, 16, 0.28);
+    --ttgl-icon-muted: rgba(44, 44, 15, 0.45);
+    --ttgl-shadow: 0 10px 24px rgba(7, 28, 19, 0.18);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--ttgl-border);
+    background: var(--ttgl-bg);
+    color: var(--ttgl-text);
+    border-radius: 999px;
+    padding: 5px 10px 5px 6px;
+    min-height: 38px;
+    cursor: pointer;
+    box-shadow: var(--ttgl-shadow);
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
 }
 
 .ttgl:hover {
-  transform: translateY(-1px);
+    transform: translateY(-1px);
 }
 
 .ttgl:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.38), var(--ttgl-shadow);
+    outline: none;
+    box-shadow:
+        0 0 0 3px rgba(218, 193, 57, 0.38),
+        var(--ttgl-shadow);
+}
+
+.dark .ttgl-track {
+    background: #423c21;
 }
 
 .ttgl-track {
-  width: 54px;
-  height: 26px;
-  border-radius: 999px;
-  background: var(--ttgl-track-bg);
-  border: 1px solid rgba(10, 35, 24, 0.14);
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 6px;
-  overflow: hidden;
+    width: 54px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--ttgl-track-bg);
+    border: 1px solid rgba(10, 35, 24, 0.14);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+    overflow: hidden;
 }
 
 .ttgl-icon {
-  width: 13px;
-  height: 13px;
-  display: inline-flex;
-  color: var(--ttgl-icon-muted);
-  transition: color 0.2s ease, opacity 0.2s ease;
-  z-index: 1;
+    width: 13px;
+    height: 13px;
+    display: inline-flex;
+    color: var(--ttgl-icon-muted);
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+    z-index: 1;
 }
 
 .ttgl-icon svg {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .ttgl-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  background: var(--ttgl-thumb-bg);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 4px 10px rgba(15, 35, 26, 0.22);
-  transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--ttgl-thumb-bg);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 4px 10px rgba(15, 35, 26, 0.22);
+    transition:
+        transform 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
 }
 
 .ttgl-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  line-height: 1;
-  min-width: 32px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1;
+    min-width: 32px;
 }
 
 .ttgl.is-dark {
-  --ttgl-bg: linear-gradient(180deg, #0f1713, #0b120f);
-  --ttgl-border: rgba(255, 255, 255, 0.14);
-  --ttgl-text: #d8ffec;
-  --ttgl-track-bg: #173527;
-  --ttgl-thumb-bg: #052e1c;
-  --ttgl-thumb-ring: rgba(16, 185, 129, 0.35);
-  --ttgl-icon-muted: rgba(216, 255, 236, 0.55);
-  --ttgl-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    --ttgl-bg: linear-gradient(180deg, #0f1713, #0b120f);
+    --ttgl-border: rgba(255, 255, 255, 0.14);
+    --ttgl-text: #fff6d8;
+    --ttgl-track-bg: #173527;
+    --ttgl-thumb-bg: #2e2805;
+    --ttgl-thumb-ring: rgba(185, 131, 16, 0.35);
+    --ttgl-icon-muted: rgba(255, 254, 216, 0.55);
+    --ttgl-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
 }
 
 .ttgl.is-light .ttgl-icon--sun {
-  color: #047857;
+    color: #785904;
 }
 
 .ttgl.is-dark .ttgl-icon--moon {
-  color: #6ee7b7;
+    color: #bb8f5c;
 }
 
 .ttgl.is-dark .ttgl-thumb {
-  transform: translateX(28px);
-  box-shadow: 0 0 0 3px var(--ttgl-thumb-ring), 0 4px 14px rgba(0, 0, 0, 0.5);
+    transform: translateX(28px);
+    box-shadow:
+        0 0 0 3px var(--ttgl-thumb-ring),
+        0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 640px) {
-  .ttgl-label {
-    display: none;
-  }
-  .ttgl {
-    padding-right: 6px;
-  }
+    .ttgl-label {
+        display: none;
+    }
+    .ttgl {
+        padding-right: 6px;
+    }
 }
-
-

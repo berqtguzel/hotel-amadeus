@@ -334,4 +334,32 @@ class SettingsService
             return [];
         }
     }
+    /**
+     * API'den aktif dilleri dinamik olarak çeker.
+     * @return array
+     */
+    public function getLanguages(): array
+    {
+        $cacheKey = $this->cacheKey('active_languages', 'global');
+
+        // Dilleri 24 saat boyunca cache'le (performans için kritik)
+        return Cache::remember($cacheKey, now()->addDay(), function () {
+            try {
+                // Senin verdiğin API uç noktası
+                $response = Http::timeout(5)->get('https://omerdogan.de/api/global/settings/languages');
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    // API'den gelen diller dizisini döndür
+                    return $data['data']['languages'] ?? [];
+                }
+
+                Log::error('Settings API Languages fetch failed: ' . $response->status());
+                return [];
+            } catch (\Throwable $e) {
+                Log::error('Settings API Languages error: ' . $e->getMessage());
+                return [];
+            }
+        });
+    }
 }

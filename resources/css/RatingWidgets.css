@@ -1,0 +1,169 @@
+.rw-grid {
+    position: relative; /* 🔥 en önemli fix */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding: 28px;
+    min-height: 170px;
+    overflow: hidden;
+}
+
+/* BACKGROUND */
+.rw-background {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+
+    background-image: url("/images/Logo/Hotel Amadeus-logo.png");
+    background-repeat: repeat;
+    background-size: 170px auto;
+
+    opacity: 0.08; /* 🔥 çok önemli (yoksa çirkin olur) */
+}
+
+/* CARDS */
+.rw-card-equal {
+    position: relative;
+    z-index: 1; /* 🔥 background üstüne gelsin */
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.92); /* 🔥 glass hissi */
+    backdrop-filter: blur(6px);
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    text-decoration: none;
+    color: #111;
+    min-width: 260px;
+    transition: all 0.25s ease;
+}
+
+.rw-card-equal:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* LOGO */
+.rw-card-equal img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* TEXT */
+.rw-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rw-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* STARS */
+.rw-stars {
+    display: flex;
+    gap: 2px;
+    font-size: 13px;
+}
+
+.star {
+    color: #d1d5db;
+}
+
+.star.filled {
+    color: #f59e0b;
+}
+
+.star.half {
+    color: #fbbf24;
+}
+
+/* SCORE */
+.rw-score {
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 14px;
+    color: #16a34a;
+}
+/* MARQUEE WRAPPER */
+.rw-marquee {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding: 20px 0;
+}
+
+/* TRACK (KAYAN ALAN) */
+.rw-track {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+}
+
+.rw-marquee.is-animated .rw-track {
+    animation: rw-scroll 25s linear infinite;
+}
+
+.rw-marquee.is-static {
+    overflow-x: auto;
+    padding-inline: 16px;
+    scrollbar-width: none;
+}
+
+.rw-marquee.is-static::-webkit-scrollbar {
+    display: none;
+}
+
+.rw-marquee.is-static .rw-track {
+    width: auto;
+    min-width: 100%;
+}
+
+/* HOVER'DA DUR */
+.rw-marquee.is-animated:hover .rw-track {
+    animation-play-state: paused;
+}
+
+/* ANIMATION */
+@keyframes rw-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+.rw-marquee::before,
+.rw-marquee::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 80px;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.rw-marquee::before {
+    left: 0;
+    background: linear-gradient(to right, white, transparent);
+}
+
+.rw-marquee::after {
+    right: 0;
+    background: linear-gradient(to left, white, transparent);
+}
+
+.rw-marquee.is-static::before,
+.rw-marquee.is-static::after {
+    display: none;
+}

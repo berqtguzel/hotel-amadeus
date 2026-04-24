@@ -3,10 +3,21 @@
     display: grid;
     place-items: center;
     padding: 40px 18px;
+
     background:
-        radial-gradient(circle at top left, rgba(25, 191, 115, 0.18), transparent 32%),
-        radial-gradient(circle at right center, rgba(59, 130, 246, 0.16), transparent 28%),
-        linear-gradient(180deg, #f5faf7 0%, #eaf4ef 100%);
+        radial-gradient(
+            circle at top left,
+            rgba(197, 161, 90, 0.12),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at right center,
+            rgba(31, 90, 62, 0.08),
+            transparent 28%
+        ),
+        var(--uu-bg);
+
+    color: var(--uu-ink);
 }
 
 .ep-shell {
@@ -22,43 +33,46 @@
     font-weight: 800;
     line-height: 0.9;
     letter-spacing: -0.06em;
-    color: rgba(6, 78, 59, 0.16);
+    color: rgba(164, 127, 54, 0.18); /* UU accent */
     text-align: center;
-    -webkit-user-select: none;
     user-select: none;
 }
 
 .ep-card {
-    border-radius: 28px;
+    border-radius: var(--uu-radius);
     padding: 34px 30px;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.12);
+
+    background: var(--uu-surface);
+    border: 1px solid var(--uu-stroke);
+    box-shadow: var(--uu-shadow);
 }
 
 .ep-kicker {
     display: inline-block;
     margin-bottom: 10px;
+
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #0f766e;
+
+    color: var(--uu-accent);
 }
 
 .ep-title {
     margin: 0;
     font-size: clamp(2rem, 4vw, 3.4rem);
     line-height: 1.05;
-    color: #0f172a;
+    color: var(--uu-ink);
 }
 
 .ep-text {
     margin: 16px 0 0;
     max-width: 56ch;
+
     font-size: 1rem;
     line-height: 1.75;
-    color: #475569;
+    color: var(--uu-muted);
 }
 
 .ep-actions {
@@ -72,71 +86,82 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     min-height: 48px;
     padding: 0 18px;
+
     border-radius: 999px;
     border: 1px solid transparent;
+
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
+
     transition:
         transform 0.18s ease,
         box-shadow 0.18s ease,
         background-color 0.18s ease;
 }
 
+/* PRIMARY BUTTON (UU style) */
 .ep-btn--primary {
-    background: linear-gradient(135deg, #059669, #14b8a6);
-    color: #fff;
-    box-shadow: 0 16px 32px rgba(5, 150, 105, 0.24);
+    background: linear-gradient(180deg, #f4e6c3, #e4c982);
+    color: #35240c;
+    box-shadow: 0 16px 32px rgba(164, 127, 54, 0.22);
 }
 
+/* GHOST BUTTON */
 .ep-btn--ghost {
     background: transparent;
-    color: #0f172a;
-    border-color: rgba(15, 23, 42, 0.14);
+    color: var(--uu-ink);
+    border-color: var(--uu-stroke);
 }
 
 .ep-btn:hover {
     transform: translateY(-1px);
 }
 
-html[data-theme="dark"] .ep-wrap,
-.dark .ep-wrap,
-body[data-theme="dark"] .ep-wrap {
+/* ================= DARK MODE ================= */
+
+.dark .ep-wrap {
     background:
-        radial-gradient(circle at top left, rgba(16, 185, 129, 0.18), transparent 32%),
-        radial-gradient(circle at right center, rgba(56, 189, 248, 0.12), transparent 28%),
-        linear-gradient(180deg, #08110e 0%, #0b1512 100%);
+        radial-gradient(
+            circle at top left,
+            rgba(220, 194, 139, 0.12),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at right center,
+            rgba(31, 90, 62, 0.12),
+            transparent 28%
+        ),
+        var(--uu-bg);
 }
 
-html[data-theme="dark"] .ep-code,
 .dark .ep-code {
-    color: rgba(110, 231, 183, 0.12);
+    color: rgba(220, 194, 139, 0.12);
 }
 
-html[data-theme="dark"] .ep-card,
 .dark .ep-card {
-    background: rgba(10, 15, 13, 0.9);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+    background: var(--uu-surface);
+    border-color: var(--uu-stroke);
+    box-shadow: var(--uu-shadow);
 }
 
-html[data-theme="dark"] .ep-title,
 .dark .ep-title {
-    color: #f8fafc;
+    color: var(--uu-ink);
 }
 
-html[data-theme="dark"] .ep-text,
 .dark .ep-text {
-    color: #cbd5e1;
+    color: var(--uu-muted);
 }
 
-html[data-theme="dark"] .ep-btn--ghost,
 .dark .ep-btn--ghost {
-    color: #f8fafc;
-    border-color: rgba(255, 255, 255, 0.18);
+    color: var(--uu-ink);
+    border-color: var(--uu-stroke);
 }
+
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 760px) {
     .ep-shell {

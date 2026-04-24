@@ -19,7 +19,7 @@ export default function KontaktPage({ currentRoute = "kontakt" }) {
     const image = page?.heroImage ?? null;
 
     return (
-        <AppLayout currentRoute={currentRoute}>
+        <AppLayout currentRoute={currentRoute} headerOverlay>
             <SeoHead
                 title={title}
                 description={description}

@@ -453,14 +453,13 @@ function normalizeRoom(apiRoom, locale) {
     const parsedDescription = parseDescription(
         translation?.description ?? apiRoom.description ?? "",
     );
-    const images = uniqueItems(
-        [
-            normalizeImageItem(apiRoom.image),
-            ...toArray(apiRoom.images).map(normalizeImageItem),
-        ]
-            .filter(Boolean)
-            .map((img) => JSON.stringify(img)),
-    ).map((item) => JSON.parse(item));
+    const images = [
+        normalizeImageItem(apiRoom.image),
+        ...toArray(apiRoom.images).map(normalizeImageItem),
+    ].filter((img, index, self) => {
+        if (!img?.url) return false;
+        return self.findIndex((i) => i.url === img.url) === index;
+    });
     const heroImg = apiRoom.image || images[0]?.url || "/images/template2.png";
     const features = Array.isArray(apiRoom.features)
         ? apiRoom.features
@@ -667,14 +666,11 @@ export default function RoomShow() {
     }, [boardPriceItems]);
     const lowestBoardPriceLabel =
         lowestBoardPrice != null ? formatMoney(lowestBoardPrice, locale) : null;
-    const calendarMonths = React.useMemo(
-        () => {
-            const built = buildPriceCalendar(data?.roomPrices ?? [], locale);
-            if (built.length > 0) return built;
-            return buildFallbackCalendar(locale, 12);
-        },
-        [data?.roomPrices, locale],
-    );
+    const calendarMonths = React.useMemo(() => {
+        const built = buildPriceCalendar(data?.roomPrices ?? [], locale);
+        if (built.length > 0) return built;
+        return buildFallbackCalendar(locale, 12);
+    }, [data?.roomPrices, locale]);
     const weekdays = React.useMemo(() => weekdayLabels(locale), [locale]);
     const allCalendarItems = React.useMemo(
         () =>
@@ -757,7 +753,7 @@ export default function RoomShow() {
     return (
         <AppLayout currentRoute="rooms">
             <SeoHead
-                title={t("roomDetail.pageTitle", { name: data.name })}
+                title={data.name}
                 description={data.description}
                 image={data.heroImage}
             />
@@ -818,35 +814,77 @@ export default function RoomShow() {
                                     <span className="rd-price-float__title">
                                         {t("roomDetail.boardPriceTitle")}
                                     </span>
+
                                     <div className="rd-price-float__list">
                                         {boardPriceItems
                                             .slice(0, 5)
-                                            .map((item, index) => (
-                                                <p
-                                                    key={
-                                                        item.id ??
-                                                        `${item.name}-${index}`
-                                                    }
-                                                >
-                                                    <strong>
-                                                        {item.name ||
-                                                            item.code ||
-                                                            t(
-                                                                "roomDetail.baseRateLabel",
-                                                            )}
-                                                    </strong>
-                                                    <em>
-                                                        {item.price != null
-                                                            ? formatMoney(
-                                                                  item.price,
-                                                                  locale,
-                                                              )
-                                                            : t(
-                                                                  "roomDetail.notAvailableShort",
-                                                              )}
-                                                    </em>
-                                                </p>
-                                            ))}
+                                            .map((item, index) => {
+                                                const priceNumber =
+                                                    item?.price != null &&
+                                                    !Number.isNaN(
+                                                        Number(item.price),
+                                                    )
+                                                        ? Number(item.price)
+                                                        : null;
+
+                                                const isLowest =
+                                                    priceNumber != null &&
+                                                    Number(priceNumber) ===
+                                                        Number(
+                                                            lowestBoardPrice,
+                                                        );
+
+                                                const fromLabel =
+                                                    {
+                                                        de: "ab",
+                                                        en: "from",
+                                                        tr: null, // TR farklı format
+                                                    }[locale] || "from";
+
+                                                return (
+                                                    <p
+                                                        key={
+                                                            item.id ??
+                                                            `${item.name}-${index}`
+                                                        }
+                                                    >
+                                                        <strong>
+                                                            {item.name ||
+                                                                item.code ||
+                                                                t(
+                                                                    "roomDetail.baseRateLabel",
+                                                                )}
+                                                        </strong>
+
+                                                        <em
+                                                            className={
+                                                                isLowest
+                                                                    ? "is-best-price"
+                                                                    : ""
+                                                            }
+                                                        >
+                                                            {priceNumber != null
+                                                                ? locale ===
+                                                                  "tr"
+                                                                    ? `${formatMoney(
+                                                                          priceNumber,
+                                                                          locale,
+                                                                      )}${
+                                                                          isLowest
+                                                                              ? "'den başlayan"
+                                                                              : ""
+                                                                      }`
+                                                                    : `${isLowest ? fromLabel + " " : ""}${formatMoney(
+                                                                          priceNumber,
+                                                                          locale,
+                                                                      )}`
+                                                                : t(
+                                                                      "roomDetail.notAvailableShort",
+                                                                  )}
+                                                        </em>
+                                                    </p>
+                                                );
+                                            })}
                                     </div>
                                 </div>
                             ) : null}
@@ -873,7 +911,7 @@ export default function RoomShow() {
                             )}
                         </figure>
 
-                        <div className="rux-thumbs rux-thumbs--single">
+                        <div className="rux-thumbs">
                             <button
                                 type="button"
                                 className="rux-thumb-nav"
@@ -884,20 +922,28 @@ export default function RoomShow() {
                                 <ChevronLeft size={16} />
                             </button>
 
-                            <button
-                                type="button"
-                                className="rux-thumb rux-thumb--single is-active"
-                                onClick={goNext}
-                                aria-label={t("roomDetail.nextImage")}
-                                disabled={images.length <= 1}
-                            >
-                                <img
-                                    src={activeImage.url}
-                                    alt={activeImage.alt || ""}
-                                    aria-hidden="true"
-                                />
-                            </button>
+                            {[0, 1, 2].map((i) => {
+                                const index = (activeIndex + i) % images.length;
+                                const img = images[index];
 
+                                return (
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        className={`rux-thumb ${
+                                            index === activeIndex
+                                                ? "is-active"
+                                                : ""
+                                        }`}
+                                        onClick={() => setActiveIndex(index)}
+                                    >
+                                        <img
+                                            src={img.url}
+                                            alt={img.alt || ""}
+                                        />
+                                    </button>
+                                );
+                            })}
                             <button
                                 type="button"
                                 className="rux-thumb-nav"
@@ -908,10 +954,7 @@ export default function RoomShow() {
                                 <ChevronRight size={16} />
                             </button>
 
-                            <span
-                                className="rux-thumb-counter"
-                                aria-live="polite"
-                            >
+                            <span className="rux-thumb-counter">
                                 {activeIndex + 1}/{images.length}
                             </span>
                         </div>

@@ -9,7 +9,7 @@ import { I18nProvider } from "./i18n";
 import PageTransitionLoader from "./Components/PageTransitionLoader";
 
 createInertiaApp({
-    title: (title) => title || "Werrapark",
+    title: (title) => title || "Hotel Amadeus",
 
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.{jsx,tsx}", {

@@ -57,7 +57,9 @@ export default function SeoHead({
     let origin = null;
     let currentUrl = null;
     try {
-        currentUrl = props?.ziggy?.location ? String(props.ziggy.location) : null;
+        currentUrl = props?.ziggy?.location
+            ? String(props.ziggy.location)
+            : null;
         origin = currentUrl ? new URL(currentUrl).origin : null;
     } catch {
         origin = null;
@@ -69,10 +71,15 @@ export default function SeoHead({
         general.siteName,
         branding.site_name,
         branding.siteName,
-        "Werrapark",
+        "Hotel Amadeus",
     );
 
-    const defaultTitle = pickFirst(seo.meta_title, seo.title, siteName, "Werrapark");
+    const defaultTitle = pickFirst(
+        seo.meta_title,
+        seo.title,
+        siteName,
+        "Hotel Amadeus",
+    );
     const finalTitle = pickFirst(
         mergedMeta?.title,
         mergedMeta?.meta_title,
@@ -136,13 +143,22 @@ export default function SeoHead({
               seo.robots,
               seo.robots_content,
           );
-    const ogTitle = pickFirst(mergedMeta?.og_title, mergedMeta?.ogTitle, finalTitle);
+    const ogTitle = pickFirst(
+        mergedMeta?.og_title,
+        mergedMeta?.ogTitle,
+        finalTitle,
+    );
     const ogDescription = pickFirst(
         mergedMeta?.og_description,
         mergedMeta?.ogDescription,
         finalDescription,
     );
-    const ogType = pickFirst(mergedMeta?.og_type, mergedMeta?.ogType, type, "website");
+    const ogType = pickFirst(
+        mergedMeta?.og_type,
+        mergedMeta?.ogType,
+        type,
+        "website",
+    );
     const twitterCard = pickFirst(
         mergedMeta?.twitter_card,
         mergedMeta?.twitterCard,
@@ -213,7 +229,11 @@ export default function SeoHead({
                 />
             ) : null}
             {ogTitle ? (
-                <meta head-key="og:title" property="og:title" content={ogTitle} />
+                <meta
+                    head-key="og:title"
+                    property="og:title"
+                    content={ogTitle}
+                />
             ) : null}
             {ogDescription ? (
                 <meta
@@ -226,7 +246,11 @@ export default function SeoHead({
                 <meta head-key="og:type" property="og:type" content={ogType} />
             ) : null}
             {currentUrl ? (
-                <meta head-key="og:url" property="og:url" content={currentUrl} />
+                <meta
+                    head-key="og:url"
+                    property="og:url"
+                    content={currentUrl}
+                />
             ) : null}
             {resolvedImage ? (
                 <meta

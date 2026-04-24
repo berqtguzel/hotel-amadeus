@@ -1,7 +1,6 @@
 import React from "react";
 import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
-import TeamGrid from "@/Components/Home/TeamGrid";
 import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
 import "../../../css/uber-uns.css";
@@ -18,7 +17,7 @@ export default function UberUns({ currentRoute = "uberuns" }) {
     const image = page?.heroImage ?? "/images/template2.png";
 
     return (
-        <AppLayout currentRoute={currentRoute}>
+        <AppLayout currentRoute={currentRoute} headerOverlay>
             <SeoHead
                 title={title}
                 description={subtitle}
@@ -38,7 +37,7 @@ export default function UberUns({ currentRoute = "uberuns" }) {
                     />
 
                     <div className="uu-shell uu-hero__inner">
-                        <span className="eyebrow">Werrapark</span>
+                        <span className="uu-eyebrow">Hotel Amadeus</span>
                         <h1 className="uu-title">{title}</h1>
                         <p className="uu-sub">{subtitle}</p>
                     </div>
@@ -46,30 +45,16 @@ export default function UberUns({ currentRoute = "uberuns" }) {
 
                 <section className="uu-shell uu-stats">
                     <div className="uu-stat">
-                        <div className="uu-stat__value">25+</div>
+                        <div className="uu-stat__value">105+</div>
                         <div className="uu-stat__label">
-                            {t("about.statsExperience")}
-                        </div>
-                    </div>
-
-                    <div className="uu-stat">
-                        <div className="uu-stat__value">300+</div>
-                        <div className="uu-stat__label">
-                            {t("about.statsRooms")}
-                        </div>
-                    </div>
-
-                    <div className="uu-stat">
-                        <div className="uu-stat__value">97%</div>
-                        <div className="uu-stat__label">
-                            {t("about.statsSatisfaction")}
+                            Menueauswahl
                         </div>
                     </div>
 
                     <div className="uu-stat">
                         <div className="uu-stat__value">120+</div>
                         <div className="uu-stat__label">
-                            {t("about.statsEmployees")}
+                            Verfuegbare Zimmer
                         </div>
                     </div>
                 </section>
@@ -102,56 +87,6 @@ export default function UberUns({ currentRoute = "uberuns" }) {
                         <h3>{t("about.valuesSustainabilityTitle")}</h3>
                         <p>{t("about.valuesSustainabilityText")}</p>
                     </article>
-                </section>
-
-                <section className="uu-shell uu-timeline">
-                    <h1 className="uu-h2">{t("about.timelineTitle")}</h1>
-
-                    <ol className="uu-steps">
-                        <li className="uu-step">
-                            <div className="uu-step__dot" />
-                            <div className="uu-step__year">1999</div>
-                            <div className="uu-step__title">
-                                {t("about.timeline1Title")}
-                            </div>
-                            <div className="uu-step__text">
-                                {t("about.timeline1Text")}
-                            </div>
-                        </li>
-
-                        <li className="uu-step">
-                            <div className="uu-step__dot" />
-                            <div className="uu-step__year">2008</div>
-                            <div className="uu-step__title">
-                                {t("about.timeline2Title")}
-                            </div>
-                            <div className="uu-step__text">
-                                {t("about.timeline2Text")}
-                            </div>
-                        </li>
-
-                        <li className="uu-step">
-                            <div className="uu-step__dot" />
-                            <div className="uu-step__year">2017</div>
-                            <div className="uu-step__title">
-                                {t("about.timeline3Title")}
-                            </div>
-                            <div className="uu-step__text">
-                                {t("about.timeline3Text")}
-                            </div>
-                        </li>
-
-                        <li className="uu-step">
-                            <div className="uu-step__dot" />
-                            <div className="uu-step__year">2024</div>
-                            <div className="uu-step__title">
-                                {t("about.timeline4Title")}
-                            </div>
-                            <div className="uu-step__text">
-                                {t("about.timeline4Text")}
-                            </div>
-                        </li>
-                    </ol>
                 </section>
 
                 <section className="uu-cta">

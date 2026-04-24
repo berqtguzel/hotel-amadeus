@@ -114,7 +114,9 @@ export default function GiftVoucherForm({
                     .querySelector('meta[name="csrf-token"]')
                     ?.getAttribute("content") ?? "";
 
-            const sessionId = localStorage.getItem("werrapark_analytics_sid");
+            const sessionId = localStorage.getItem(
+                "Hotel Amadeus_analytics_sid",
+            );
 
             const requestBody = {
                 event: payload.event ?? "button_click",
@@ -235,7 +237,7 @@ export default function GiftVoucherForm({
                     quantity,
                     payment_method: paymentMethod,
                     message: message.trim(),
-                    description: `Werrapark gift voucher - ${quantity} x ${amount} EUR - ${paymentMethod}`,
+                    description: `Hotel Amadeus gift voucher - ${quantity} x ${amount} EUR - ${paymentMethod}`,
                 }),
             });
 
@@ -399,7 +401,7 @@ export default function GiftVoucherForm({
                         <div className="gvf-card gcf-back" />
                         <div className="gvf-card gcf-front">
                             <span className="gcf-chip" />
-                            <span className="gcf-brand">WERRAPARK</span>
+                            <span className="gcf-brand">Hotel Amadeus</span>
                             <span className="gcf-tag">
                                 {t("giftVoucher.cardTag")}
                             </span>

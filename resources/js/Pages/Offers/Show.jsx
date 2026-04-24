@@ -83,7 +83,7 @@ export default function OfferShow({ offer: offerId }) {
                         <div className="of-hero-layout">
                             <div className="of-hero-copy">
                                 <p className="of-eyebrow">
-                                    {t("offerDetail.eyebrow")} • Werrapark
+                                    {t("offerDetail.eyebrow")} • Hotel Amadeus
                                     Resort
                                 </p>
                                 <h1 id="offer-title" className="of-title">

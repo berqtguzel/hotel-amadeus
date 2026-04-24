@@ -27,11 +27,17 @@
 
 .hero {
     position: relative;
-    min-height: clamp(60vh, 72vh, 88vh);
+    min-height: clamp(75vh, 95vh, 105vh);
     display: grid;
     place-items: center;
     overflow: clip;
     isolation: isolate;
+    width: 100%;
+    margin: 0;
+    margin-top: -150px;
+    padding: 0;
+    top: 0;
+    left: 0;
 }
 
 .hero-bg {
@@ -132,6 +138,9 @@
     display: grid;
     gap: 14px;
     transform: translateY(-4vh);
+    padding-top: 160px;
+    margin: 0;
+    width: 100%;
 }
 
 .hero-content > h1,
@@ -139,6 +148,7 @@
     color: white;
     display: inline-block;
     margin-inline: auto;
+    margin-top: 0;
     padding: 0.55rem 0.9rem;
     border-radius: 14px;
 }
@@ -211,13 +221,18 @@
 
 @media (max-width: 640px) {
     .hero {
-        min-height: 64vh;
+        min-height: 80vh;
+        margin: 0;
+        margin-top: -150px;
+        padding: 0;
     }
     .hero-content {
         transform: translateY(-2vh);
+        padding-top: 135px;
     }
     .hero-content > h1,
     .hero-content > p {
         padding: 0.5rem 0.75rem;
+        margin-top: 0;
     }
 }

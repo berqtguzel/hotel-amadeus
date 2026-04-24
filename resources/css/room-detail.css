@@ -3,15 +3,15 @@
     background:
         radial-gradient(
             1000px 620px at -8% -14%,
-            rgba(35, 170, 118, 0.18),
+            rgb(170, 134, 93),
             transparent 56%
         ),
         radial-gradient(
             1000px 680px at 108% -6%,
-            rgba(35, 170, 118, 0.12),
+            rgba(143, 108, 33, 0.596),
             transparent 58%
         ),
-        linear-gradient(180deg, #f7fcf9, #edf8f2 56%, #f8fcfa);
+        linear-gradient(180deg, #523e20a1, #a38b5f 56%, #583f21bd);
     color: #16372a;
 }
 
@@ -22,6 +22,7 @@
 }
 
 .rux-grid {
+    margin-top: 10em;
     display: grid;
     grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
     gap: 14px;
@@ -29,7 +30,6 @@
 
 .rux-stage-card {
     border-radius: 24px;
-    border: 1px solid rgba(19, 124, 86, 0.18);
     background: rgba(255, 255, 255, 0.76);
     box-shadow: 0 24px 48px rgba(20, 87, 62, 0.14);
     padding: 14px;
@@ -135,8 +135,8 @@
 }
 
 .rux-thumb.is-active {
-    border-color: #149a68;
-    box-shadow: 0 0 0 3px rgba(20, 154, 104, 0.2);
+    border-color: #916f32;
+    box-shadow: 0 0 0 3px rgba(100, 89, 28, 0.2);
 }
 
 .rux-thumbs--single {
@@ -153,7 +153,7 @@
     border-radius: 999px;
     border: 1px solid rgba(19, 124, 86, 0.2);
     background: #fff;
-    color: #1d6b4d;
+    color: #6b471d;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -346,13 +346,13 @@
 
 .rux-aside {
     border-radius: 24px;
-    border: 1px solid rgba(19, 124, 86, 0.18);
+    border: 1px solid rgba(124, 82, 19, 0.18);
     background: linear-gradient(
         165deg,
         rgba(255, 255, 255, 0.92),
         rgba(242, 250, 246, 0.94)
     );
-    box-shadow: 0 24px 48px rgba(20, 87, 62, 0.12);
+    box-shadow: 0 24px 48px rgba(87, 75, 20, 0.12);
     padding: 18px;
     display: grid;
     grid-auto-rows: min-content;
@@ -369,7 +369,7 @@
     font-size: 11px;
     letter-spacing: 0.19em;
     text-transform: uppercase;
-    color: #4d8e74;
+    color: #8e7f4d;
 }
 
 .rux-title {
@@ -471,7 +471,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #4c7d69;
+    color: #7d704c;
     font-size: 12px;
 }
 
@@ -492,7 +492,7 @@
 
 .rux-fact {
     border-radius: 11px;
-    border: 1px solid rgba(19, 124, 86, 0.2);
+    border: 1px solid rgba(124, 78, 19, 0.2);
     background: #f2faf6;
     padding: 9px 10px;
     display: flex;
@@ -520,7 +520,7 @@
 .rux-cta {
     margin-top: 4px;
     border-radius: 16px;
-    border: 1px solid rgba(19, 124, 86, 0.18);
+    border: 1px solid rgba(124, 87, 19, 0.18);
     background: linear-gradient(
         140deg,
         rgba(22, 162, 109, 0.18),
@@ -738,7 +738,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #138359;
+    color: #584f19;
 }
 
 .rux-panel-head h3 {
@@ -1141,4 +1141,16 @@
     position: sticky;
     top: 20px;
     height: fit-content;
+}
+.rux-thumbs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rux-thumb img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
 }

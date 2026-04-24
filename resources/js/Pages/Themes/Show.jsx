@@ -35,8 +35,8 @@ export default function ThemeShow({ theme }) {
                         <div className="td-hero-layout">
                             <div className="td-hero-copy">
                                 <p className="td-eyebrow">
-                                    {t("themeDetail.eyebrow")}{" "}
-                                    • Werrapark Resort
+                                    {t("themeDetail.eyebrow")} • Hotel Amadeus
+                                    Resort
                                 </p>
                                 <h1 id="theme-title" className="td-title">
                                     {title}

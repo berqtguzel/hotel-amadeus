@@ -27,7 +27,7 @@ export default function GiftVoucherPage({
     const methods = [
         {
             key: "stripe",
-            title: "Stripe",
+            title: "Mastercard & Visa",
             desc: t("giftVoucher.methodStripeDesc"),
             href: `/${locale}/gutschein/stripe`,
             enabled: Boolean(stripe.enabled),
@@ -90,7 +90,7 @@ export default function GiftVoucherPage({
                             <span className="gvf-intro-label">
                                 {t("giftVoucher.brandLabel")}
                             </span>
-                            <h1>Werrapark</h1>
+                            <h1>Hotel Amadeus</h1>
                             <p>{t("giftVoucher.brandText")}</p>
                         </div>
                     </section>

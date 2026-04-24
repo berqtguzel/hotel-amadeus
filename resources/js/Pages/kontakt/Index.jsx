@@ -4,7 +4,7 @@ import React from "react";
 
 const Contact = () => {
     return (
-        <AppLayout>
+        <AppLayout headerOverlay>
             <ContactSection />
         </AppLayout>
     );

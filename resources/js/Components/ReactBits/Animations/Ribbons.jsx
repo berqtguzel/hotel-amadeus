@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Renderer, Transform, Vec3, Color, Polyline } from "ogl";
 import "../../../../css/ReactBits/Animations/Ribbons.css";
 
-const Ribbons = ({
+export default function Ribbons({
     colors = ["#FC8EAC"],
     baseSpring = 0.03,
     baseFriction = 0.9,
@@ -15,7 +15,7 @@ const Ribbons = ({
     enableShaderEffect = false,
     effectAmplitude = 2,
     backgroundColor = [0, 0, 0, 0],
-}) => {
+}) {
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -32,7 +32,7 @@ const Ribbons = ({
                 backgroundColor[0],
                 backgroundColor[1],
                 backgroundColor[2],
-                backgroundColor[3]
+                backgroundColor[3],
             );
         } else {
             gl.clearColor(0, 0, 0, 0);
@@ -44,6 +44,7 @@ const Ribbons = ({
         gl.canvas.style.width = "100%";
         gl.canvas.style.height = "100%";
         container.appendChild(gl.canvas);
+        gl.canvas.style.pointerEvents = "none";
 
         const scene = new Transform();
         const lines = [];
@@ -124,7 +125,7 @@ const Ribbons = ({
             const mouseOffset = new Vec3(
                 (index - center) * offsetFactor + (Math.random() - 0.5) * 0.01,
                 (Math.random() - 0.5) * 0.1,
-                0
+                0,
             );
 
             const line = {
@@ -178,9 +179,9 @@ const Ribbons = ({
             const height = container.clientHeight;
             mouse.set((x / width) * 2 - 1, (y / height) * -2 + 1, 0);
         }
-        container.addEventListener("mousemove", updateMouse);
-        container.addEventListener("touchstart", updateMouse);
-        container.addEventListener("touchmove", updateMouse);
+        window.addEventListener("mousemove", updateMouse);
+        window.addEventListener("touchmove", updateMouse);
+        window.addEventListener("touchstart", updateMouse);
 
         const tmp = new Vec3();
         let frameId;
@@ -204,7 +205,7 @@ const Ribbons = ({
                         const segmentDelay = maxAge / (line.points.length - 1);
                         const alpha = Math.min(
                             1,
-                            (dt * speedMultiplier) / segmentDelay
+                            (dt * speedMultiplier) / segmentDelay,
                         );
                         line.points[i].lerp(line.points[i - 1], alpha);
                     } else {
@@ -224,9 +225,9 @@ const Ribbons = ({
 
         return () => {
             window.removeEventListener("resize", resize);
-            container.removeEventListener("mousemove", updateMouse);
-            container.removeEventListener("touchstart", updateMouse);
-            container.removeEventListener("touchmove", updateMouse);
+            window.removeEventListener("mousemove", updateMouse);
+            window.removeEventListener("touchstart", updateMouse);
+            window.removeEventListener("touchmove", updateMouse);
             cancelAnimationFrame(frameId);
             if (gl.canvas && gl.canvas.parentNode === container) {
                 container.removeChild(gl.canvas);
@@ -248,6 +249,4 @@ const Ribbons = ({
     ]);
 
     return <div ref={containerRef} className="ribbons-container" />;
-};
-
-export default Ribbons;
+}

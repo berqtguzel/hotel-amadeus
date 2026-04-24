@@ -1,6 +1,12 @@
 "use client";
 
-import React from "react";
+import React, {
+    useMemo,
+    useRef,
+    useState,
+    useEffect,
+    useCallback,
+} from "react";
 import { Link, usePage } from "@inertiajs/react";
 import {
     FiCheck,
@@ -8,9 +14,14 @@ import {
     FiCreditCard,
     FiChevronRight,
     FiLayers,
+    FiArrowLeft,
+    FiArrowRight,
 } from "react-icons/fi";
 import "../../../css/rooms-showcase.css";
 import { useTranslation } from "@/i18n";
+import DotField from "@/Components/DotField";
+
+// --- YARDIMCI FONKSİYONLAR ---
 
 function stripHtml(value = "") {
     return String(value)
@@ -19,7 +30,7 @@ function stripHtml(value = "") {
         .trim();
 }
 
-function summarizeText(value = "", maxLength = 130) {
+function summarizeText(value = "", maxLength = 138) {
     const text = stripHtml(value);
     if (!text) return "";
     if (text.length <= maxLength) return text;
@@ -46,19 +57,24 @@ function slugifyRoom(value = "") {
         .replace(/^-+|-+$/g, "");
 }
 
-function RoomCard({ hotel, locale, t }) {
+// --- BİLEŞENLER ---
+
+function RoomCard({ hotel, locale, t, featured = false, onClick }) {
     const roomIdentifier = hotel.slug || slugifyRoom(hotel.name) || hotel.id;
     const href = `/${locale}/rooms/${roomIdentifier}`;
+
     const boardSummary = (hotel.boardTypes || [])
         .map((item) => item?.description ?? item?.name ?? item?.code)
         .filter(Boolean)
         .slice(0, 2);
+
     const featureSummary = (hotel.features || [])
         .map((item) => item?.name)
         .filter(Boolean)
-        .slice(0, 3);
+        .slice(0, 4);
+
     const detailList = normalizeList(hotel.items).slice(0, 3);
-    const cardSummary = summarizeText(hotel.description, 132);
+    const cardSummary = summarizeText(hotel.description, 138);
 
     const factItems = [
         hotel.capacity
@@ -85,20 +101,16 @@ function RoomCard({ hotel, locale, t }) {
     ].filter(Boolean);
 
     return (
-        /* TASARIMI BOZMAMAK İÇİN:
-           Article yerine Link kullanıyoruz, 'as="article"' ile CSS sınıflarını koruyoruz.
-           textDecoration: 'none' ve color: 'inherit' ile linkin varsayılan mavi rengini engelliyoruz.
-        */
         <Link
             href={href}
-            className="rsm-card"
+            className={`rsm-card ${featured ? "is-featured" : ""}`}
             as="article"
-            aria-labelledby={`room-card-${hotel.id}`}
+            aria-labelledby={`room-card-${hotel.id ?? roomIdentifier}`}
             style={{
                 textDecoration: "none",
                 color: "inherit",
-                cursor: "pointer",
             }}
+            onClick={onClick}
         >
             <div className="rsm-media">
                 <div className="rsm-media__frame">
@@ -109,20 +121,41 @@ function RoomCard({ hotel, locale, t }) {
                         loading="lazy"
                         decoding="async"
                     />
+                    <div className="rsm-media__overlay" />
+                    <div className="rsm-badge-row">
+                        {hotel.price && (
+                            <span className="rsm-badge rsm-badge--solid">
+                                {hotel.price}
+                            </span>
+                        )}
+                        {hotel.capacity && (
+                            <span className="rsm-badge">
+                                <FiUsers aria-hidden />
+                                {t("rooms.capacityValue", {
+                                    count: hotel.capacity,
+                                })}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 
             <div className="rsm-body">
-                <div className="rsm-header-block">
-                    <h3 id={`room-card-${hotel.id}`} className="rsm-title">
-                        {hotel.name}
-                    </h3>
-                    {cardSummary ? (
-                        <p className="rsm-desc">{cardSummary}</p>
-                    ) : null}
+                <div className="rsm-heading-row">
+                    <div className="rsm-heading-copy">
+                        <h3
+                            id={`room-card-${hotel.id ?? roomIdentifier}`}
+                            className="rsm-title"
+                        >
+                            {hotel.name}
+                        </h3>
+                        {cardSummary && (
+                            <p className="rsm-desc">{cardSummary}</p>
+                        )}
+                    </div>
                 </div>
 
-                {factItems.length ? (
+                {factItems.length > 0 && (
                     <div className="rsm-facts">
                         {factItems.map((fact, idx) => (
                             <div
@@ -136,14 +169,16 @@ function RoomCard({ hotel, locale, t }) {
                                     <span className="rsm-fact__label">
                                         {fact.label}
                                     </span>
-                                    <strong>{fact.value}</strong>
+                                    <strong className="rsm-fact__value">
+                                        {fact.value}
+                                    </strong>
                                 </div>
                             </div>
                         ))}
                     </div>
-                ) : null}
+                )}
 
-                {featureSummary.length ? (
+                {featureSummary.length > 0 && (
                     <div className="rsm-chips">
                         {featureSummary.map((item, idx) => (
                             <span className="rsm-chip" key={idx}>
@@ -151,9 +186,9 @@ function RoomCard({ hotel, locale, t }) {
                             </span>
                         ))}
                     </div>
-                ) : null}
+                )}
 
-                {detailList.length ? (
+                {detailList.length > 0 && (
                     <ul className="rsm-points">
                         {detailList.map((item, idx) => (
                             <li key={idx}>
@@ -162,53 +197,339 @@ function RoomCard({ hotel, locale, t }) {
                             </li>
                         ))}
                     </ul>
-                ) : null}
+                )}
 
-                {/* Burada 'Link' yerine 'div' kullanıyoruz çünkü en dıştaki Link zaten tüm kartı kapsıyor.
-                   Tasarım (rsm-cta sınıfı) aynı kalıyor.
-                */}
                 <div className="rsm-cta">
                     <span>{t("rooms.explore")}</span>
-                    <FiChevronRight aria-hidden />
+                    <span className="rsm-cta__icon">
+                        <FiChevronRight aria-hidden />
+                    </span>
                 </div>
             </div>
         </Link>
     );
 }
 
+// --- ANA BİLEŞEN ---
+
 export default function RoomsShowcase() {
     const { props } = usePage();
     const hotels = Array.isArray(props?.rooms) ? props.rooms : [];
     const { t, locale } = useTranslation();
 
-    return (
-        <section className="rsm-wrap" aria-labelledby="rooms-title">
-            <div className="rsm-shell">
-                <header className="rsm-header">
-                    <p className="rsm-eyebrow">{t("rooms.eyebrow")}</p>
-                    <h1 id="rooms-title" className="rsm-heading">
-                        {t("rooms.title")}
-                    </h1>
-                    <p className="rsm-intro">{t("rooms.intro")}</p>
-                </header>
+    const sliderRef = useRef(null);
+    const sectionRef = useRef(null);
+    const isHovering = useRef(false);
+    const hoverRef = useRef(false);
 
-                {hotels.length ? (
-                    <div className="rsm-grid">
-                        {hotels.map((hotel) => (
-                            <RoomCard
-                                key={hotel.id ?? hotel.slug}
-                                hotel={hotel}
-                                locale={locale}
-                                t={t}
-                            />
-                        ))}
-                    </div>
-                ) : (
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [showDotField, setShowDotField] = useState(false);
+
+    const cards = useMemo(() => hotels, [hotels]);
+
+    const scrollToIndex = useCallback((index) => {
+        if (!sliderRef.current) return;
+
+        const slides = sliderRef.current.querySelectorAll(".rsm-slide");
+        if (!slides[index]) return;
+
+        const container = sliderRef.current;
+        const slide = slides[index];
+
+        const offset =
+            slide.offsetLeft -
+            container.offsetWidth / 2 +
+            slide.offsetWidth / 2;
+
+        container.scrollTo({
+            left: offset,
+            behavior: "smooth",
+        });
+
+        setActiveIndex(index);
+    }, []);
+
+    const scroll = (direction) => {
+        const next = Math.max(
+            0,
+            Math.min(activeIndex + direction, cards.length - 1),
+        );
+        scrollToIndex(next);
+    };
+
+    // Scroll pozisyonunu dinleyip aktif kartı bulma
+    useEffect(() => {
+        const el = sliderRef.current;
+        if (!el || cards.length === 0) return;
+
+        let timeoutId;
+        const handle = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                const slides = el.querySelectorAll(".rsm-slide");
+                let closest = 0;
+                let min = Infinity;
+
+                slides.forEach((slide, i) => {
+                    const diff = Math.abs(
+                        slide.offsetLeft -
+                            el.scrollLeft -
+                            el.offsetWidth / 2 +
+                            slide.offsetWidth / 2,
+                    );
+
+                    if (diff < min) {
+                        min = diff;
+                        closest = i;
+                    }
+                });
+
+                setActiveIndex(closest);
+            }, 50);
+        };
+
+        el.addEventListener("scroll", handle, { passive: true });
+        handle(); // İlk render için çalıştır
+
+        return () => {
+            el.removeEventListener("scroll", handle);
+            clearTimeout(timeoutId);
+        };
+    }, [cards.length]);
+
+    // Otomatik Kaydırma (Auto-Play) İşlemi
+    useEffect(() => {
+        if (!cards.length) return;
+
+        const interval = setInterval(() => {
+            if (isHovering.current || hoverRef.current) return;
+
+            setActiveIndex((prev) => {
+                const next = (prev + 1) % cards.length;
+                scrollToIndex(next);
+                return next;
+            });
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [cards.length, scrollToIndex]);
+
+    // Arka Plan Efekti (DotField) Performans Kontrolü
+    useEffect(() => {
+        if (typeof window === "undefined") return undefined;
+
+        const motionQuery = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        );
+        const pointerQuery = window.matchMedia(
+            "(pointer: fine) and (hover: hover)",
+        );
+
+        let observer;
+
+        const syncEffectState = () => {
+            if (
+                motionQuery.matches ||
+                !pointerQuery.matches ||
+                !sectionRef.current
+            ) {
+                setShowDotField(false);
+                if (observer) {
+                    observer.disconnect();
+                    observer = null;
+                }
+                return;
+            }
+
+            if (!observer) {
+                observer = new IntersectionObserver(
+                    ([entry]) => {
+                        setShowDotField(entry.isIntersecting);
+                    },
+                    { threshold: 0.12 },
+                );
+                observer.observe(sectionRef.current);
+            }
+        };
+
+        syncEffectState();
+        motionQuery.addEventListener("change", syncEffectState);
+        pointerQuery.addEventListener("change", syncEffectState);
+
+        return () => {
+            motionQuery.removeEventListener("change", syncEffectState);
+            pointerQuery.removeEventListener("change", syncEffectState);
+            observer?.disconnect();
+        };
+    }, []);
+
+    // Veri Yoksa Boş Durum Gösterimi
+    if (!cards.length) {
+        return (
+            <section className="rsm-wrap" aria-labelledby="rooms-title">
+                <div className="rsm-shell">
+                    <header className="rsm-header">
+                        <p className="rsm-eyebrow">{t("rooms.eyebrow")}</p>
+                        <h1 id="rooms-title" className="rsm-heading">
+                            {t("rooms.title")}
+                        </h1>
+                        <p className="rsm-intro">{t("rooms.intro")}</p>
+                    </header>
+
                     <article className="rsm-empty">
                         <h3>{t("rooms.emptyTitle")}</h3>
                         <p>{t("rooms.emptyText")}</p>
                     </article>
-                )}
+                </div>
+            </section>
+        );
+    }
+
+    console.log("RoomsShowcase Rendered with hotels:", hotels);
+    return (
+        <section
+            className="rsm-wrap"
+            aria-labelledby="rooms-title"
+            ref={sectionRef}
+        >
+            <div className="rsm-dotfield-bg" aria-hidden="true">
+                <DotField
+                    enabled={showDotField}
+                    dotRadius={1.5}
+                    dotSpacing={18}
+                    bulgeStrength={54}
+                    glowRadius={0}
+                    sparkle={false}
+                    waveAmplitude={0}
+                    cursorRadius={320}
+                    cursorForce={0.06}
+                    bulgeOnly
+                    gradientFrom="#A855F7"
+                    gradientTo="#B497CF"
+                    glowColor="#120F17"
+                />
+            </div>
+            <div className="rsm-shell">
+                <header className="rsm-header">
+                    <div className="rsm-header__top">
+                        <div>
+                            <p className="rsm-eyebrow">{t("rooms.eyebrow")}</p>
+                            <h1 id="rooms-title" className="rsm-heading">
+                                {t("rooms.title")}
+                            </h1>
+                        </div>
+                    </div>
+
+                    <p className="rsm-intro">{t("rooms.intro")}</p>
+                </header>
+
+                {/* Slider Alanı ve Yan Oklar */}
+                <div style={{ position: "relative" }}>
+                    {/* Sol Ok (Masaüstü) - Kart gridinin solunda ortalanır */}
+                    <div
+                        className="rsm-controls--desktop"
+                        style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "16px",
+                            transform: "translateY(-50%)",
+                            zIndex: 10,
+                        }}
+                    >
+                        <button
+                            type="button"
+                            className="rsm-nav"
+                            onClick={() => scroll(-1)}
+                            aria-label={t("rooms.previous", "Previous room")}
+                            disabled={activeIndex <= 0}
+                        >
+                            <FiArrowLeft />
+                        </button>
+                    </div>
+
+                    {/* Sağ Ok (Masaüstü) - Kart gridinin sağında ortalanır */}
+                    <div
+                        className="rsm-controls--desktop"
+                        style={{
+                            position: "absolute",
+                            top: "50%",
+                            right: "16px",
+                            transform: "translateY(-50%)",
+                            zIndex: 10,
+                        }}
+                    >
+                        <button
+                            type="button"
+                            className="rsm-nav"
+                            onClick={() => scroll(1)}
+                            aria-label={t("rooms.next", "Next room")}
+                            disabled={activeIndex >= cards.length - 1}
+                        >
+                            <FiArrowRight />
+                        </button>
+                    </div>
+
+                    <div
+                        className="rsm-slider-shell"
+                        onMouseEnter={() => (isHovering.current = true)}
+                        onMouseLeave={() => (isHovering.current = false)}
+                        onTouchStart={() => (isHovering.current = true)}
+                        onTouchEnd={() => (isHovering.current = false)}
+                    >
+                        <div
+                            className="rsm-track center-mode"
+                            ref={sliderRef}
+                            onMouseEnter={() => (hoverRef.current = true)}
+                            onMouseLeave={() => (hoverRef.current = false)}
+                        >
+                            {cards.map((hotel, i) => (
+                                <div
+                                    key={hotel.id ?? i}
+                                    className={`rsm-slide ${i === activeIndex ? "active" : ""}`}
+                                >
+                                    <RoomCard
+                                        hotel={hotel}
+                                        locale={locale}
+                                        t={t}
+                                        featured={i === activeIndex}
+                                        onClick={(e) => {
+                                            // Kart aktif değilse yönlendirmeyi iptal et ve kartı ortala
+                                            if (i !== activeIndex) {
+                                                e.preventDefault();
+                                                scrollToIndex(i);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobil Yönlendirme Kontrolleri */}
+                <div className="rsm-footer">
+                    <div className="rsm-controls rsm-controls--mobile">
+                        <button
+                            type="button"
+                            className="rsm-nav"
+                            onClick={() => scroll(-1)}
+                            aria-label={t("rooms.previous", "Previous room")}
+                            disabled={activeIndex <= 0}
+                        >
+                            <FiArrowLeft />
+                        </button>
+
+                        <button
+                            type="button"
+                            className="rsm-nav"
+                            onClick={() => scroll(1)}
+                            aria-label={t("rooms.next", "Next room")}
+                            disabled={activeIndex >= cards.length - 1}
+                        >
+                            <FiArrowRight />
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
     );

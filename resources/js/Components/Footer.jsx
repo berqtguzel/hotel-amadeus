@@ -4,174 +4,30 @@ import { useTranslation } from "@/i18n";
 import { ensureLocaleInUrl } from "@/utils/url";
 
 import { Facebook, Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
+import {
+    deduplicateByUrl,
+    ensureTreeNoDuplicates,
+    flattenTreeForNav,
+} from "@/utils/menuUtils";
 
 import "../../css/Footer.css";
 
-const TREE_IMG = "/images/Logo/tree.png";
+function resolveFooterText(value, locale) {
+    if (typeof value === "string") return value.trim();
+    if (!value || typeof value !== "object") return "";
 
-const TREE_LAYERS = [
-    { key: "a", className: "wh-tree wh-tree--a", alt: "" },
-    { key: "b", className: "wh-tree wh-tree--b", alt: "" },
-    { key: "c", className: "wh-tree wh-tree--c", alt: "" },
-    { key: "d", className: "wh-tree wh-tree--d", alt: "" },
-];
+    const localized =
+        value[locale] ??
+        value[locale?.toLowerCase?.()] ??
+        value.de ??
+        value.en ??
+        value.tr ??
+        value.title ??
+        value.label ??
+        value.name;
 
-const LEAVES = [
-    {
-        id: 1,
-        style: {
-            "--leaf-left": "6%",
-            "--leaf-size": "9px",
-            "--leaf-duration": "11.2s",
-            "--leaf-delay": "0s",
-            "--leaf-rotation": "1.05",
-            "--leaf-drift": "-22px",
-        },
-    },
-    {
-        id: 2,
-        style: {
-            "--leaf-left": "16%",
-            "--leaf-size": "11px",
-            "--leaf-duration": "13.6s",
-            "--leaf-delay": "-2.1s",
-            "--leaf-rotation": "1.18",
-            "--leaf-drift": "14px",
-        },
-    },
-    {
-        id: 3,
-        style: {
-            "--leaf-left": "28%",
-            "--leaf-size": "8px",
-            "--leaf-duration": "10.4s",
-            "--leaf-delay": "-4s",
-            "--leaf-rotation": "0.92",
-            "--leaf-drift": "-30px",
-        },
-    },
-    {
-        id: 4,
-        style: {
-            "--leaf-left": "42%",
-            "--leaf-size": "12px",
-            "--leaf-duration": "14.8s",
-            "--leaf-delay": "-1.3s",
-            "--leaf-rotation": "1.22",
-            "--leaf-drift": "26px",
-        },
-    },
-    {
-        id: 5,
-        style: {
-            "--leaf-left": "55%",
-            "--leaf-size": "7px",
-            "--leaf-duration": "9.6s",
-            "--leaf-delay": "-5.5s",
-            "--leaf-rotation": "0.88",
-            "--leaf-drift": "-12px",
-        },
-    },
-    {
-        id: 6,
-        style: {
-            "--leaf-left": "68%",
-            "--leaf-size": "10px",
-            "--leaf-duration": "12.5s",
-            "--leaf-delay": "-3.2s",
-            "--leaf-rotation": "1.1",
-            "--leaf-drift": "18px",
-        },
-    },
-    {
-        id: 7,
-        style: {
-            "--leaf-left": "78%",
-            "--leaf-size": "9px",
-            "--leaf-duration": "11s",
-            "--leaf-delay": "-6.4s",
-            "--leaf-rotation": "1",
-            "--leaf-drift": "-24px",
-        },
-    },
-    {
-        id: 8,
-        style: {
-            "--leaf-left": "88%",
-            "--leaf-size": "11px",
-            "--leaf-duration": "15.2s",
-            "--leaf-delay": "-2.8s",
-            "--leaf-rotation": "1.15",
-            "--leaf-drift": "20px",
-        },
-    },
-    {
-        id: 9,
-        style: {
-            "--leaf-left": "12%",
-            "--leaf-size": "8px",
-            "--leaf-duration": "10.8s",
-            "--leaf-delay": "-7.2s",
-            "--leaf-rotation": "0.95",
-            "--leaf-drift": "8px",
-        },
-    },
-    {
-        id: 10,
-        style: {
-            "--leaf-left": "36%",
-            "--leaf-size": "10px",
-            "--leaf-duration": "12.9s",
-            "--leaf-delay": "-0.6s",
-            "--leaf-rotation": "1.08",
-            "--leaf-drift": "-16px",
-        },
-    },
-    {
-        id: 11,
-        style: {
-            "--leaf-left": "62%",
-            "--leaf-size": "9px",
-            "--leaf-duration": "11.6s",
-            "--leaf-delay": "-4.4s",
-            "--leaf-rotation": "1.02",
-            "--leaf-drift": "12px",
-        },
-    },
-    {
-        id: 12,
-        style: {
-            "--leaf-left": "74%",
-            "--leaf-size": "7px",
-            "--leaf-duration": "9.2s",
-            "--leaf-delay": "-8.1s",
-            "--leaf-rotation": "0.9",
-            "--leaf-drift": "-8px",
-        },
-    },
-    {
-        id: 13,
-        style: {
-            "--leaf-left": "48%",
-            "--leaf-size": "11px",
-            "--leaf-duration": "13.2s",
-            "--leaf-delay": "-1.9s",
-            "--leaf-rotation": "1.2",
-            "--leaf-drift": "28px",
-        },
-    },
-    {
-        id: 14,
-        style: {
-            "--leaf-left": "92%",
-            "--leaf-size": "8px",
-            "--leaf-duration": "10.1s",
-            "--leaf-delay": "-3.7s",
-            "--leaf-rotation": "0.98",
-            "--leaf-drift": "-20px",
-        },
-    },
-];
+    return typeof localized === "string" ? localized.trim() : "";
+}
 
 function flattenMenuItems(items) {
     if (!Array.isArray(items)) return [];
@@ -183,11 +39,68 @@ function flattenMenuItems(items) {
     return out;
 }
 
+function extractMenuCollection(menuSource) {
+    if (Array.isArray(menuSource)) return menuSource;
+    if (Array.isArray(menuSource?.data)) return menuSource.data;
+    if (Array.isArray(menuSource?.items)) return menuSource.items;
+    return menuSource ? [menuSource] : [];
+}
+
+function resolveMenuLocation(menu, locale) {
+    return [
+        menu?.location,
+        menu?.type,
+        menu?.slug,
+        menu?.key,
+        resolveFooterText(menu?.name, locale),
+        resolveFooterText(menu?.title, locale),
+        resolveFooterText(menu?.label, locale),
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+}
+
+function getMenuItems(menu) {
+    const rawItems =
+        menu?.items ??
+        menu?.children ??
+        menu?.menu_items ??
+        menu?.menuItems ??
+        menu?.links ??
+        [];
+
+    if (!Array.isArray(rawItems) || !rawItems.length) return [];
+    return ensureTreeNoDuplicates(rawItems);
+}
+
 function normalizeMenuLinks(items, locale) {
+    return deduplicateByUrl(flattenTreeForNav(getMenuItems(items)))
+        .map((item) => ({
+            id: item.id ?? item.slug ?? item.name ?? item.url,
+            name:
+                resolveFooterText(item.name, locale) ||
+                resolveFooterText(item.title, locale) ||
+                resolveFooterText(item.label, locale),
+            url: ensureLocaleInUrl(
+                item.url?.startsWith("http") || item.url?.startsWith("/")
+                    ? item.url
+                    : `/${locale}/${item.slug ?? item.url ?? ""}`,
+                locale,
+            ),
+            key: item.slug ?? item.key ?? item.id ?? "",
+        }))
+        .filter((item) => item.name && item.url);
+}
+
+function normalizeFooterLinks(items, locale) {
     return flattenMenuItems(items)
         .map((item) => ({
             id: item.id ?? item.slug ?? item.name ?? item.url,
-            name: item.name ?? item.title ?? "",
+            name:
+                resolveFooterText(item.name, locale) ||
+                resolveFooterText(item.title, locale) ||
+                resolveFooterText(item.label, locale),
             url: ensureLocaleInUrl(
                 item.url?.startsWith("http") || item.url?.startsWith("/")
                     ? item.url
@@ -202,7 +115,7 @@ function normalizeMenuLinks(items, locale) {
 function useFooterData() {
     const { props } = usePage();
     const locale = props?.locale ?? "de";
-    const menu = Array.isArray(props?.global?.menu) ? props.global.menu : [];
+    const menu = extractMenuCollection(props?.global?.menu);
     const settings = props?.global?.settings ?? {};
     const branding = settings.branding ?? {};
     const contact = settings.contact ?? {};
@@ -261,14 +174,19 @@ function useFooterData() {
         ].filter(Boolean);
 
         const footerMenu =
-            menu.find((m) =>
-                ["footer", "Footer"].includes(m.location ?? m.type ?? m.slug),
-            ) ??
+            menu.find((m) => {
+                const haystack = resolveMenuLocation(m, locale);
+                return (
+                    haystack.includes("footer") ||
+                    haystack.includes("footer menu") ||
+                    haystack.includes("fuss") ||
+                    haystack.includes("bottom")
+                );
+            }) ??
             menu[1] ??
             null;
 
-        const rawItems = footerMenu?.items ?? footerMenu?.children ?? [];
-        const navItems = normalizeMenuLinks(rawItems, locale);
+        const navItems = normalizeMenuLinks(footerMenu, locale);
 
         const bottomMenu =
             menu.find((m) => Number(m?.id) === 3) ??
@@ -276,8 +194,8 @@ function useFooterData() {
                 ["bottom", "legal"].includes(m.location ?? m.type ?? m.slug),
             ) ??
             null;
-        const bottomItems = normalizeMenuLinks(
-            bottomMenu?.items ?? bottomMenu?.children ?? [],
+        const bottomItems = normalizeFooterLinks(
+            getMenuItems(bottomMenu),
             locale,
         );
 
@@ -317,7 +235,10 @@ function useFooterData() {
             footerSettings.cta_label ?? footerSettings.ctaLabel ?? null;
         const ctaHref =
             footerSettings.cta_href ?? footerSettings.ctaHref ?? null;
-        const navTitle = footerMenu?.name ?? null;
+        const navTitle =
+            resolveFooterText(footerMenu?.name, locale) ||
+            resolveFooterText(footerMenu?.title, locale) ||
+            "Navigation";
         const showNewsletter = footerSettings.show_newsletter ?? false;
 
         return {
@@ -449,37 +370,18 @@ export default function Footer() {
     const hasBrand = d.logo || d.description || d.social.length > 0;
     const hasNav = d.navItems.length > 0;
     const hasContact = d.address || d.email || d.phone || d.website || d.mapUrl;
+    const quickLinks = d.navItems.slice(0, 8);
+    const hasLegal = d.legalLinks.length > 0;
 
     return (
         <footer className="wh-foot" role="contentinfo">
             <div className="wh-foot-ambient" aria-hidden="true" />
-            <div className="wh-nature-layer" aria-hidden="true">
-                {TREE_LAYERS.map((layer) => (
-                    <img
-                        key={layer.key}
-                        src={TREE_IMG}
-                        alt={layer.alt}
-                        className={layer.className}
-                        loading="lazy"
-                        decoding="async"
-                    />
-                ))}
-                <div className="wh-leaves">
-                    {LEAVES.map((leaf) => (
-                        <span
-                            key={leaf.id}
-                            className="wh-leaf"
-                            style={leaf.style}
-                            aria-hidden="true"
-                        />
-                    ))}
-                </div>
-            </div>
+            <div className="wh-foot-gridline" aria-hidden="true" />
             <div className="wh-foot-cta">
                 <div className="wh-container wh-foot-cta__inner">
                     <h2 id="footer-cta-title">{ctaTitleText}</h2>
                     <a
-                        href="/#gift-voucher-promo"
+                        href={ctaHrefResolved}
                         className="wh-btn wh-btn--primary"
                     >
                         {ctaLabelText}
@@ -492,15 +394,22 @@ export default function Footer() {
                     <div className="wh-container wh-foot-grid">
                         {hasBrand && (
                             <div className="wh-foot-col wh-foot-col--brand">
-                                {d.logo && (
-                                    <a href="/" className="wh-foot-brand">
-                                        <img
-                                            src={d.logo}
-                                            alt={d.siteName || "Logo"}
-                                            className="wh-foot-logo"
-                                        />
-                                    </a>
-                                )}
+                                <div className="wh-foot-brand-wrap">
+                                    {d.logo && (
+                                        <a href="/" className="wh-foot-brand">
+                                            <img
+                                                src={d.logo}
+                                                alt={d.siteName || "Logo"}
+                                                className="wh-foot-logo"
+                                            />
+                                        </a>
+                                    )}
+                                    {d.siteName && (
+                                        <span className="wh-foot-badge">
+                                            {d.siteName}
+                                        </span>
+                                    )}
+                                </div>
                                 {d.description && (
                                     <p className="wh-foot-text">
                                         {d.description}
@@ -517,14 +426,14 @@ export default function Footer() {
                         )}
 
                         {hasNav && (
-                            <nav className="wh-foot-col">
+                            <nav className="wh-foot-col wh-foot-col--nav">
                                 {d.navTitle && (
                                     <h4 className="wh-foot-title">
                                         {d.navTitle}
                                     </h4>
                                 )}
-                                <ul className="wh-foot-list">
-                                    {d.navItems.map((item) => (
+                                <ul className="wh-foot-list wh-foot-list--grid">
+                                    {quickLinks.map((item) => (
                                         <li key={item.id}>
                                             <a href={item.url}>{item.name}</a>
                                         </li>
@@ -534,7 +443,7 @@ export default function Footer() {
                         )}
 
                         {hasContact && (
-                            <div className="wh-foot-col">
+                            <div className="wh-foot-col wh-foot-col--contact">
                                 <h4 className="wh-foot-title">
                                     {t("footer.contact")}
                                 </h4>
@@ -551,32 +460,21 @@ export default function Footer() {
                 </div>
             )}
 
-            {(d.siteName || d.legalLinks.length > 0) && (
+            {d.siteName && (
                 <div className="wh-foot-bottom">
                     <div className="wh-container wh-foot-bottom__inner">
-                        {d.siteName && (
-                            <p className="wh-foot-copy">
-                                &copy; {year}{" "}
-                                <a
-                                    href="http://omer-dogan.company/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="wh-foot-link"
-                                >
-                                    {d.siteName}
-                                </a>
-                                . {t("footer.rightsReserved")}
-                            </p>
-                        )}{" "}
-                        {d.legalLinks.length > 0 && (
-                            <ul className="wh-foot-mini">
-                                {d.legalLinks.map((l) => (
-                                    <li key={l.key}>
-                                        <a href={l.url}>{l.name}</a>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        <p className="wh-foot-copy">
+                            &copy; {year}{" "}
+                            <a
+                                href="http://omer-dogan.company/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="wh-foot-link"
+                            >
+                                {d.siteName}
+                            </a>
+                            . {t("footer.rightsReserved")}
+                        </p>
                     </div>
                 </div>
             )}

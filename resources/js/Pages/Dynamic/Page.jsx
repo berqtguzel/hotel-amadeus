@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import SeoHead from "@/Components/SeoHead";
@@ -9,9 +9,7 @@ export default function DynamicPage({ currentRoute = "page" }) {
     const page = props?.page ?? {};
     const rawGalleries = Array.isArray(props?.galleries) ? props.galleries : [];
 
-    const { title = "Seite", subtitle = "", blocks = [], content = "" } = page;
-
-    const hasBlocks = Array.isArray(blocks) && blocks.length > 0;
+    const { title = "Seite", subtitle = "", content = "" } = page;
     const isGalleryPage = ["galerie", "gallery"].includes(
         String(page?.slug || "").toLowerCase(),
     );
@@ -33,8 +31,37 @@ export default function DynamicPage({ currentRoute = "page" }) {
 
     const heroSrc = page.heroImage || "/images/template1.webp";
 
+    /* ğŸ”¥ MODAL STATE */
+    const [activeIndex, setActiveIndex] = React.useState(null);
+
+    const closeModal = () => setActiveIndex(null);
+
+    const nextImage = () =>
+        setActiveIndex((prev) =>
+            prev === galleryImages.length - 1 ? 0 : prev + 1,
+        );
+
+    const prevImage = () =>
+        setActiveIndex((prev) =>
+            prev === 0 ? galleryImages.length - 1 : prev - 1,
+        );
+
+    /* ğŸ”¥ KEYBOARD CONTROL */
+    React.useEffect(() => {
+        const handleKey = (e) => {
+            if (activeIndex === null) return;
+
+            if (e.key === "Escape") closeModal();
+            if (e.key === "ArrowRight") nextImage();
+            if (e.key === "ArrowLeft") prevImage();
+        };
+
+        window.addEventListener("keydown", handleKey);
+        return () => window.removeEventListener("keydown", handleKey);
+    }, [activeIndex]);
+
     return (
-        <AppLayout currentRoute={currentRoute}>
+        <AppLayout currentRoute={currentRoute} headerOverlay>
             <SeoHead
                 title={title}
                 description={subtitle}
@@ -48,14 +75,12 @@ export default function DynamicPage({ currentRoute = "page" }) {
                         className="dp-hero__bg"
                         style={{ backgroundImage: `url(${heroSrc})` }}
                     />
-
                     <div className="dp-hero__overlay" />
+                    <div className="dp-hero__grid" />
 
                     <div className="dp-hero__inner">
-                        <span className="dp-eyebrow">Werrapark Resort</span>
-
+                        <span className="dp-eyebrow">Hotel Amadeus</span>
                         <h1 className="dp-title">{title}</h1>
-
                         {subtitle && <p className="dp-subtitle">{subtitle}</p>}
                     </div>
                 </section>
@@ -65,19 +90,22 @@ export default function DynamicPage({ currentRoute = "page" }) {
                         <div className="dp-container dp-container--gallery">
                             {galleryImages.length === 0 ? (
                                 <div className="dp-card dp-empty">
-                                    <p>Galerie görselleri bulunamadı.</p>
+                                    <p>Galerie bilder wurden nicht gefunden.</p>
                                 </div>
                             ) : (
                                 <div className="dp-gallery-grid">
-                                    {galleryImages.map((image) => (
+                                    {galleryImages.map((image, index) => (
                                         <figure
-                                            className="dp-gallery-card"
+                                            className="dp-gallery-card cursor-target"
                                             key={image.id}
                                         >
                                             <img
                                                 src={image.url}
                                                 alt={image.alt}
                                                 loading="lazy"
+                                                onClick={() =>
+                                                    setActiveIndex(index)
+                                                }
                                             />
                                         </figure>
                                     ))}
@@ -88,14 +116,16 @@ export default function DynamicPage({ currentRoute = "page" }) {
                 ) : (
                     <section className="dp-content">
                         <div className="dp-container">
-                            {!hasBlocks && content && (
+                            {content && (
                                 <div
                                     className="dp-card dp-richtext"
-                                    dangerouslySetInnerHTML={{ __html: content }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: content,
+                                    }}
                                 />
                             )}
 
-                            {!hasBlocks && !content && (
+                            {!content && (
                                 <div className="dp-card dp-empty">
                                     <p>
                                         Diese Seite wird aktuell vorbereitet.
@@ -104,65 +134,51 @@ export default function DynamicPage({ currentRoute = "page" }) {
                                     </p>
                                 </div>
                             )}
-
-                            {hasBlocks &&
-                                blocks.map((b, i) => {
-                                    if (b.type === "text") {
-                                        return (
-                                            <div key={i} className="dp-card">
-                                                {b.heading && <h2>{b.heading}</h2>}
-                                                {b.html ? (
-                                                    <div
-                                                        className="dp-richtext"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: b.html,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="dp-richtext">
-                                                        {b.content}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    }
-
-                                    if (b.type === "image") {
-                                        return (
-                                            <div
-                                                key={i}
-                                                className="dp-card dp-image"
-                                            >
-                                                <img
-                                                    src={b.src}
-                                                    alt={b.alt || ""}
-                                                    loading="lazy"
-                                                />
-                                            </div>
-                                        );
-                                    }
-
-                                    if (b.type === "list") {
-                                        return (
-                                            <div key={i} className="dp-card">
-                                                {b.heading && <h2>{b.heading}</h2>}
-                                                <ul>
-                                                    {(b.items || []).map(
-                                                        (item, idx) => (
-                                                            <li key={idx}>
-                                                                {item}
-                                                            </li>
-                                                        ),
-                                                    )}
-                                                </ul>
-                                            </div>
-                                        );
-                                    }
-
-                                    return null;
-                                })}
                         </div>
                     </section>
+                )}
+
+                {activeIndex !== null && (
+                    <div
+                        className="dp-modal cursor-target"
+                        onClick={closeModal}
+                    >
+                        <div
+                            className="dp-modal-inner"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img
+                                src={galleryImages[activeIndex].url}
+                                alt=""
+                                className="dp-modal-img cursor-target"
+                            />
+
+                            <button
+                                className="dp-close cursor-target"
+                                onClick={closeModal}
+                                aria-label="Close"
+                            >
+                                <span />
+                                <span />
+                            </button>
+
+                            <button
+                                className="dp-nav dp-prev cursor-target"
+                                onClick={prevImage}
+                                aria-label="Previous image"
+                            >
+                                ‹
+                            </button>
+
+                            <button
+                                className="dp-nav dp-next cursor-target"
+                                onClick={nextImage}
+                                aria-label="Next image"
+                            >
+                                ›
+                            </button>
+                        </div>
+                    </div>
                 )}
             </div>
         </AppLayout>

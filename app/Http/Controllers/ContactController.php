@@ -78,7 +78,7 @@ class ContactController extends Controller
 
             if (config('dashboard.send_backup_email', true)) {
                 try {
-                    Mail::to(config('mail.admin_email', 'info@werrapark.de'))
+                    Mail::to(config('mail.admin_email', 'info@Hotel Amadeus.de'))
                         ->send(new ContactFormMail($validated));
                 } catch (\Throwable $e) {
                     Log::warning('Contact form backup mail hatası', ['error' => $e->getMessage()]);

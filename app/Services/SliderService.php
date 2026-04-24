@@ -124,54 +124,52 @@ class SliderService
         }
     }
 
-    /**
-     * GET /v1/sliders - liste dönerse ilk slider'ı kullan
-     */
-    private function fetchList(string $locale): ?array
-    {
-        $base     = rtrim(config('omr.base_url'), '/');
-        $endpoint = rtrim(config('omr.endpoint'), '/');
-        $tenant   = config('omr.main_tenant') ?: config('omr.tenant_id');
 
-        if (!$base || !$tenant) {
-            return null;
-        }
+/**
+ * GET /v1/sliders - Tüm slider listesini çeker ve normalize eder
+ */
+private function fetchList(string $locale): ?array
+{
+    $base     = rtrim(config('omr.base_url'), '/');
+    $endpoint = rtrim(config('omr.endpoint'), '/');
+    $tenant   = config('omr.main_tenant') ?: config('omr.tenant_id');
 
-        $url = "{$base}{$endpoint}/sliders";
-
-        try {
-            $response = Http::timeout(config('omr.timeout', 10))
-                ->withHeaders([
-                    'X-Tenant-ID'      => $tenant,
-                    'Accept-Language'  => $locale,
-                ])
-                ->get($url, ['locale' => $locale, 'lang' => $locale]);
-
-            if (!$response->successful()) {
-                return null;
-            }
-
-            $json = $response->json();
-            $list = $json['data'] ?? $json;
-
-            if (!is_array($list)) {
-                return null;
-            }
-
-            $first = $list[0] ?? null;
-            if ($first && is_array($first)) {
-                $attrs = $first['attributes'] ?? [];
-                $data  = array_merge($first, $attrs);
-                $data  = self::fixStorageUrls($data);
-                return $this->normalize($data, $base);
-            }
-
-            $list = self::fixStorageUrls($list);
-            return $this->normalize($list, $base);
-        } catch (\Throwable $e) {
-            return null;
-        }
+    if (!$base || !$tenant) {
+        return null;
     }
+
+    $url = "{$base}{$endpoint}/sliders";
+
+    try {
+        $response = Http::timeout(config('omr.timeout', 10))
+            ->withHeaders([
+                'X-Tenant-ID'      => $tenant,
+                'Accept-Language'  => $locale,
+            ])
+            ->get($url, ['locale' => $locale, 'lang' => $locale]);
+
+        if (!$response->successful()) {
+            return null;
+        }
+
+        $json = $response->json();
+        $list = $json['data'] ?? $json;
+
+        if (!is_array($list)) {
+            return null;
+        }
+
+        // URL'leri düzelt
+        $list = self::fixStorageUrls($list);
+
+        // ÖNEMLİ: Burada tek bir objeyi değil, tüm listeyi normalize metoduna gönderiyoruz
+        // normalize metodu içindeki mantığı diziye göre uyarlayacağız.
+        return $this->normalize($list, $base);
+    } catch (\Throwable $e) {
+        Log::error('SliderService List Fetch Error: ' . $e->getMessage());
+        return null;
+    }
+}
 
     /** /storage/ path'leri için domain kökü - api base değil */
     private static function storageBase(string $apiBase): string
@@ -187,76 +185,93 @@ class SliderService
     }
 
     private function normalize(array $data, string $base): array
-    {
-        $items = $data['items'] ?? $data['slides'] ?? $data['images'] ?? null;
-        if ($items === null && isset($data[0]) && is_array($data[0])) {
-            $items = $data;
+{
+    // Eğer gelen veri bir liste (birden fazla slider) ise
+    if (isset($data[0]) && is_array($data[0])) {
+        $allSliders = [];
+        foreach ($data as $sliderData) {
+            $allSliders[] = $this->formatSingleSlider($sliderData, $base);
         }
-        $items = $items ?? [$data];
-        $storageBase = self::storageBase($base);
-
-        $videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
-        $slides = [];
-        foreach ($items as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $attrs = $item['attributes'] ?? $item;
-            $img   = $attrs['image'] ?? $attrs['url'] ?? $attrs['src'] ?? $attrs['media'] ?? null;
-            $vid   = $attrs['video'] ?? $attrs['video_url'] ?? $attrs['media_url'] ?? null;
-
-            if (is_array($img)) {
-                $img = $img['url'] ?? $img['data']['attributes']['url'] ?? null;
-            }
-            if ($img && is_string($img) && !str_starts_with($img, 'http')) {
-                $prefix = (str_starts_with($img, '/storage/') ? $storageBase : $base);
-                $img = $prefix . (str_starts_with($img, '/') ? '' : '/') . $img;
-            }
-
-            if (is_array($vid)) {
-                $vid = $vid['url'] ?? $vid['src'] ?? $vid['data']['attributes']['url'] ?? null;
-            }
-            if ($vid && is_string($vid) && !str_starts_with($vid, 'http')) {
-                $prefix = (str_starts_with($vid, '/storage/') || str_contains($vid, '/api/storage/') ? $storageBase : $base);
-                $vid = $prefix . (str_starts_with($vid, '/') ? '' : '/') . str_replace('/api/storage/', '/storage/', $vid);
-            }
-            // media type video ise veya URL video uzantısıyla bitiyorsa
-            $mediaType = $attrs['media_type'] ?? $attrs['type'] ?? $attrs['mime_type'] ?? null;
-            if (!$vid && $mediaType && stripos($mediaType, 'video') !== false && $img) {
-                $vid = $img;
-                $img = null;
-            }
-            $urlAttr = $attrs['url'] ?? $attrs['src'] ?? null;
-            if (!$vid && $urlAttr && is_string($urlAttr)) {
-                $ext = strtolower(pathinfo(parse_url($urlAttr, PHP_URL_PATH) ?: '', PATHINFO_EXTENSION));
-                if (in_array($ext, $videoExtensions, true)) {
-                    $vid = $urlAttr;
-                    if (!$img) {
-                        $img = $attrs['poster'] ?? $attrs['thumbnail'] ?? null;
-                    }
-                }
-            }
-
-            $slides[] = [
-                'image'       => $img,
-                'video'       => $vid,
-                'poster'      => $attrs['poster'] ?? $attrs['thumbnail'] ?? $img ?? null,
-                'title'       => $attrs['title'] ?? $attrs['heading'] ?? '',
-                'description' => $attrs['description'] ?? $attrs['content'] ?? $attrs['text'] ?? '',
-                'link'        => $attrs['link'] ?? $attrs['url'] ?? null,
-                'alt'         => $attrs['alt'] ?? $attrs['title'] ?? '',
-            ];
-        }
-
-        $result = [
-            'slug'   => $data['slug'] ?? null,
-            'title'  => $data['title'] ?? $data['name'] ?? null,
-            'slides' => $slides,
+        return [
+            'is_list' => true,
+            'sliders' => $allSliders
         ];
-
-        return self::fixStorageUrls($result);
     }
 
+    // Eğer tek bir slider objesi ise
+    return $this->formatSingleSlider($data, $base);
+}
+
+/**
+ * Tek bir slider objesini ve içindeki slide'ları formatlar
+ */
+private function formatSingleSlider(array $data, string $base): array
+{
+    $attrs = $data['attributes'] ?? $data;
+    $items = $attrs['items'] ?? $attrs['slides'] ?? $attrs['images'] ?? null;
+
+    // Eğer iç itemlar yoksa ama datanın kendisi bir listeyse (slides dizisi direkt dataysa)
+    if ($items === null && isset($data[0])) {
+        $items = $data;
+    }
+
+    $items = $items ?? [$data];
+    $storageBase = self::storageBase($base);
+    $videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+    $slides = [];
+
+    foreach ($items as $item) {
+        if (!is_array($item)) continue;
+
+        $sAttrs = $item['attributes'] ?? $item;
+        $img    = $sAttrs['image'] ?? $sAttrs['url'] ?? $sAttrs['src'] ?? $sAttrs['media'] ?? null;
+        $vid    = $sAttrs['video'] ?? $sAttrs['video_url'] ?? $sAttrs['media_url'] ?? null;
+
+        // Resim Normalizasyonu
+        if (is_array($img)) {
+            $img = $img['url'] ?? $img['data']['attributes']['url'] ?? null;
+        }
+        if ($img && is_string($img) && !str_starts_with($img, 'http')) {
+            $prefix = (str_starts_with($img, '/storage/') ? $storageBase : $base);
+            $img = $prefix . (str_starts_with($img, '/') ? '' : '/') . $img;
+        }
+
+        // Video Normalizasyonu
+        if (is_array($vid)) {
+            $vid = $vid['url'] ?? $vid['src'] ?? $vid['data']['attributes']['url'] ?? null;
+        }
+        if ($vid && is_string($vid) && !str_starts_with($vid, 'http')) {
+            $prefix = (str_starts_with($vid, '/storage/') || str_contains($vid, '/api/storage/') ? $storageBase : $base);
+            $vid = $prefix . (str_starts_with($vid, '/') ? '' : '/') . str_replace('/api/storage/', '/storage/', $vid);
+        }
+
+        // Uzantıdan Video Kontrolü
+        $urlAttr = $sAttrs['url'] ?? $sAttrs['src'] ?? null;
+        if (!$vid && $urlAttr && is_string($urlAttr)) {
+            $ext = strtolower(pathinfo(parse_url($urlAttr, PHP_URL_PATH) ?: '', PATHINFO_EXTENSION));
+            if (in_array($ext, $videoExtensions, true)) {
+                $vid = $urlAttr;
+            }
+        }
+
+        $slides[] = [
+            'image'       => $img,
+            'video'       => $vid,
+            'poster'      => $sAttrs['poster'] ?? $sAttrs['thumbnail'] ?? $img ?? null,
+            'title'       => $sAttrs['title'] ?? $sAttrs['heading'] ?? '',
+            'description' => $sAttrs['description'] ?? $sAttrs['content'] ?? $sAttrs['text'] ?? '',
+            'link'        => $sAttrs['link'] ?? $sAttrs['url'] ?? null,
+            'alt'         => $sAttrs['alt'] ?? $sAttrs['title'] ?? '',
+        ];
+    }
+
+    return [
+        'id'     => $data['id'] ?? null,
+        'slug'   => $data['slug'] ?? null,
+        'title'  => $data['title'] ?? $data['name'] ?? null,
+        'slides' => $slides,
+    ];
+}
     /**
      * Recursively replace "/api/storage/" with "/storage/" in all string values.
      * Handles both relative paths and full URLs.

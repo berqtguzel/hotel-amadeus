@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import "../../../../css/ReactBits/Animations/ElectricBorder.css";
 
@@ -19,11 +19,41 @@ const ElectricBorder = ({
     const svgRef = useRef(null);
     const rootRef = useRef(null);
     const strokeRef = useRef(null);
+    const [allowAnimatedBorder, setAllowAnimatedBorder] = useState(true);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return undefined;
+
+        const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const pointerQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
+
+        const syncAvailability = () => {
+            setAllowAnimatedBorder(
+                pointerQuery.matches && !motionQuery.matches,
+            );
+        };
+
+        syncAvailability();
+        motionQuery.addEventListener("change", syncAvailability);
+        pointerQuery.addEventListener("change", syncAvailability);
+
+        return () => {
+            motionQuery.removeEventListener("change", syncAvailability);
+            pointerQuery.removeEventListener("change", syncAvailability);
+        };
+    }, []);
 
     const updateAnim = () => {
         const svg = svgRef.current;
         const host = rootRef.current;
         if (!svg || !host) return;
+
+        if (!allowAnimatedBorder) {
+            if (strokeRef.current) {
+                strokeRef.current.style.filter = "none";
+            }
+            return;
+        }
 
         if (strokeRef.current) {
             strokeRef.current.style.filter = `url(#${filterId})`;
@@ -93,7 +123,7 @@ const ElectricBorder = ({
     useEffect(() => {
         updateAnim();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [speed, chaos]);
+    }, [speed, chaos, allowAnimatedBorder]);
 
     useIsomorphicLayoutEffect(() => {
         if (!rootRef.current) return;
@@ -242,9 +272,13 @@ const ElectricBorder = ({
 
             <div className="eb-layers">
                 <div ref={strokeRef} className="eb-stroke" />
-                <div className="eb-glow-1" />
-                <div className="eb-glow-2" />
-                <div className="eb-background-glow" />
+                {allowAnimatedBorder ? (
+                    <>
+                        <div className="eb-glow-1" />
+                        <div className="eb-glow-2" />
+                        <div className="eb-background-glow" />
+                    </>
+                ) : null}
             </div>
 
             <div className="eb-content">{children}</div>

@@ -25,9 +25,7 @@ const slugifyHotel = (value = "") =>
 
 const splitToChips = (value) => {
     if (Array.isArray(value)) {
-        return value
-            .flatMap((item) => splitToChips(item))
-            .filter(Boolean);
+        return value.flatMap((item) => splitToChips(item)).filter(Boolean);
     }
 
     if (value == null) return [];
@@ -116,7 +114,7 @@ export default function HotelShow({ hotel: hotelParam }) {
                         <div className="hd-hero-layout">
                             <div className="hd-hero-copy">
                                 <p className="hd-eyebrow">
-                                    {t("hotelDetail.eyebrow")} • Werrapark
+                                    {t("hotelDetail.eyebrow")} • Hotel Amadeus
                                     Resort
                                 </p>
                                 <h1 id="hotel-title" className="hd-title">

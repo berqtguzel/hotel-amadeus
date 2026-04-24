@@ -64,7 +64,7 @@ export default function ErrorPage({ status = 500 }) {
     const code = Number(status) || 500;
     const content = CONTENT[code] || CONTENT[500];
     const homeHref = locale === "de" ? "/" : `/${locale}`;
-
+    const hotelName = props?.global?.hotel_name ?? "Hotel Amadeus";
     return (
         <>
             <SeoHead
@@ -76,7 +76,7 @@ export default function ErrorPage({ status = 500 }) {
                 <div className="ep-shell">
                     <div className="ep-code">{code}</div>
                     <div className="ep-card">
-                        <span className="ep-kicker">Werrapark Resort</span>
+                        <span className="ep-kicker">{hotelName}</span>
                         <h1 className="ep-title">
                             {pickLocaleText(content.title, locale)}
                         </h1>
@@ -84,7 +84,10 @@ export default function ErrorPage({ status = 500 }) {
                             {pickLocaleText(content.text, locale)}
                         </p>
                         <div className="ep-actions">
-                            <Link href={homeHref} className="ep-btn ep-btn--primary">
+                            <Link
+                                href={homeHref}
+                                className="ep-btn ep-btn--primary"
+                            >
                                 {locale === "tr"
                                     ? "Ana sayfaya don"
                                     : locale === "en"

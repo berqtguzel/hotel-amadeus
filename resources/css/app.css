@@ -383,3 +383,6 @@ a {
         transition: none !important;
     }
 }
+.ribbons-container canvas {
+    pointer-events: none !important;
+}

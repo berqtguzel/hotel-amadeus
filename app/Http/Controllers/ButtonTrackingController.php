@@ -31,7 +31,7 @@ class ButtonTrackingController extends Controller
 
         // ✅ SESSION_ID: Öncelik frontend'den gelen veri, yoksa cookie
         $payload['session_id'] = $request->input('session_id')
-            ?? $request->cookie('werrapark_analytics_sid');
+            ?? $request->cookie('Hotel Amadeus_analytics_sid');
 
         $payload['metadata'] = $payload['metadata'] ?? [];
 
@@ -61,7 +61,7 @@ class ButtonTrackingController extends Controller
         $target = str_starts_with($redirect, '/') ? url($redirect) : $redirect;
 
         // Whitelist kontrolü (Mevcut mantığın aynısı)
-        $allowedDomains = ['omerdogan.de', 'paypal.com', 'stripe.com', 'werrapark.de']; // werrapark'ı eklemeyi unutma
+        $allowedDomains = ['omerdogan.de', 'paypal.com', 'stripe.com', 'Hotel Amadeus.de']; // Hotel Amadeus'ı eklemeyi unutma
         $host = parse_url($target, PHP_URL_HOST);
 
         // Eğer domain whitelist dışındaysa ama kendi domaininse izin ver
@@ -71,7 +71,7 @@ class ButtonTrackingController extends Controller
 
         $payload = [
             'event' => 'redirect_click',
-            'session_id' => $validated['session_id'] ?? $request->cookie('werrapark_analytics_sid'), // ✅ ID'yi eşle
+            'session_id' => $validated['session_id'] ?? $request->cookie('Hotel Amadeus_analytics_sid'), // ✅ ID'yi eşle
             'button_id' => $validated['button_id'] ?? null,
             'button_label' => $validated['button_label'] ?? null,
             'url' => $request->header('referer'), // ✅ Gerçek sayfa URL'si

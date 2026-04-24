@@ -3,7 +3,7 @@ import { usePage } from "@inertiajs/react";
 import { useTranslation } from "@/i18n";
 import "../../../css/map-section.css";
 
-const WERRAPARK_POSITION = [50.5167, 10.7833];
+const hotelAmadeusPosition = [50.5167, 10.7833];
 const DEFAULT_ZOOM = 16;
 
 const DEFAULTS = {
@@ -69,14 +69,14 @@ export default function MapSection({
             .join(", ");
 
         return {
-            markerPosition: hasCoords ? [lat, lng] : WERRAPARK_POSITION,
+            markerPosition: hasCoords ? [lat, lng] : hotelAmadeusPosition,
             markerTitle: info.title ?? markerTitle,
             markerAddress:
                 addr || (markerAddressProp ?? DEFAULTS.markerAddress),
         };
     }, [props?.global?.settings?.contact, markerTitle, markerAddressProp]);
 
-    const markerPosition = contactData?.markerPosition ?? WERRAPARK_POSITION;
+    const markerPosition = contactData?.markerPosition ?? hotelAmadeusPosition;
     const markerAddressResolved =
         contactData?.markerAddress ??
         markerAddressProp ??

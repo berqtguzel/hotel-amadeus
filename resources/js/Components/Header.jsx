@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -39,16 +39,62 @@ const sendTracking = async (payload) => {
         console.error("Tracking error:", e);
     }
 };
+
+function resolveMenuText(value, locale) {
+    if (typeof value === "string") return value.trim();
+    if (!value || typeof value !== "object") return "";
+
+    const localized =
+        value[locale] ??
+        value[locale?.toLowerCase?.()] ??
+        value.de ??
+        value.en ??
+        value.tr ??
+        value.label ??
+        value.title ??
+        value.name;
+
+    return typeof localized === "string" ? localized.trim() : "";
+}
+
+function fallbackMenuText(item, locale) {
+    const slugSource =
+        item?.slug ?? item?.key ?? item?.url ?? item?.path ?? item?.href ?? "";
+
+    const normalized = String(slugSource)
+        .split("/")
+        .filter(Boolean)
+        .pop()
+        ?.replace(/[-_]+/g, " ")
+        ?.trim();
+
+    if (!normalized) {
+        return locale === "tr" ? "Menu" : "Menu";
+    }
+
+    return normalized.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function buildNavFromApi(apiMenu, locale) {
-    if (!Array.isArray(apiMenu) || !apiMenu.length) return null;
+    const menuList = Array.isArray(apiMenu)
+        ? apiMenu
+        : Array.isArray(apiMenu?.data)
+          ? apiMenu.data
+          : Array.isArray(apiMenu?.items)
+            ? apiMenu.items
+            : apiMenu
+              ? [apiMenu]
+              : [];
+
+    if (!menuList.length) return null;
 
     const headerMenu =
-        apiMenu.find(
+        menuList.find(
             (m) =>
                 m.location === "header" ||
                 m.type === "header" ||
                 m.slug === "header",
-        ) ?? apiMenu[0];
+        ) ?? menuList[0];
 
     let items = headerMenu?.items ?? headerMenu?.children ?? [];
     if (!items.length) return null;
@@ -63,9 +109,14 @@ function buildNavFromApi(apiMenu, locale) {
               ? item.url
               : `/${locale}/${item.slug ?? item.url ?? ""}`;
         const url = ensureLocaleInUrl(rawUrl, locale);
+        const itemName =
+            resolveMenuText(item.name, locale) ||
+            resolveMenuText(item.title, locale) ||
+            resolveMenuText(item.label, locale) ||
+            fallbackMenuText(item, locale);
 
         const entry = {
-            name: item.name ?? item.title ?? "",
+            name: itemName,
             url,
             key: item.slug ?? item.key ?? "",
         };
@@ -77,8 +128,15 @@ function buildNavFromApi(apiMenu, locale) {
                     : child.url?.startsWith("/")
                       ? child.url
                       : `/${locale}/${child.slug ?? child.url ?? ""}`;
+
+                const childName =
+                    resolveMenuText(child.name, locale) ||
+                    resolveMenuText(child.title, locale) ||
+                    resolveMenuText(child.label, locale) ||
+                    fallbackMenuText(child, locale);
+
                 return {
-                    name: child.name ?? child.title ?? "",
+                    name: childName,
                     url: ensureLocaleInUrl(childRaw, locale),
                     key: child.slug ?? child.key ?? "",
                 };
@@ -93,8 +151,8 @@ function buildNavFromApi(apiMenu, locale) {
     return deduped.length ? deduped : null;
 }
 
-const DEFAULT_LOGO_LIGHT = "/images/Logo/werrapark-logo-white.png";
-const DEFAULT_LOGO_DARK = "/images/Logo/werrapark-logo.png";
+const DEFAULT_LOGO_LIGHT = "/images/Logo/Hotel Amadeus-logo-white.png";
+const DEFAULT_LOGO_DARK = "/images/Logo/Hotel Amadeus-logo.png";
 
 export default function Header({ currentRoute }) {
     const { props } = usePage();
@@ -103,6 +161,35 @@ export default function Header({ currentRoute }) {
     const apiMenu = props?.global?.menu;
     const branding = props?.global?.settings?.branding ?? {};
     const contact = props?.global?.settings?.contact ?? {};
+    const [scrolled, setScrolled] = React.useState(false);
+
+    useEffect(() => {
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (ticking) return;
+
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+                if (window.scrollY > 50) {
+                    setScrolled((current) => (current ? current : true));
+                } else {
+                    setScrolled((current) => (current ? false : current));
+                }
+
+                ticking = false;
+            });
+        };
+
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            ticking = false;
+        };
+    }, []);
 
     const logoLight =
         branding.logo_light ??
@@ -179,8 +266,8 @@ export default function Header({ currentRoute }) {
 
             const pad = 6;
 
-            const maxFs = 11.5;
-            const minFs = 6;
+            const maxFs = 14;
+            const minFs = 11;
             let lo = minFs;
             let hi = maxFs;
             let best = minFs;
@@ -231,7 +318,9 @@ export default function Header({ currentRoute }) {
     }, [apiMenu, locale, navFromApi]);
 
     return (
-        <header className="wh-header">
+        <header
+            className={`wh-header ${scrolled ? "is-scrolled" : "is-transparent"}`}
+        >
             <div className="wh-topbar">
                 <div className="wh-container wh-topbar__inner">
                     <div className="wh-topbar__left">
@@ -284,47 +373,51 @@ export default function Header({ currentRoute }) {
                         />
                     </Link>
 
-                    <nav
-                        className="wh-nav-desktop"
-                        ref={navDesktopRef}
-                        style={{ fontSize: `${navFontPx}px` }}
-                        aria-label="Main navigation"
-                    >
-                        {desktopNav.map((n, i) => {
-                            const hasChildren = n.children?.length;
+                    <div className="wh-nav-fit-wrap" ref={navFitWrapRef}>
+                        <nav
+                            className="wh-nav-desktop"
+                            ref={navDesktopRef}
+                            style={{ fontSize: `${navFontPx}px` }}
+                            aria-label="Main navigation"
+                        >
+                            {desktopNav.map((n, i) => {
+                                const hasChildren = n.children?.length;
 
-                            return (
-                                <div key={i} className="wh-nav-item">
-                                    <Link
-                                        href={n.url}
-                                        className={`wh-link ${currentRoute === n.key ? "is-active" : ""}`}
-                                    >
-                                        <span className="wh-link__label">
-                                            {n.name}
-                                        </span>
+                                return (
+                                    <div key={i} className="wh-nav-item">
+                                        <Link
+                                            href={n.url}
+                                            className={`wh-link ${currentRoute === n.key ? "is-active" : ""}`}
+                                        >
+                                            <span className="wh-link__label">
+                                                {n.name}
+                                            </span>
+
+                                            {hasChildren && (
+                                                <span className="wh-arrow">
+                                                    ▾
+                                                </span>
+                                            )}
+                                        </Link>
 
                                         {hasChildren && (
-                                            <span className="wh-arrow">▾</span>
+                                            <div className="wh-dropdown">
+                                                {n.children.map((c, j) => (
+                                                    <Link
+                                                        key={j}
+                                                        href={c.url}
+                                                        className="wh-dropdown-link"
+                                                    >
+                                                        {c.name}
+                                                    </Link>
+                                                ))}
+                                            </div>
                                         )}
-                                    </Link>
-
-                                    {hasChildren && (
-                                        <div className="wh-dropdown">
-                                            {n.children.map((c, j) => (
-                                                <Link
-                                                    key={j}
-                                                    href={c.url}
-                                                    className="wh-dropdown-link"
-                                                >
-                                                    {c.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </nav>
+                                    </div>
+                                );
+                            })}
+                        </nav>
+                    </div>
 
                     <div className="wh-nav-ctas wh-ctas-desktop">
                         <a
@@ -351,7 +444,7 @@ export default function Header({ currentRoute }) {
                         </a>
 
                         <a
-                            href="https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
+                            href="https://www.secure-hotel-booking.com/d-edge/Hotel Amadeus-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
                             className="wh-btn wh-btn--light"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -365,7 +458,7 @@ export default function Header({ currentRoute }) {
                                 });
 
                                 window.open(
-                                    "https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
+                                    "https://www.secure-hotel-booking.com/d-edge/Hotel Amadeus-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
                                     "_blank",
                                 );
                             }}
@@ -520,7 +613,7 @@ export default function Header({ currentRoute }) {
                             </a>
 
                             <a
-                                href="https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
+                                href="https://www.secure-hotel-booking.com/d-edge/Hotel Amadeus-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
                                 className="wh-btn wh-btn--primary wh-btn--block"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -536,7 +629,7 @@ export default function Header({ currentRoute }) {
                                     setOpen(false);
 
                                     window.open(
-                                        "https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
+                                        "https://www.secure-hotel-booking.com/d-edge/Hotel Amadeus-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1",
                                         "_blank",
                                     );
                                 }}

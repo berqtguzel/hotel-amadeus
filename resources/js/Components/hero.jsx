@@ -1,7 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, usePage } from "@inertiajs/react";
+import React, {
+    useState,
+    useEffect,
+    useRef,
+    useMemo,
+    useCallback,
+} from "react";
+import { usePage } from "@inertiajs/react";
 import "../../css/home.css";
 
+// --- Yardımcı Fonksiyonlar ---
 function isVideoUrl(url) {
     if (!url || typeof url !== "string") return false;
     const ext = url.split(".").pop()?.split("?")[0]?.toLowerCase();
@@ -21,130 +28,158 @@ function getVideoType(url) {
 
 export default function Hero() {
     const { props } = usePage();
-    const slider = props?.global?.slider ?? null;
-    const slides = slider?.slides ?? [];
     const [activeIndex, setActiveIndex] = useState(0);
     const videoRefs = useRef({});
 
-    const hasSlider = Array.isArray(slides) && slides.length > 0;
-    const firstSlide = slides[0];
-    const title =
-        (slides[activeIndex] ?? firstSlide)?.title ||
-        slider?.title ||
-        "Willkommen im Werrapark";
-    const subtitle =
-        (slides[activeIndex] ?? firstSlide)?.description ||
-        "Ihre Oase der Ruhe inmitten der Natur";
+    // Sürükleme (Drag) için state'ler
+    const [isDragging, setIsDragging] = useState(false);
+    const [startX, setStartX] = useState(0);
+    const sliderRef = useRef(null);
 
+    // 1. Tüm slide'ları birleştir
+    const allSlides = useMemo(() => {
+        const sliderData = props?.global?.slider;
+        let combined = [];
+
+        if (sliderData?.is_list && Array.isArray(sliderData.sliders)) {
+            sliderData.sliders.forEach((sliderObj) => {
+                if (Array.isArray(sliderObj.slides)) {
+                    combined = [...combined, ...sliderObj.slides];
+                }
+            });
+        } else if (Array.isArray(sliderData?.slides)) {
+            combined = sliderData.slides;
+        }
+
+        return combined
+            .map((s) => ({
+                image: s.image || s.url || s.video,
+                title: s.title || "",
+                description: s.description || "",
+            }))
+            .filter((s) => s.image);
+    }, [props?.global?.slider]);
+
+    const nextSlide = useCallback(() => {
+        setActiveIndex((prev) => (prev + 1) % allSlides.length);
+    }, [allSlides.length]);
+
+    const prevSlide = useCallback(() => {
+        setActiveIndex(
+            (prev) => (prev - 1 + allSlides.length) % allSlides.length,
+        );
+    }, [allSlides.length]);
+
+    // 2. Otomatik Kaydırma (Sürükleme yaparken durur)
     useEffect(() => {
-        if (!hasSlider || slides.length < 2) return;
-        const id = setInterval(() => {
-            setActiveIndex((i) => (i + 1) % slides.length);
+        if (allSlides.length < 2 || isDragging) return;
+
+        const interval = setInterval(() => {
+            nextSlide();
         }, 5000);
-        return () => clearInterval(id);
-    }, [hasSlider, slides.length]);
 
+        return () => clearInterval(interval);
+    }, [allSlides.length, nextSlide, activeIndex, isDragging]);
+
+    // 3. Sürükleme Mantığı (Mouse & Touch)
+    const handleDragStart = (e) => {
+        setIsDragging(true);
+        setStartX(e.pageX || e.touches[0].pageX);
+    };
+
+    const handleDragEnd = (e) => {
+        if (!isDragging) return;
+        const endX =
+            e.pageX || (e.changedTouches ? e.changedTouches[0].pageX : 0);
+        const diff = startX - endX;
+
+        // Hassasiyet eşiği (50px sürükleyince kaydır)
+        if (diff > 50) {
+            nextSlide();
+        } else if (diff < -50) {
+            prevSlide();
+        }
+        setIsDragging(false);
+    };
+
+    // 4. Video Kontrolü
     useEffect(() => {
-        Object.values(videoRefs.current).forEach((el) => {
+        Object.values(videoRefs.current).forEach((el, idx) => {
             if (!el) return;
-            const slideEl = el.closest(".hero-slider-slide");
-            if (slideEl?.classList.contains("is-active")) {
+            if (parseInt(idx) === activeIndex) {
                 el.play().catch(() => {});
             } else {
                 el.pause();
                 el.currentTime = 0;
             }
         });
-    }, [activeIndex, hasSlider]);
+    }, [activeIndex]);
+
+    const hasSlides = allSlides.length > 0;
 
     return (
-        <section className="hero" aria-label="Willkommen im Werrapark">
-            {hasSlider ? (
-                <div className="hero-slider">
-                    {slides.map((s, i) => {
-                        const hasVideo =
-                            s.video || (s.image && isVideoUrl(s.image));
-                        const mediaUrl = hasVideo
-                            ? s.video || s.image
-                            : s.image;
-
+        <section
+            className={`hero ${isDragging ? "is-dragging" : ""}`}
+            aria-label="Hero Slider"
+            onMouseDown={handleDragStart}
+            onMouseUp={handleDragEnd}
+            onMouseLeave={() => setIsDragging(false)}
+            onTouchStart={handleDragStart}
+            onTouchEnd={handleDragEnd}
+            style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        >
+            {hasSlides ? (
+                <div className="hero-slider" ref={sliderRef}>
+                    {allSlides.map((s, i) => {
+                        const isVideo = isVideoUrl(s.image);
                         return (
                             <div
                                 key={i}
                                 className={`hero-slider-slide ${i === activeIndex ? "is-active" : ""}`}
                                 style={
-                                    !hasVideo && s.image
+                                    !isVideo
                                         ? { backgroundImage: `url(${s.image})` }
-                                        : undefined
+                                        : {}
                                 }
                             >
-                                {hasVideo && mediaUrl && (
+                                {isVideo && (
                                     <video
-                                        ref={(el) => {
-                                            videoRefs.current[i] = el;
-                                        }}
+                                        ref={(el) =>
+                                            (videoRefs.current[i] = el)
+                                        }
                                         className="hero-slider-video"
-                                        autoPlay={i === activeIndex}
                                         muted
                                         loop
                                         playsInline
                                         preload="auto"
-                                        poster={s.poster || s.image}
                                     >
                                         <source
-                                            src={mediaUrl}
-                                            type={getVideoType(mediaUrl)}
+                                            src={s.image}
+                                            type={getVideoType(s.image)}
                                         />
-                                        Ihr Browser unterstützt dieses Video
-                                        nicht.
                                     </video>
                                 )}
                             </div>
                         );
                     })}
-                    <div className="hero-slider-dots">
-                        {slides.map((_, i) => (
-                            <button
-                                key={i}
-                                type="button"
-                                className={`hero-slider-dot ${i === activeIndex ? "is-active" : ""}`}
-                                onClick={() => setActiveIndex(i)}
-                                aria-label={`Slide ${i + 1}`}
-                            />
-                        ))}
-                    </div>
                 </div>
             ) : (
-                <video
-                    className="hero-bg"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                >
+                <video className="hero-bg" autoPlay muted loop playsInline>
                     <source
-                        src="/videos/werraparkvideo.webm"
-                        type="video/webm"
+                        src="/videos/Hotel Amadeusvideo.mp4"
+                        type="video/mp4"
                     />
-                    <source src="/videos/werraparkvideo.mp4" type="video/mp4" />
-                    Ihr Browser unterstützt dieses Video nicht.
                 </video>
             )}
 
-            <div className="hero-overlay" aria-hidden />
+            <div className="hero-overlay" style={{ pointerEvents: "none" }} />
 
-            <div className="hero-content container">
-                <h1>{title}</h1>
-                <p>{subtitle}</p>
-                {/* <div className="hero-ctas">
-                    <Link href="/offers" className="btn btn--primary">
-                        Jetzt buchen
-                    </Link>
-                    <Link href="/rooms" className="btn btn--ghost">
-                        Zimmer &amp; Suiten
-                    </Link>
-                </div> */}
+            <div
+                className="hero-content container"
+                style={{ pointerEvents: "none" }}
+            >
+                <h1>{allSlides[activeIndex]?.title || "Willkommen"}</h1>
+                <p>{allSlides[activeIndex]?.description}</p>
             </div>
         </section>
     );

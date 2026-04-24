@@ -18,7 +18,7 @@ html:not(.dark) .wh-foot {
     --wh-footer-btn-fg: #ffffff;
     --wh-footer-btn-bg: rgba(255, 255, 255, 0.22);
     --wh-footer-btn-border: rgba(255, 255, 255, 0.45);
-    --wh-footer-btn-glow: rgba(200, 255, 220, 0.55);
+    --wh-footer-btn-glow: rgba(248, 223, 82, 0.55);
 }
 
 html.dark .wh-foot,
@@ -26,10 +26,10 @@ html.dark .wh-foot,
 [data-theme="dark"] .wh-foot {
     --wh-ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
     --wh-footer-bg-1: #06160f;
-    --wh-footer-bg-2: #0b241a;
-    --wh-footer-bg-3: #123327;
-    --wh-footer-accent: #9de9bf;
-    --wh-footer-accent-strong: #c2f7d9;
+    --wh-footer-bg-2: #24190b;
+    --wh-footer-bg-3: #333012;
+    --wh-footer-accent: #dee99d;
+    --wh-footer-accent-strong: #f7f6c2;
     --wh-footer-text: #f4fbf7;
     --wh-footer-text-soft: rgba(244, 251, 247, 0.72);
     --wh-footer-text-muted: rgba(244, 251, 247, 0.56);
@@ -38,9 +38,9 @@ html.dark .wh-foot,
     --wh-footer-panel: rgba(255, 255, 255, 0.035);
     --wh-footer-cta-shadow: rgba(0, 0, 0, 0.25);
     --wh-footer-btn-fg: #0d2419;
-    --wh-footer-btn-bg: linear-gradient(135deg, #d4ffe7, #98dfbb);
+    --wh-footer-btn-bg: linear-gradient(135deg, #fff7d4, #dfd498);
     --wh-footer-btn-border: transparent;
-    --wh-footer-btn-glow: rgba(140, 223, 180, 0.45);
+    --wh-footer-btn-glow: rgba(218, 223, 140, 0.45);
 }
 
 .sr-only {
@@ -150,97 +150,25 @@ html.dark .wh-foot-ambient,
         );
 }
 
-.wh-nature-layer {
+.wh-foot-gridline {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-}
-
-html.light .wh-tree--a,
-html:not(.dark) .wh-tree--a {
-    opacity: 0.26;
-}
-
-html.light .wh-tree--b,
-html:not(.dark) .wh-tree--b {
-    opacity: 0.2;
-}
-
-html.light .wh-tree--c,
-html:not(.dark) .wh-tree--c {
-    opacity: 0.16;
-}
-
-html.light .wh-tree--d,
-html:not(.dark) .wh-tree--d {
-    opacity: 0.12;
-}
-
-.wh-tree {
-    position: absolute;
-    right: clamp(-2rem, -4vw, 0rem);
-    bottom: -1.5rem;
-    width: clamp(220px, 30vw, 440px);
-    height: auto;
-    object-fit: contain;
-    opacity: 0.2;
-    filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.36));
-    transform-origin: 65% 100%;
-    animation: whTreeFloat 13s ease-in-out infinite;
-}
-
-.wh-tree--a {
-    right: clamp(-2rem, -4vw, 0rem);
-    width: clamp(260px, 32vw, 470px);
-    opacity: 0.2;
-    animation-duration: 14s;
-}
-
-.wh-tree--b {
-    right: clamp(7rem, 14vw, 16rem);
-    bottom: -1.1rem;
-    width: clamp(200px, 24vw, 330px);
-    opacity: 0.16;
-    animation-duration: 16s;
-    animation-delay: -3s;
-}
-
-.wh-tree--c {
-    right: clamp(16rem, 29vw, 34rem);
-    bottom: -1.2rem;
-    width: clamp(160px, 19vw, 270px);
-    opacity: 0.12;
-    animation-duration: 18s;
-    animation-delay: -6s;
-}
-
-.wh-tree--d {
-    right: clamp(24rem, 43vw, 50rem);
-    bottom: -1.05rem;
-    width: clamp(120px, 14vw, 210px);
-    opacity: 0.1;
-    animation-duration: 20s;
-    animation-delay: -8s;
-}
-
-.wh-leaves {
-    position: absolute;
-    inset: -6% 0 -9%;
-}
-
-.wh-leaf {
-    position: absolute;
-    top: -10%;
-    left: var(--leaf-left);
-    width: var(--leaf-size);
-    height: calc(var(--leaf-size) * 1.35);
-    border-radius: 65% 0 65% 0;
-    background: linear-gradient(145deg, #d8ffe9, #7ad0a1);
-    opacity: 0.65;
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
-    animation: whLeafFall var(--leaf-duration) linear var(--leaf-delay) infinite;
+    background-image:
+        linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.05) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.04) 1px,
+            transparent 1px
+        );
+    background-size: 120px 120px;
+    mask-image: radial-gradient(circle at 50% 45%, black 34%, transparent 86%);
+    opacity: 0.4;
 }
 
 .wh-foot-cta,
@@ -259,7 +187,9 @@ html:not(.dark) .wh-tree--d {
     min-height: 76px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    text-align: center;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
@@ -279,27 +209,33 @@ html:not(.dark) .wh-foot-cta__inner h2 {
 }
 
 .wh-foot-main {
-    padding: 2.1rem 0 2rem;
+    padding: 2.4rem 0 2.1rem;
     border-bottom: 1px solid var(--wh-footer-line);
 }
 
 .wh-foot-grid {
     display: grid;
-    grid-template-columns: minmax(200px, 1.25fr) repeat(2, minmax(160px, 1fr));
-    gap: 1.35rem;
+    grid-template-columns: minmax(260px, 1.25fr) repeat(2, minmax(220px, 1fr));
+    gap: 1.1rem;
     align-items: start;
+    justify-content: center;
 }
 
 .wh-foot-col {
     min-width: 0;
-    padding: 0.95rem;
-    border: 1px solid transparent;
-    border-radius: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.15rem;
+    border: 1px solid var(--wh-footer-line-soft);
+    border-radius: 22px;
     background: linear-gradient(
         180deg,
         var(--wh-footer-panel),
         rgba(255, 255, 255, 0.015)
     );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     transition:
         transform 0.45s var(--wh-ease-premium),
         border-color 0.45s var(--wh-ease-premium),
@@ -314,14 +250,37 @@ html:not(.dark) .wh-foot-cta__inner h2 {
 
 .wh-foot-brand {
     display: inline-flex;
-    margin-bottom: 0.72rem;
+}
+
+.wh-foot-brand-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
 }
 
 .wh-foot-logo {
     width: auto;
-    max-width: 148px;
-    max-height: 70px;
+    max-width: 154px;
+    max-height: 72px;
     object-fit: contain;
+}
+
+.wh-foot-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--wh-footer-line-soft);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--wh-footer-text-soft);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .wh-foot-wordmark {
@@ -341,6 +300,7 @@ html:not(.dark) .wh-foot-cta__inner h2 {
     max-width: 34ch;
     font-size: 0.875rem;
     line-height: 1.65;
+    text-align: center;
 }
 
 html.light .wh-foot-text,
@@ -352,6 +312,7 @@ html:not(.dark) .wh-foot-text {
     margin-top: 1rem;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.45rem;
 }
 
@@ -385,6 +346,7 @@ html:not(.dark) .wh-foot-text {
     letter-spacing: 0.08em;
     font-size: 0.68rem;
     color: var(--wh-footer-text-muted);
+    text-align: center;
 }
 
 .wh-foot .wh-foot-title {
@@ -402,6 +364,12 @@ html:not(.dark) .wh-foot-text {
 .wh-foot-list {
     display: grid;
     gap: 0.4rem;
+    justify-items: center;
+}
+
+.wh-foot-list--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
 }
 
 .wh-foot-list a {
@@ -432,11 +400,20 @@ html:not(.dark) .wh-foot-text {
     font-size: 0.84rem;
     line-height: 1.65;
     color: var(--wh-footer-text-soft);
+    text-align: center;
+}
+
+.wh-foot-col--nav .wh-foot-list a,
+.wh-foot-col--legal .wh-foot-list a,
+.wh-foot-col--contact .wh-foot-link {
+    display: inline-flex;
+    width: fit-content;
 }
 
 .wh-foot-links {
     display: grid;
     gap: 0.4rem;
+    justify-items: center;
 }
 
 .wh-foot-links .wh-foot-link {
@@ -536,7 +513,8 @@ html:not(.dark) .wh-foot-text {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    text-align: center;
     gap: 0.8rem 1.25rem;
 }
 
@@ -571,32 +549,6 @@ html:not(.dark) .wh-foot-text {
 .wh-foot input:focus-visible {
     outline: 2px solid var(--wh-footer-accent);
     outline-offset: 2px;
-}
-
-@keyframes whLeafFall {
-    0% {
-        transform: translate3d(0, -8%, 0)
-            rotate(calc(var(--leaf-rotation) * 0deg));
-        opacity: 0;
-    }
-    12% {
-        opacity: 0.62;
-    }
-    100% {
-        transform: translate3d(var(--leaf-drift), 118%, 0)
-            rotate(calc(var(--leaf-rotation) * 330deg));
-        opacity: 0;
-    }
-}
-
-@keyframes whTreeFloat {
-    0%,
-    100% {
-        transform: translate3d(0, 0, 0);
-    }
-    50% {
-        transform: translate3d(-8px, -10px, 0);
-    }
 }
 
 @keyframes whAmbientMove {
@@ -653,15 +605,8 @@ html:not(.dark) .wh-foot-text {
         text-align: center;
     }
 
-    .wh-tree {
-        width: 230px;
-        opacity: 0.22;
-    }
-
-    .wh-tree--b,
-    .wh-tree--c,
-    .wh-tree--d {
-        display: none;
+    .wh-foot-list--grid {
+        grid-template-columns: 1fr;
     }
 }
 

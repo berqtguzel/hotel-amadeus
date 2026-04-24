@@ -87,38 +87,135 @@ class RoomPageController extends Controller
             'error' => $error,
         ]);
     }
+private function normalizeRoomData(array $data): array
+{
+    $rawImages = $data['images'] ?? $data['media'] ?? $data['gallery'] ?? [];
 
-    private function fetchRoom(string $locale, string $room): ?array
-    {
-        $identifier = trim((string) $room);
-        if ($identifier === '') {
+    $images = array_values(array_filter(array_map(function ($img) {
+        if (!is_array($img)) {
             return null;
         }
 
-        $url = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $identifier;
-        $response = $this->apiRequest($url, $this->langQuery(strtolower($locale)));
+        $url = $img['url'] ?? $img['path'] ?? $img['src'] ?? $img['image'] ?? null;
 
-        if ($response && $response->successful()) {
-            $json = $response->json();
-            $data = $json['data'] ?? null;
-            if (is_array($data)) {
-                return $data;
-            }
+        if (!$url) {
+            return null;
         }
 
+        return [
+            'url' => $url,
+            'alt' => $img['alt'] ?? '',
+        ];
+    }, $rawImages)));
 
-        $listUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms';
-        foreach ($this->localeFallbackChain($locale) as $lang) {
-            $items = $this->fetchPaginatedItems($listUrl, $this->langQuery($lang));
-            $matched = $this->findRoomByIdentifier($items, $identifier);
-            if ($matched) {
-                return $matched;
-            }
+    // URL bazlı duplicate temizle
+    $seen = [];
+    $images = array_values(array_filter($images, function ($img) use (&$seen) {
+        $url = $img['url'] ?? null;
+        if (!$url) {
+            return false;
         }
 
-        $items = $this->fetchPaginatedItems($listUrl);
-        return $this->findRoomByIdentifier($items, $identifier);
+        if (in_array($url, $seen, true)) {
+            return false;
+        }
+
+        $seen[] = $url;
+        return true;
+    }));
+
+    // Sadece images boşsa hero image fallback ekle
+    if ($images === [] && !empty($data['image'])) {
+        $images[] = [
+            'url' => $data['image'],
+            'alt' => $data['name'] ?? '',
+        ];
     }
+
+    $data['images'] = $images;
+
+    return $data;
+}
+private function fetchRoom(string $locale, string $room): ?array
+{
+    $identifier = trim((string) $room);
+    if ($identifier === '') {
+        return null;
+    }
+
+    $locale = strtolower($locale);
+
+    // 1) Önce verilen identifier ile direkt dene (slug veya id çalışıyorsa)
+    $directUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $identifier;
+    $directResponse = $this->apiRequest($directUrl, $this->langQuery($locale));
+
+    if ($directResponse && $directResponse->successful()) {
+        $json = $directResponse->json();
+        $data = $json['data'] ?? null;
+
+        if (is_array($data)) {
+            return $this->normalizeRoomData($data);
+        }
+    }
+
+    // 2) Fallback: listeden bul
+    $listUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms';
+
+    foreach ($this->localeFallbackChain($locale) as $lang) {
+        $items = $this->fetchPaginatedItems($listUrl, $this->langQuery($lang));
+        $matched = $this->findRoomByIdentifier($items, $identifier);
+
+        if ($matched) {
+            // KRİTİK NOKTA:
+            // Listeden bulduğun kaydı direkt döndürme.
+            // Önce ID ile detay endpoint'ine git.
+            $roomId = $matched['id'] ?? null;
+
+            if ($roomId) {
+                $detailUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $roomId;
+                $detailResponse = $this->apiRequest($detailUrl, $this->langQuery($lang));
+
+                if ($detailResponse && $detailResponse->successful()) {
+                    $detailJson = $detailResponse->json();
+                    $detailData = $detailJson['data'] ?? null;
+
+                    if (is_array($detailData)) {
+                        return $this->normalizeRoomData($detailData);
+                    }
+                }
+            }
+
+            // Detay endpoint yine olmazsa en azından matched kaydı normalize edip dön
+            return $this->normalizeRoomData($matched);
+        }
+    }
+
+    // 3) Son fallback: langsız liste
+    $items = $this->fetchPaginatedItems($listUrl);
+    $matched = $this->findRoomByIdentifier($items, $identifier);
+
+    if ($matched) {
+        $roomId = $matched['id'] ?? null;
+
+        if ($roomId) {
+            $detailUrl = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $roomId;
+            $detailResponse = $this->apiRequest($detailUrl);
+
+            if ($detailResponse && $detailResponse->successful()) {
+                $detailJson = $detailResponse->json();
+                $detailData = $detailJson['data'] ?? null;
+
+                if (is_array($detailData)) {
+                    return $this->normalizeRoomData($detailData);
+                }
+            }
+        }
+
+        return $this->normalizeRoomData($matched);
+    }
+
+    return null;
+}
 
     private function findRoomByIdentifier(array $items, string $identifier): ?array
     {

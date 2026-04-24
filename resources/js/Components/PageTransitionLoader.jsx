@@ -97,7 +97,9 @@ export default function PageTransitionLoader() {
             const percentage = event?.detail?.progress?.percentage;
 
             if (typeof percentage === "number") {
-                setProgress((current) => Math.max(current, Math.min(94, percentage)));
+                setProgress((current) =>
+                    Math.max(current, Math.min(94, percentage)),
+                );
             }
         });
         const removeFinish = router.on("finish", finishLoader);
@@ -137,7 +139,10 @@ export default function PageTransitionLoader() {
             <div className="page-transition-loader__backdrop" />
 
             <div className="page-transition-loader__content">
-                <div className="page-transition-loader__spinner" aria-hidden="true" />
+                <div
+                    className="page-transition-loader__spinner"
+                    aria-hidden="true"
+                />
 
                 <div className="page-transition-loader__copy">
                     <span className="page-transition-loader__label">

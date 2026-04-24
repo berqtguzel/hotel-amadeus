@@ -1,5 +1,5 @@
 .gvf-page {
-    padding: 28px 20px 70px;
+    padding: 10em 20px 10em;
     background: linear-gradient(180deg, #dae9fb, #cfe0f5);
 }
 
@@ -783,7 +783,7 @@ html[data-theme="dark"] .gvf-invoice-result-grid b,
             rgba(255, 255, 255, 0.78),
             transparent 34%
         ),
-        linear-gradient(180deg, #dbeafe 0%, #d5e6fb 44%, #eaf2fb 100%);
+        linear-gradient(180deg, #ac8a57 0%, #b39364 44%, #ac8a57 100%);
 }
 
 .gvf-box {
@@ -855,7 +855,7 @@ html[data-theme="dark"] .gvf-invoice-result-grid b,
 }
 
 .gvf-intro-card--highlight {
-    background: linear-gradient(145deg, #0f172a, #026e2b 55%, #2a9765);
+    background: linear-gradient(145deg, #c7ae69, #c3a985 55%, #c3a985);
     color: #eff6ff;
 }
 

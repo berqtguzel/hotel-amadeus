@@ -18,7 +18,9 @@ const norm = (s = "") =>
         .toLowerCase();
 
 const resolveMapEmbedUrl = (url, address) => {
-    const fallbackQuery = String(address || "").trim();
+    const fallbackQuery = String(address || "")
+        .replace(/\s+/g, " ")
+        .trim();
 
     try {
         if (url) {
@@ -38,7 +40,6 @@ const resolveMapEmbedUrl = (url, address) => {
 
     return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&z=15&output=embed`;
 };
-
 const sanitizePhoneInput = (value = "") =>
     String(value).replace(/[^\d+\s\-()]/g, "");
 
@@ -319,8 +320,12 @@ export default function ContactPage() {
         <main className="ct-section" id="kontakt">
             <div className="ct-container">
                 <header className="ct-header">
-                    <h1 className="ct-title">{t("contact.title")}</h1>
-                    <p className="ct-subtitle">{t("contact.subtitle")}</p>
+                    <div className="ct-hero">
+                        <div className="ct-hero__overlay" />
+                        <div className="ct-hero__content">
+                            <h1 className="ct-title">{t("contact.title")}</h1>
+                        </div>
+                    </div>
                 </header>
 
                 <section aria-labelledby="exec-title" className="ct-block">
@@ -412,7 +417,7 @@ export default function ContactPage() {
                                 className="ct-map-placeholder"
                                 aria-label={t("contact.mapLabel")}
                             >
-                                <div className="ct-map-inner">
+                                <div className="ct-map-inner ct-map-inner--empty">
                                     <span className="ct-map-badge">
                                         {t("contact.mapBadge")}
                                     </span>
@@ -423,225 +428,226 @@ export default function ContactPage() {
                             </div>
                         )}
                     </div>
-
-                    {submitStatus?.type === "error" && (
-                        <div
-                            className="ct-form-status ct-form-status--error"
-                            role="alert"
-                            aria-live="polite"
-                        >
+                    <div className="ct-panel__form">
+                        {submitStatus?.type === "error" && (
                             <div
-                                className="ct-form-status__icon"
-                                aria-hidden="true"
-                            >
-                                <AlertCircle size={18} />
-                            </div>
-                            <div className="ct-form-status__body">
-                                <strong className="ct-form-status__title">
-                                    {submitStatus.title ||
-                                        t("contact.errorTitle")}
-                                </strong>
-                                <p className="ct-form-status__text">
-                                    {submitStatus.message}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                    <Transition
-                        appear
-                        show={submitStatus?.type === "success"}
-                        as={Fragment}
-                    >
-                        <Dialog
-                            as="div"
-                            className="ct-modal"
-                            onClose={() => {
-                                setSubmitStatus(null);
-                                window.location.reload();
-                            }}
-                        >
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ct-modal__backdrop-enter"
-                                enterFrom="ct-modal__backdrop-enter-from"
-                                enterTo="ct-modal__backdrop-enter-to"
-                                leave="ct-modal__backdrop-leave"
-                                leaveFrom="ct-modal__backdrop-leave-from"
-                                leaveTo="ct-modal__backdrop-leave-to"
+                                className="ct-form-status ct-form-status--error"
+                                role="alert"
+                                aria-live="polite"
                             >
                                 <div
-                                    className="ct-modal__backdrop"
+                                    className="ct-form-status__icon"
                                     aria-hidden="true"
-                                />
-                            </Transition.Child>
-
-                            <div className="ct-modal__wrap">
-                                <div className="ct-modal__container">
-                                    <Transition.Child
-                                        as={Fragment}
-                                        enter="ct-modal__panel-enter"
-                                        enterFrom="ct-modal__panel-enter-from"
-                                        enterTo="ct-modal__panel-enter-to"
-                                        leave="ct-modal__panel-leave"
-                                        leaveFrom="ct-modal__panel-leave-from"
-                                        leaveTo="ct-modal__panel-leave-to"
-                                    >
-                                        <Dialog.Panel className="ct-modal__panel">
-                                            <div className="ct-modal__icon">
-                                                <CheckCircle
-                                                    size={56}
-                                                    strokeWidth={1.5}
-                                                />
-                                            </div>
-                                            <Dialog.Title className="ct-modal__title">
-                                                {t("contact.successTitle")}
-                                            </Dialog.Title>
-                                            <Dialog.Description className="ct-modal__desc">
-                                                {submitStatus?.message}
-                                            </Dialog.Description>
-                                            <button
-                                                type="button"
-                                                className="ct-modal__btn"
-                                                onClick={() => {
-                                                    setSubmitStatus(null);
-                                                    window.location.reload();
-                                                }}
-                                            >
-                                                {t("contact.successClose")}
-                                            </button>
-                                        </Dialog.Panel>
-                                    </Transition.Child>
+                                >
+                                    <AlertCircle size={18} />
+                                </div>
+                                <div className="ct-form-status__body">
+                                    <strong className="ct-form-status__title">
+                                        {submitStatus.title ||
+                                            t("contact.errorTitle")}
+                                    </strong>
+                                    <p className="ct-form-status__text">
+                                        {submitStatus.message}
+                                    </p>
                                 </div>
                             </div>
-                        </Dialog>
-                    </Transition>
-                    {hasForm ? (
-                        <form
-                            ref={formRef}
-                            className="ct-form"
-                            onSubmit={onSubmit}
-                            onInput={updateFormValidity}
-                            onChange={updateFormValidity}
-                            noValidate
+                        )}
+                        <Transition
+                            appear
+                            show={submitStatus?.type === "success"}
+                            as={Fragment}
                         >
-                            {formFields.map((field) => {
-                                const labelKey = `contact.${field.name}`;
-                                const labelText =
-                                    t(labelKey) !== labelKey
-                                        ? t(labelKey)
-                                        : (field.label ?? field.name);
-                                const placeholderKey = `contact.${field.name}Placeholder`;
-                                const placeholderText =
-                                    t(placeholderKey) !== placeholderKey
-                                        ? t(placeholderKey)
-                                        : (field.placeholder ?? "");
-                                const isPhoneField =
-                                    field.name === "phone" ||
-                                    field.type === "tel";
-                                const isEmailField =
-                                    field.name === "email" ||
-                                    field.type === "email";
-                                return (
-                                    <div
-                                        key={field.name}
-                                        className={
-                                            field.type === "textarea"
-                                                ? "ct-field ct-field--full"
-                                                : "ct-field"
-                                        }
-                                    >
-                                        <label htmlFor={field.name}>
-                                            {labelText}
-                                            {field.required && " *"}
-                                        </label>
-                                        {field.type === "textarea" ? (
-                                            <textarea
-                                                id={field.name}
-                                                name={field.name}
-                                                rows="6"
-                                                placeholder={
-                                                    placeholderText ||
-                                                    t(
-                                                        "contact.messagePlaceholder",
-                                                    )
-                                                }
-                                                required={field.required}
-                                            />
-                                        ) : (
-                                            <input
-                                                id={field.name}
-                                                name={field.name}
-                                                type={field.type || "text"}
-                                                inputMode={
-                                                    isPhoneField
-                                                        ? "tel"
-                                                        : isEmailField
-                                                          ? "email"
-                                                          : undefined
-                                                }
-                                                autoComplete={
-                                                    isPhoneField
-                                                        ? "tel"
-                                                        : isEmailField
-                                                          ? "email"
-                                                          : undefined
-                                                }
-                                                pattern={
-                                                    isPhoneField
-                                                        ? "[0-9+()\\-\\s]*"
-                                                        : undefined
-                                                }
-                                                spellCheck={
-                                                    isEmailField
-                                                        ? false
-                                                        : undefined
-                                                }
-                                                placeholder={
-                                                    placeholderText ||
-                                                    (field.name === "phone"
-                                                        ? "+49 …"
-                                                        : "")
-                                                }
-                                                required={field.required}
-                                                onInput={(event) => {
-                                                    if (isPhoneField) {
-                                                        event.currentTarget.value =
-                                                            sanitizePhoneInput(
-                                                                event
-                                                                    .currentTarget
-                                                                    .value,
-                                                            );
-                                                    }
-
-                                                    if (isEmailField) {
-                                                        event.currentTarget.value =
-                                                            sanitizeEmailInput(
-                                                                event
-                                                                    .currentTarget
-                                                                    .value,
-                                                            );
-                                                    }
-
-                                                    updateFormValidity();
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                );
-                            })}
-
-                            <div className="ct-actions">
-                                <button
-                                    type="submit"
-                                    className="ct-button"
-                                    disabled={!canSubmit}
-                                    aria-disabled={!canSubmit}
+                            <Dialog
+                                as="div"
+                                className="ct-modal"
+                                onClose={() => {
+                                    setSubmitStatus(null);
+                                    window.location.reload();
+                                }}
+                            >
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ct-modal__backdrop-enter"
+                                    enterFrom="ct-modal__backdrop-enter-from"
+                                    enterTo="ct-modal__backdrop-enter-to"
+                                    leave="ct-modal__backdrop-leave"
+                                    leaveFrom="ct-modal__backdrop-leave-from"
+                                    leaveTo="ct-modal__backdrop-leave-to"
                                 >
-                                    {t("contact.send")}
-                                </button>
-                            </div>
-                        </form>
-                    ) : null}
+                                    <div
+                                        className="ct-modal__backdrop"
+                                        aria-hidden="true"
+                                    />
+                                </Transition.Child>
+
+                                <div className="ct-modal__wrap">
+                                    <div className="ct-modal__container">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ct-modal__panel-enter"
+                                            enterFrom="ct-modal__panel-enter-from"
+                                            enterTo="ct-modal__panel-enter-to"
+                                            leave="ct-modal__panel-leave"
+                                            leaveFrom="ct-modal__panel-leave-from"
+                                            leaveTo="ct-modal__panel-leave-to"
+                                        >
+                                            <Dialog.Panel className="ct-modal__panel">
+                                                <div className="ct-modal__icon">
+                                                    <CheckCircle
+                                                        size={56}
+                                                        strokeWidth={1.5}
+                                                    />
+                                                </div>
+                                                <Dialog.Title className="ct-modal__title">
+                                                    {t("contact.successTitle")}
+                                                </Dialog.Title>
+                                                <Dialog.Description className="ct-modal__desc">
+                                                    {submitStatus?.message}
+                                                </Dialog.Description>
+                                                <button
+                                                    type="button"
+                                                    className="ct-modal__btn"
+                                                    onClick={() => {
+                                                        setSubmitStatus(null);
+                                                        window.location.reload();
+                                                    }}
+                                                >
+                                                    {t("contact.successClose")}
+                                                </button>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                        {hasForm ? (
+                            <form
+                                ref={formRef}
+                                className="ct-form"
+                                onSubmit={onSubmit}
+                                onInput={updateFormValidity}
+                                onChange={updateFormValidity}
+                                noValidate
+                            >
+                                {formFields.map((field) => {
+                                    const labelKey = `contact.${field.name}`;
+                                    const labelText =
+                                        t(labelKey) !== labelKey
+                                            ? t(labelKey)
+                                            : (field.label ?? field.name);
+                                    const placeholderKey = `contact.${field.name}Placeholder`;
+                                    const placeholderText =
+                                        t(placeholderKey) !== placeholderKey
+                                            ? t(placeholderKey)
+                                            : (field.placeholder ?? "");
+                                    const isPhoneField =
+                                        field.name === "phone" ||
+                                        field.type === "tel";
+                                    const isEmailField =
+                                        field.name === "email" ||
+                                        field.type === "email";
+                                    return (
+                                        <div
+                                            key={field.name}
+                                            className={
+                                                field.type === "textarea"
+                                                    ? "ct-field ct-field--full"
+                                                    : "ct-field"
+                                            }
+                                        >
+                                            <label htmlFor={field.name}>
+                                                {labelText}
+                                                {field.required && " *"}
+                                            </label>
+                                            {field.type === "textarea" ? (
+                                                <textarea
+                                                    id={field.name}
+                                                    name={field.name}
+                                                    rows="6"
+                                                    placeholder={
+                                                        placeholderText ||
+                                                        t(
+                                                            "contact.messagePlaceholder",
+                                                        )
+                                                    }
+                                                    required={field.required}
+                                                />
+                                            ) : (
+                                                <input
+                                                    id={field.name}
+                                                    name={field.name}
+                                                    type={field.type || "text"}
+                                                    inputMode={
+                                                        isPhoneField
+                                                            ? "tel"
+                                                            : isEmailField
+                                                              ? "email"
+                                                              : undefined
+                                                    }
+                                                    autoComplete={
+                                                        isPhoneField
+                                                            ? "tel"
+                                                            : isEmailField
+                                                              ? "email"
+                                                              : undefined
+                                                    }
+                                                    pattern={
+                                                        isPhoneField
+                                                            ? "[0-9+()\\-\\s]*"
+                                                            : undefined
+                                                    }
+                                                    spellCheck={
+                                                        isEmailField
+                                                            ? false
+                                                            : undefined
+                                                    }
+                                                    placeholder={
+                                                        placeholderText ||
+                                                        (field.name === "phone"
+                                                            ? "+49 …"
+                                                            : "")
+                                                    }
+                                                    required={field.required}
+                                                    onInput={(event) => {
+                                                        if (isPhoneField) {
+                                                            event.currentTarget.value =
+                                                                sanitizePhoneInput(
+                                                                    event
+                                                                        .currentTarget
+                                                                        .value,
+                                                                );
+                                                        }
+
+                                                        if (isEmailField) {
+                                                            event.currentTarget.value =
+                                                                sanitizeEmailInput(
+                                                                    event
+                                                                        .currentTarget
+                                                                        .value,
+                                                                );
+                                                        }
+
+                                                        updateFormValidity();
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    );
+                                })}
+
+                                <div className="ct-actions">
+                                    <button
+                                        type="submit"
+                                        className="ct-button"
+                                        disabled={!canSubmit}
+                                        aria-disabled={!canSubmit}
+                                    >
+                                        {t("contact.send")}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : null}
+                    </div>
                 </section>
             </div>
         </main>
