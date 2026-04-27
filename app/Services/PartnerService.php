@@ -52,14 +52,16 @@ class PartnerService
     {
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: 'default';
         $mainTenant = config('omr.main_tenant') ?: env('OMR_MAIN_TENANT') ?: $tenantId;
+        $version = config('omr.version', 'v1');
 
-        return self::CACHE_KEY_PREFIX . "{$tenantId}:{$mainTenant}:" . strtolower($locale) . ':' . $suffix;
+        return self::CACHE_KEY_PREFIX . "{$version}:{$tenantId}:{$mainTenant}:" . strtolower($locale) . ':' . $suffix;
     }
 
     private function fetch(string $endpoint, string $locale = 'de'): array
     {
         $base = rtrim(config('omr.base_url') ?? env('OMR_API_BASE') ?? 'https://omerdogan.de/api', '/');
-        $url = "{$base}/v1/{$endpoint}";
+        $apiEndpoint = rtrim(config('omr.endpoint'), '/');
+        $url = "{$base}{$apiEndpoint}/{$endpoint}";
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         try {

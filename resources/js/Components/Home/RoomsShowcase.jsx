@@ -384,7 +384,6 @@ export default function RoomsShowcase() {
         );
     }
 
-    console.log("RoomsShowcase Rendered with hotels:", hotels);
     return (
         <section
             className="rsm-wrap"

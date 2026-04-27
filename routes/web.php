@@ -23,172 +23,165 @@ use App\Services\HolidayThemeService;
 use App\Services\HotelService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/*
+|--------------------------------------------------------------------------
+| API ROUTES
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/api/hotels', [HotelController::class, 'index'])->name('api.hotels');
-
-Route::get('/track', [ButtonTrackingController::class, 'trackAndRedirect'])->name('button-tracking.redirect');
-Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit'])->name('contact.forms.submit');
-Route::get('/robots.txt', function (SettingsService $settingsService) {
-    $seo = $settingsService->get('seo', 'de');
-    $content = trim((string) ($seo['robots_txt'] ?? $seo['robotsTxt'] ?? ''));
-
-    if ($content === '') {
-        $content = "User-agent: *\nAllow: /";
-    }
-
-    return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
-});
+Route::get('/api/hotels', [HotelController::class, 'index']);
+Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit']);
 
 Route::prefix('api/settings')->group(function () {
-    Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
-    Route::get('/frontend', [SettingsController::class, 'frontend'])->name('settings.frontend');
-    Route::get('/{key}', [SettingsController::class, 'show'])->name('settings.show');
-    Route::post('/clear-cache', [SettingsController::class, 'clearCache'])->name('settings.clear-cache');
-});
-
-Route::prefix('api/billing')->group(function () {
-    Route::get('/companies', [GiftVoucherController::class, 'companiesJson'])->name('billing.companies');
-    Route::get('/invoices', [GiftVoucherController::class, 'invoicesJson'])->name('billing.invoices');
-    Route::post('/invoices', [GiftVoucherController::class, 'createInvoice'])->name('billing.invoices.create');
-    Route::get('/invoices/{invoice}', [GiftVoucherController::class, 'invoiceShow'])->name('billing.invoices.show');
+    Route::get('/', [SettingsController::class, 'index']);
+    Route::get('/frontend', [SettingsController::class, 'frontend']);
 });
 
 Route::prefix('api/reviews')->group(function () {
-    // 🔥 CRITERIA API (Öncelikli olması için en üste alındı!)
-    Route::get('/criteria', [ReviewsController::class, 'criteria'])->name('reviews.criteria');
-
-    // Diğer Reviews rotaları
-    Route::get('/{locale}', [ReviewsController::class, 'index'])->name('reviews.index');
-    Route::post('/', [ReviewsController::class, 'store'])->name('reviews.store');
+    Route::get('/criteria', [ReviewsController::class, 'criteria']);
+    Route::get('/{locale}', [ReviewsController::class, 'index']);
+    Route::post('/', [ReviewsController::class, 'store']);
 });
 
-Route::prefix('api/partners')->group(function () {
-    Route::get('/', [PartnerController::class, 'index'])->name('partners.index');
-    Route::get('/{identifier}', [PartnerController::class, 'show'])->name('partners.show');
+/*
+|--------------------------------------------------------------------------
+| WEB ROUTES
+|--------------------------------------------------------------------------
+*/
+
+// 🔥 API'den locale listesi (fallback ile)
+$apiLocales = collect(app(SettingsService::class)->get('languages') ?? [])
+    ->pluck('locale')
+    ->map(fn($l) => strtolower($l))
+    ->toArray();
+
+$fallbackLocales = ['de','en','tr','fr','es','it','pt','ro','pl','bg','hr','ru','sk','cs'];
+$locales = array_unique(array_merge($apiLocales, $fallbackLocales));
+
+$localePattern = implode('|', $locales);
+
+// 🔥 homepage
+Route::get('/', function () {
+    return redirect('/de');
 });
 
-
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// 🔥 HOME (locale ile)
 Route::get('/{locale}', [HomeController::class, 'index'])
-    ->where(['locale' => 'de|en|tr'])
+    ->where(['locale' => $localePattern])
     ->name('home.locale');
 
-Route::get('/hotels', fn() => redirect('/de/hotels'));
+// 🔥 HOTELS
 Route::get('/{locale}/hotels', [HotelController::class, 'listPage'])
-    ->where(['locale' => 'de|en|tr'])
-    ->name('hotels.index');
+    ->where(['locale' => $localePattern]);
 
-Route::get('/{locale}/hotels/{hotel}', function (string $locale, string $hotel, HotelService $hotelService) {
-    $locale = strtolower($locale);
+Route::get('/{locale}/hotels/{hotel}', function ($locale, $hotel, HotelService $hotelService) {
+
     $hotels = $hotelService->getHotels();
 
     $exists = collect($hotels)->contains(function ($item) use ($hotel) {
-        $slug = (string) ($item['slug'] ?? $item['id'] ?? '');
-        $nameSlug = \Illuminate\Support\Str::slug((string) ($item['name'] ?? ''));
-
-        return (string) ($item['id'] ?? '') === (string) $hotel
-            || $slug === (string) $hotel
-            || $nameSlug === (string) $hotel;
+        return (string)($item['id'] ?? '') === (string)$hotel
+            || ($item['slug'] ?? '') === $hotel;
     });
 
-    if (! $exists) {
+    if (!$exists) {
         throw new NotFoundHttpException();
     }
 
-    return Inertia::render('Hotels/Show', ['locale' => $locale, 'hotel' => $hotel]);
-})->where(['locale' => 'de|en|tr'])
-    ->name('hotels.show');
+    return Inertia::render('Hotels/Show', compact('locale', 'hotel'));
+})->where(['locale' => $localePattern]);
 
-Route::get('/hotels/{hotel}', fn($hotel) => redirect("/de/hotels/{$hotel}"));
-
+// 🔥 ROOMS
 Route::get('/{locale}/rooms/{room}', [RoomPageController::class, 'show'])
-    ->where(['locale' => 'de|en|tr'])
-    ->name('rooms.show');
+    ->where(['locale' => $localePattern]);
 
-// Allow locale-less room links like /rooms/deluxe-suite → /de/rooms/deluxe-suite
-Route::get('/rooms/{room}', fn($room) => redirect("/de/rooms/{$room}"));
+// 🔥 OFFERS
+Route::get('/{locale}/offers/{offer}', function ($locale, $offer, HolidayThemeService $service) {
 
+    $offers = $service->getThemes($locale);
 
-Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer, HolidayThemeService $holidayThemeService) {
-    $locale = strtolower($locale);
-    $offers = $holidayThemeService->getThemes($locale);
+    $exists = collect($offers)->contains(fn($item) =>
+        ($item['slug'] ?? '') === $offer
+    );
 
-    $exists = collect($offers)->contains(function ($item) use ($offer) {
-        $slug = (string) ($item['slug'] ?? $item['id'] ?? '');
-
-        return (string) ($item['id'] ?? '') === (string) $offer
-            || $slug === (string) $offer;
-    });
-
-    if (! $exists) {
+    if (!$exists) {
         throw new NotFoundHttpException();
     }
 
-    return Inertia::render('Offers/Show', ['locale' => $locale, 'offer' => $offer]);
-})->where(['locale' => 'de|en|tr'])->name('offers.show');
+    return Inertia::render('Offers/Show', compact('locale', 'offer'));
+})->where(['locale' => $localePattern]);
 
-Route::get('/{locale}/coupons', function (string $locale, CouponService $couponService) {
-    $locale = strtolower($locale);
-
+// 🔥 COUPONS
+Route::get('/{locale}/coupons', function ($locale, CouponService $service) {
     return Inertia::render('Coupons/Index', [
         'locale' => $locale,
-        'coupons' => $couponService->getCoupons(),
+        'coupons' => $service->getCoupons(),
     ]);
-})->where(['locale' => 'de|en|tr'])->name('coupons.index');
+})->where(['locale' => $localePattern]);
 
+// 🔥 THEMES
 Route::get('/{locale}/urlaubsthemen/{theme}', [ThemeController::class, 'show'])
-    ->where(['locale' => 'de|en|tr'])
-    ->name('themes.show');
+    ->where(['locale' => $localePattern]);
 
+// 🔥 ABOUT (fallback var)
+Route::get('/{locale}/uber-uns', function ($locale) {
 
-Route::get('/{locale}/uber-uns', function (string $locale) {
-    $locale = strtolower($locale);
-    $page = app(ApiHealthService::class)->isAvailable()
-        ? app(PageService::class)->getPage('uber-uns', $locale)
-        : null;
+    $page = app(PageService::class)->getPage('uber-uns', $locale);
 
-    return Inertia::render('Home/UberUns', [
-        'currentRoute' => 'uberuns',
-        'locale' => $locale,
-        'page' => $page,
-    ]);
-})->where(['locale' => 'de|en|tr'])->name('uberuns.locale');
+    if (!$page) {
+        $page = app(PageService::class)->getPage('uber-uns', 'de');
+    }
 
-// Kontakt
-Route::get('/{locale}/kontakt', [ContactController::class, 'index'])->where(['locale' => 'de|en|tr'])->name('contact.index');
-Route::post('/{locale}/kontakt', [ContactController::class, 'store'])->where(['locale' => 'de|en|tr'])->name('contact.store');
+    return Inertia::render('Home/UberUns', compact('locale', 'page'));
+})->where(['locale' => $localePattern]);
 
+// 🔥 CONTACT
+Route::get('/{locale}/kontakt', [ContactController::class, 'index'])
+    ->where(['locale' => $localePattern]);
 
-Route::prefix('/{locale}/gutschein')
-    ->where(['locale' => 'de|en|tr'])
-    ->group(function () {
-        Route::get('/', [GiftVoucherController::class, 'index'])->name('gutschein.index');
-        Route::get('/stripe', [GiftVoucherController::class, 'stripe'])->name('gutschein.stripe');
-        Route::get('/paypal', [GiftVoucherController::class, 'paypal'])->name('gutschein.paypal');
-        Route::get('/sepa', [GiftVoucherController::class, 'sepa'])->name('gutschein.sepa');
-        Route::get('/rechnung/{invoice}', [GiftVoucherController::class, 'invoicePage'])->name('gutschein.invoice');
-    });
+Route::post('/{locale}/kontakt', [ContactController::class, 'store'])
+    ->where(['locale' => $localePattern]);
 
+// 🔥 REVIEWS (fallback var)
+Route::get('/{locale}/bewertungen', function ($locale, ReviewsService $service) {
 
-Route::get('/{locale}/bewertungen', function (string $locale, ReviewsService $service) {
-    $locale = strtolower($locale);
+    $reviews = $service->getReviews($locale);
 
-    return Inertia::render('Reviews/Index', [
-        'locale'   => $locale,
-        'reviews'  => $service->getReviews($locale),
+    if (empty($reviews)) {
+        $reviews = $service->getReviews('de');
+    }
 
-    ]);
-})->where(['locale' => 'de|en|tr'])->name('reviews.page');
+    return Inertia::render('Reviews/Index', compact('locale', 'reviews'));
+})->where(['locale' => $localePattern]);
 
-Route::controller(PageController::class)->group(function () {
+// 🔥 PAGE ROUTES
+Route::controller(PageController::class)->group(function () use ($localePattern) {
+
     Route::get('/{locale}/{slug}', 'show')
         ->where([
-            'locale' => 'de|en|tr',
-            'slug'   => '[a-z0-9\-]+',
-        ])
-        ->name('page.show');
+            'locale' => $localePattern,
+            'slug' => "(?!$localePattern)[a-z0-9\-]+",
+        ]);
 
     Route::get('/{slug}', function ($slug) {
         return redirect("/de/{$slug}");
-    })->where(['slug' => '[a-z0-9\-]+']);
+    })->where([
+        'slug' => "(?!$localePattern)[a-z0-9\-]+",
+    ]);
+});
+
+// 🔥 GLOBAL FALLBACK (EN KRİTİK)
+Route::fallback(function () use ($locales) {
+
+    $segments = request()->segments();
+
+    if (count($segments) > 0) {
+        $locale = strtolower($segments[0]);
+
+        if (in_array($locale, $locales)) {
+            // 👉 locale varsa → homepage render et (404 yok)
+            return app(HomeController::class)->index($locale);
+        }
+    }
+
+    return redirect('/de');
 });

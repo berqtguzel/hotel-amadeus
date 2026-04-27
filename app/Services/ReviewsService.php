@@ -223,6 +223,7 @@ class ReviewsService
     private function cacheKey(string $locale): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-        return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
+        $version = config('omr.version', 'v1');
+        return self::CACHE_KEY_PREFIX . $version . ':' . $tenant . ':' . strtolower($locale);
     }
 }

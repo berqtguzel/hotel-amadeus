@@ -6,6 +6,8 @@ use App\Services\SettingsService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Route;
+
 class AppServiceProvider extends ServiceProvider
 {
     private static function colorsToCssVars(array $colors): string
@@ -46,29 +48,64 @@ class AppServiceProvider extends ServiceProvider
         return implode("\n  ", $lines);
     }
 
-    public function register()
-    {
-        //
-    }
+    public function register() {}
 
     public function boot(): void
-
     {
-
+        // 🔒 HTTPS zorla
         if (filter_var(env('FORCE_HTTPS', false), FILTER_VALIDATE_BOOL)) {
             URL::forceScheme('https');
         }
 
+        // 🌍 API'den diller
+        $availableLocales = collect(app(SettingsService::class)->get('languages') ?? [])
+            ->pluck('locale')
+            ->filter()
+            ->map(fn($l) => strtolower($l))
+            ->unique()
+            ->values()
+            ->toArray();
 
+        // fallback
+        if (empty($availableLocales)) {
+            $availableLocales = ['de', 'en', 'tr'];
+        }
+
+        // 🔥 GLOBAL ROUTE PATTERN
+        Route::pattern('locale', implode('|', $availableLocales));
+
+        // 🔥 URL normalize (ÇOK ÖNEMLİ)
+        $segments = request()->segments();
+
+        if (count($segments) >= 2) {
+            $first = strtolower($segments[0]);
+            $second = strtolower($segments[1]);
+
+            if (in_array($first, $availableLocales) && in_array($second, $availableLocales)) {
+                array_shift($segments);
+                redirect('/' . implode('/', $segments))->send();
+                exit;
+            }
+        }
+
+        // 🔥 aktif locale
         $locale = request()->route('locale')
-            ?? (in_array(request()->segment(1), ['de', 'en', 'tr'], true) ? request()->segment(1) : null)
+            ?? (in_array(request()->segment(1), $availableLocales, true) ? request()->segment(1) : null)
             ?? config('omr.default_locale', 'de');
+
+        // 🌍 global paylaş (frontend için önemli)
+        View::share('locale', $locale);
+        View::share('availableLocales', $availableLocales);
+
+        // 🎨 renk sistemi
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
         $siteColorsCss = '';
+
         if ($tenantId) {
             $colors = app(SettingsService::class)->get('colors', $locale);
             $siteColorsCss = self::colorsToCssVars(is_array($colors) ? $colors : []);
         }
+
         View::share('siteColorsCss', $siteColorsCss);
     }
 }

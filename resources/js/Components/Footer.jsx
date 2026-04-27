@@ -240,7 +240,10 @@ function useFooterData() {
             resolveFooterText(footerMenu?.title, locale) ||
             "Navigation";
         const showNewsletter = footerSettings.show_newsletter ?? false;
-
+        const footerCopyright =
+            footerSettings.footer_copyright ??
+            footerSettings.footerCopyright ??
+            null;
         return {
             locale,
             logo,
@@ -260,6 +263,7 @@ function useFooterData() {
             ctaHref,
             navTitle,
             showNewsletter,
+            footerCopyright,
         };
     }, [locale, props?.global?.menu, props?.global?.settings]);
 }
@@ -471,7 +475,7 @@ export default function Footer() {
                                 rel="noopener noreferrer"
                                 className="wh-foot-link"
                             >
-                                {d.siteName}
+                                {d.footerCopyright}
                             </a>
                             . {t("footer.rightsReserved")}
                         </p>

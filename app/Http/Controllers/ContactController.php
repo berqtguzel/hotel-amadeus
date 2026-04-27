@@ -23,7 +23,7 @@ class ContactController extends Controller
     {
         $locale = strtolower($locale);
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-        $cacheKey = "contact_page:v2:{$tenant}:{$locale}";
+        $cacheKey = "contact_page:v2:" . config('omr.version', 'v1') . ":{$tenant}:{$locale}";
 
         $payload = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             $page = null;

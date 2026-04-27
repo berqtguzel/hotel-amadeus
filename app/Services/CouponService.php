@@ -19,7 +19,7 @@ class CouponService
             return [];
         }
 
-        $cacheKey = "coupons:{$tenant}";
+        $cacheKey = "coupons:" . config('omr.version', 'v1') . ":{$tenant}";
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $endpoint, $tenant) {
             try {
@@ -62,7 +62,7 @@ class CouponService
             return [];
         }
 
-        $cacheKey = "coupon:{$tenant}:{$id}";
+        $cacheKey = "coupon:" . config('omr.version', 'v1') . ":{$tenant}:{$id}";
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $endpoint, $tenant, $id) {
             try {

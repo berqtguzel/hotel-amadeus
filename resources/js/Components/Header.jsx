@@ -239,7 +239,7 @@ export default function Header({ currentRoute }) {
         }
 
         const fit = () => {
-            const desktopMq = window.matchMedia("(min-width: 1024px)");
+            const desktopMq = window.matchMedia("(min-width: 1200px)");
             if (!desktopMq.matches) {
                 setNavFontPx(12);
                 return;
@@ -267,7 +267,7 @@ export default function Header({ currentRoute }) {
             const pad = 6;
 
             const maxFs = 14;
-            const minFs = 11;
+            const minFs = 9;
             let lo = minFs;
             let hi = maxFs;
             let best = minFs;
@@ -307,7 +307,7 @@ export default function Header({ currentRoute }) {
         ro.observe(row);
         ro.observe(wrap);
 
-        const mq = window.matchMedia("(min-width: 1024px)");
+        const mq = window.matchMedia("(min-width: 1200px)");
         const onMq = () => requestAnimationFrame(fit);
         mq.addEventListener("change", onMq);
 

@@ -185,12 +185,10 @@ span {
     text-transform: uppercase;
 }
 
-/* LINKS */
 a {
     color: var(--site-link-color);
 }
 
-/* BUTTON GLOBAL (bonus ekledim 🔥) */
 button,
 .btn {
     background-color: var(--site-button-color);
@@ -218,7 +216,7 @@ body {
     font-weight: var(--font-extrabold);
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #065f46;
+    color: #5f4f06;
     background: rgba(16, 185, 129, 0.18);
 }
 
@@ -310,8 +308,8 @@ a {
     display: block;
     height: 100%;
     border-radius: 999px;
-    background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
-    box-shadow: 0 0 24px rgba(16, 185, 129, 0.45);
+    background: linear-gradient(90deg, #b99110, #d3b634, #e7bd6e);
+    box-shadow: 0 0 24px rgba(185, 140, 16, 0.45);
     transition: width 180ms ease-out;
 }
 
@@ -335,14 +333,14 @@ a {
     height: 2.75rem;
     border-radius: 999px;
     border: 2px solid rgba(15, 23, 42, 0.1);
-    border-top-color: #10b981;
+    border-top-color: #b98c10;
     animation: loader-spin 900ms linear infinite;
 }
 
 .dark .page-transition-loader__spinner,
 [data-theme="dark"] .page-transition-loader__spinner {
     border-color: rgba(255, 255, 255, 0.12);
-    border-top-color: #6ee7b7;
+    border-top-color: #e7bd6e;
 }
 
 .page-transition-loader__label {

@@ -1,12 +1,10 @@
 import Ribbons from "@/Components/ReactBits/Animations/Ribbons";
-import { createPortal } from "react-dom";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
 import CookieConsent from "@/Components/CookieConsent";
 import WhatsAppWidget from "@/Components/WhatsAppWidget";
 import { ThemeProvider } from "@/Context/ThemeContext";
-import { lazy, Suspense } from "react";
 
 export default function AppLayout({
     children,
@@ -14,7 +12,6 @@ export default function AppLayout({
     headerOverlay = false,
 }) {
     const [isClient, setIsClient] = useState(false);
-    const [shouldUseTargetCursor, setShouldUseTargetCursor] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -24,42 +21,13 @@ export default function AppLayout({
     useEffect(() => {
         if (!isClient) return undefined;
 
-        const finePointerQuery = window.matchMedia(
-            "(pointer: fine) and (hover: hover)",
-        );
-        const reducedMotionQuery = window.matchMedia(
-            "(prefers-reduced-motion: reduce)",
-        );
         const mobileQuery = window.matchMedia("(max-width: 768px)");
+        const handleMobileChange = (event) => setIsMobile(event.matches);
 
-        const syncCursorAvailability = () => {
-            setShouldUseTargetCursor(
-                finePointerQuery.matches && !reducedMotionQuery.matches,
-            );
-        };
-
-        const handleMobileChange = (e) => {
-            setIsMobile(e.matches);
-        };
-
-        // Başlangıç değerlerini ata
-        syncCursorAvailability();
         setIsMobile(mobileQuery.matches);
-
-        // Dinleyicileri ekle
-        finePointerQuery.addEventListener("change", syncCursorAvailability);
-        reducedMotionQuery.addEventListener("change", syncCursorAvailability);
         mobileQuery.addEventListener("change", handleMobileChange);
 
         return () => {
-            finePointerQuery.removeEventListener(
-                "change",
-                syncCursorAvailability,
-            );
-            reducedMotionQuery.removeEventListener(
-                "change",
-                syncCursorAvailability,
-            );
             mobileQuery.removeEventListener("change", handleMobileChange);
         };
     }, [isClient]);
@@ -75,7 +43,6 @@ export default function AppLayout({
                     zIndex: 20,
                 }}
             >
-                {/* Mobilde değilsek ve isClient true ise Ribbons'u göster */}
                 {isClient && !isMobile && (
                     <Suspense fallback={null}>
                         <div
@@ -83,7 +50,7 @@ export default function AppLayout({
                             style={{
                                 position: "fixed",
                                 inset: 0,
-                                zIndex: 10, // 👈 EN KRİTİK
+                                zIndex: 10,
                                 overflow: "hidden",
                                 pointerEvents: "none",
                             }}
@@ -107,18 +74,7 @@ export default function AppLayout({
 
                 {isClient && <Header currentRoute={currentRoute} />}
 
-                <main
-                    style={{
-                        flex: 1,
-                        paddingTop: isClient
-                            ? headerOverlay
-                                ? "0px"
-                                : "0px"
-                            : "0px",
-                    }}
-                >
-                    {children}
-                </main>
+                <main style={{ flex: 1, paddingTop: "0px" }}>{children}</main>
 
                 {isClient && (
                     <>

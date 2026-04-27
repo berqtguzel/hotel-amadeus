@@ -13,7 +13,7 @@ class GalleryService
     public function getGalleries(string $locale = 'de'): array
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-        $cacheKey = self::CACHE_PREFIX . $tenant . ':' . strtolower($locale);
+        $cacheKey = self::CACHE_PREFIX . config('omr.version', 'v1') . ':' . $tenant . ':' . strtolower($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetchGalleries($locale);

@@ -127,8 +127,9 @@ class SettingsService
     {
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: 'default';
         $mainTenant = config('omr.main_tenant') ?: env('OMR_MAIN_TENANT') ?: $tenantId;
+        $version = config('omr.version', 'v1');
 
-        return self::CACHE_KEY_PREFIX . "{$tenantId}:{$mainTenant}:" . strtolower($locale) . ':' . $suffix;
+        return self::CACHE_KEY_PREFIX . "{$version}:{$tenantId}:{$mainTenant}:" . strtolower($locale) . ':' . $suffix;
     }
 
     /**

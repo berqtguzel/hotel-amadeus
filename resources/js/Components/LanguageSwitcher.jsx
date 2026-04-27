@@ -21,17 +21,24 @@ const FLAG_BY_LOCALE = {
     ru: "\uD83C\uDDF7\uD83C\uDDFA",
 };
 
-function toLocalePath(path, nextLocale, availableLanguages) {
-    const langCodes = availableLanguages.map((l) => l.locale).join("|");
-    const langRegex = new RegExp(`^\\/(${langCodes})(\\/|$)`);
+function toLocalePath(path, nextLocale, currentLocale, availableLanguages) {
+    const cleanPath = path.split("?")[0].split("#")[0];
 
-    if (langRegex.test(path)) {
-        return path.replace(langRegex, `/${nextLocale}$2`);
+    const segments = cleanPath.split("/").filter(Boolean);
+
+    // 🔥 geçerli locale listesi
+    const localeSet = new Set(
+        availableLanguages.map((l) => l.locale?.toLowerCase()),
+    );
+
+    // 🔥 ilk segment locale ise replace et
+    if (segments.length > 0 && localeSet.has(segments[0].toLowerCase())) {
+        segments[0] = nextLocale;
+        return "/" + segments.join("/");
     }
 
-    if (path === "/") return `/${nextLocale}`;
-
-    return `/${nextLocale}${path.startsWith("/") ? path : `/${path}`}`;
+    // 🔥 locale yoksa başına ekle
+    return "/" + [nextLocale, ...segments].join("/");
 }
 
 function getLanguageFlag(locale) {
@@ -55,11 +62,15 @@ export default function LanguageSwitcher() {
         setPending(true);
         closeModal();
 
-        const targetPath = toLocalePath(
-            window.location.pathname,
-            nextLocale,
-            languages,
-        );
+        const targetPath =
+            toLocalePath(
+                window.location.pathname,
+                nextLocale,
+                currentLocale,
+                languages,
+            ) +
+            (window.location.search || "") +
+            (window.location.hash || "");
 
         router.visit(targetPath, {
             preserveScroll: true,

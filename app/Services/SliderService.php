@@ -292,7 +292,8 @@ private function formatSingleSlider(array $data, string $base): array
     private function cacheKey(string $locale, string $slug): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $version = config('omr.version', 'v1');
 
-        return self::CACHE_KEY_PREFIX . 'v' . self::CACHE_VERSION . ":{$tenant}:" . strtolower($locale) . ':' . strtolower($slug);
+        return self::CACHE_KEY_PREFIX . 'v' . self::CACHE_VERSION . ":{$version}:{$tenant}:" . strtolower($locale) . ':' . strtolower($slug);
     }
 }

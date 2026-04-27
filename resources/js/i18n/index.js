@@ -1,5 +1,10 @@
-import { createElement, createContext, useContext, useCallback, useState, useEffect } from "react";
-import { router } from "@inertiajs/react";
+import {
+    createElement,
+    createContext,
+    useContext,
+    useCallback,
+} from "react";
+
 import bg from "./bg.json";
 import cs from "./cs.json";
 import de from "./de.json";
@@ -20,46 +25,40 @@ const supportedLocales = Object.keys(translations);
 
 const I18nContext = createContext({ t: (k) => k, locale: "de" });
 
+/* ---------------------------------- */
+/* 🔥 normalize */
+/* ---------------------------------- */
 function normalizeLocale(value) {
     const locale = String(value || "").toLowerCase();
     return supportedLocales.includes(locale) ? locale : "de";
 }
 
+/* ---------------------------------- */
+/* 🔥 URL'den oku (TEK SOURCE OF TRUTH) */
+/* ---------------------------------- */
 function getLocaleFromUrl() {
     if (typeof window === "undefined") return "de";
-    const match = window.location.pathname.match(
-        new RegExp(`^\\/(${supportedLocales.join("|")})(\\/|$)`),
-    );
-    return normalizeLocale(match ? match[1] : "de");
+
+    const segments = window.location.pathname.split("/").filter(Boolean);
+
+    if (segments.length > 0) {
+        return normalizeLocale(segments[0]);
+    }
+
+    return "de";
 }
 
-export function I18nProvider({ children, initialLocale = null }) {
-    const [locale, setLocale] = useState(() =>
-        normalizeLocale(initialLocale || "de"),
-    );
+/* ---------------------------------- */
+/* 🔥 PROVIDER */
+/* ---------------------------------- */
+export function I18nProvider({ children }) {
+    // 🔥 STATE YOK → direkt URL
+    const locale = getLocaleFromUrl();
 
-    useEffect(() => {
-        if (!initialLocale) {
-            setLocale(normalizeLocale(getLocaleFromUrl()));
-        }
-    }, []);
-
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-
-        const off = router.on("navigate", (event) => {
-            const nextLocale =
-                event?.detail?.page?.props?.locale ??
-                event?.detail?.page?.props?.global?.locale ??
-                getLocaleFromUrl();
-
-            setLocale(normalizeLocale(nextLocale));
-        });
-
-        return off;
-    }, []);
-
-    const dict = translations[locale] || translations.en || translations.de;
+    const dict =
+        translations[locale] ||
+        translations.en ||
+        translations.de;
 
     const t = useCallback(
         (key, params) => {
@@ -68,18 +67,26 @@ export function I18nProvider({ children, initialLocale = null }) {
                 translations.en[key] ??
                 translations.de[key] ??
                 key;
+
             if (params) {
                 Object.entries(params).forEach(([k, v]) => {
                     str = str.replace(new RegExp(`\\{\\{${k}\\}\\}`, "g"), v);
                 });
             }
+
             return str;
         },
-        [dict],
+        [dict]
     );
 
-    return createElement(I18nContext.Provider, { value: { t, locale } }, children);
+    return createElement(
+        I18nContext.Provider,
+        { value: { t, locale } },
+        children
+    );
 }
+
+/* ---------------------------------- */
 export function useTranslation() {
     return useContext(I18nContext);
 }

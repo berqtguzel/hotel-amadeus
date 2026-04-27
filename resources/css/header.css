@@ -313,7 +313,7 @@ html:not(.dark) .wh-header .wh-social:hover {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: clamp(8px, 1.2vw, 20px);
+    gap: clamp(6px, 0.9vw, 16px);
     min-height: 72px;
     padding-block: 8px;
     box-sizing: border-box;
@@ -334,12 +334,12 @@ html:not(.dark) .wh-header .wh-social:hover {
     align-items: center;
     gap: 8px;
     min-width: 0;
-    max-width: clamp(96px, 14vw, 200px);
+    max-width: clamp(82px, 10vw, 150px);
     flex-shrink: 0;
 }
 
 .wh-brand__logo {
-    height: clamp(48px, 3.6vw + 1.75rem, 84px);
+    height: clamp(42px, 2.4vw + 1rem, 64px);
     width: auto;
     max-width: 100%;
     object-fit: contain;
@@ -357,7 +357,7 @@ html.dark .wh-brand__logo--dark {
     display: block;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .wh-nav-fit-wrap {
         min-width: 0;
         width: 100%;
@@ -369,7 +369,7 @@ html.dark .wh-brand__logo--dark {
         justify-content: center;
         align-items: center;
         align-content: center;
-        gap: clamp(4px, 0.65vw, 10px);
+        gap: clamp(2px, 0.45vw, 8px);
         width: 100%;
         max-width: 100%;
         margin: 0;
@@ -496,7 +496,7 @@ html.dark .wh-hamburger span,
     background: var(--wh-header-text);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .wh-hamburger {
         display: none;
     }
@@ -715,7 +715,7 @@ html.dark .wh-hamburger span,
     border-top: 1px solid var(--wh-header-line);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
     .wh-nav__inner {
         display: flex;
         align-items: center;
@@ -738,6 +738,10 @@ html.dark .wh-hamburger span,
     .wh-nav-desktop {
         display: none;
     }
+
+    .wh-nav-fit-wrap {
+        display: none;
+    }
 }
 
 .wh-nav-item {
@@ -748,8 +752,8 @@ html.dark .wh-hamburger span,
 
 .wh-nav-item > .wh-link {
     max-width: 100%;
-    padding: 8px;
-    font-size: 1rem;
+    padding: 0.32em 0.38em;
+    font-size: inherit;
 }
 
 .wh-nav-item > .wh-link .wh-link__label {
@@ -847,7 +851,7 @@ html.dark .wh-hamburger span,
     z-index: 4;
     isolation: isolate;
     display: flex;
-    gap: 15px;
+    gap: clamp(6px, 0.65vw, 10px);
     align-items: center;
     flex-shrink: 0;
 }
@@ -873,7 +877,7 @@ html.dark .wh-hamburger span,
     }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
     .wh-nav-ctas {
         display: none;
     }

@@ -3,7 +3,6 @@ import { usePage } from "@inertiajs/react";
 import {
     FiArrowUpRight,
     FiFacebook,
-    FiGlobe,
     FiInstagram,
     FiMail,
     FiMapPin,
@@ -30,6 +29,42 @@ function getPrimaryContact(contact) {
     return infos.find((item) => item?.is_primary) ?? infos[0] ?? null;
 }
 
+function absoluteUrl(value) {
+    if (!value || typeof value !== "string") return "";
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+        return value;
+    }
+
+    const baseUrl =
+        import.meta.env.VITE_API_BASE_URL ||
+        import.meta.env.VITE_OMR_API_BASE?.replace(/\/api\/?$/, "") ||
+        "";
+
+    if (!baseUrl) return value;
+
+    return `${baseUrl.replace(/\/$/, "")}/${value.replace(/^\//, "")}`;
+}
+
+function resolveImageUrl(item, branding) {
+    const candidates = [
+        item?.media?.url,
+        item?.image?.url,
+        item?.image?.src,
+        item?.image,
+        item?.hero_image,
+        branding?.hero_image,
+    ];
+
+    const image = candidates.find(
+        (candidate) =>
+            typeof candidate === "string" &&
+            candidate.trim() !== "" &&
+            !/^\d+$/.test(candidate.trim()),
+    );
+
+    return absoluteUrl(image);
+}
+
 function getLocaleCopy(locale, brandName) {
     const content = {
         tr: {
@@ -37,10 +72,6 @@ function getLocaleCopy(locale, brandName) {
             badgeLabel: "Deneyim",
             badgeCaption: "Konaklama ve misafir deneyiminde rafine yaklasim",
             badgeUnit: "Yil",
-            statStay: "Misafir odakli",
-            statStayValue: "Premium servis",
-            statReach: "Dogrudan iletisim",
-            statReachValue: "Hizli geri donus",
             contactLabel: "Iletisim",
             socialLabel: "Sosyal medya",
             mapLabel: "Konum",
@@ -53,10 +84,6 @@ function getLocaleCopy(locale, brandName) {
             badgeLabel: "Experience",
             badgeCaption: "A refined approach to hospitality and guest comfort",
             badgeUnit: "Years",
-            statStay: "Guest focused",
-            statStayValue: "Premium service",
-            statReach: "Direct contact",
-            statReachValue: "Fast response",
             contactLabel: "Contact",
             socialLabel: "Social media",
             mapLabel: "Location",
@@ -70,10 +97,6 @@ function getLocaleCopy(locale, brandName) {
             badgeCaption:
                 "Gastfreundschaft mit stilvoller Atmosphaere und echter Sorgfalt",
             badgeUnit: "Jahre",
-            statStay: "Gastorientiert",
-            statStayValue: "Premium Service",
-            statReach: "Direkter Kontakt",
-            statReachValue: "Schnelle Rueckmeldung",
             contactLabel: "Kontakt",
             socialLabel: "Soziale Medien",
             mapLabel: "Standort",
@@ -104,18 +127,12 @@ const ExperienceHero = () => {
 
     const primaryContact = getPrimaryContact(settingsContact);
     const title =
-        translation.name ||
-        item?.name ||
-        branding?.site_name ||
-        "Hotel Amadeus";
+        translation.name || item?.name || branding?.site_name || "";
     const description =
-        translation.description ||
-        item?.description ||
-        "Experience a hospitality concept shaped by calm comfort, thoughtful service, and memorable stays.";
-    const image = item?.image || branding?.hero_image || "";
-    const years = Number(item?.years || 25);
-    const brandName =
-        branding?.site_name || branding?.brand_name || "Hotel Amadeus";
+        translation.description || item?.description || "";
+    const image = resolveImageUrl(item, branding);
+    const years = Number(item?.years || item?.experience_years || 0);
+    const brandName = branding?.site_name || branding?.brand_name || "";
     const email =
         settingsContact?.email ||
         settingsContact?.reservation_email ||
@@ -151,22 +168,6 @@ const ExperienceHero = () => {
         { key: "twitter", url: settingsSocial?.twitter_url },
     ].filter((link) => link.url);
 
-    const statItems = [
-        {
-            label: copy.badgeLabel,
-            value: years,
-            suffix: copy.badgeUnit,
-        },
-        {
-            label: copy.statStay,
-            value: copy.statStayValue,
-        },
-        {
-            label: copy.statReach,
-            value: copy.statReachValue,
-        },
-    ];
-
     const contactCards = [
         phone
             ? {
@@ -194,6 +195,10 @@ const ExperienceHero = () => {
             : null,
     ].filter(Boolean);
 
+    if (!title && !summary && !image) {
+        return null;
+    }
+
     return (
         <section className="ex-wrap">
             <div className="ex-pattern" />
@@ -202,9 +207,9 @@ const ExperienceHero = () => {
                 <div className="ex-content">
                     <span className="ex-eyebrow">{copy.eyebrow}</span>
 
-                    <h1 className="ex-title">{title}</h1>
+                    {title ? <h1 className="ex-title">{title}</h1> : null}
 
-                    <p className="ex-lead">{summary}</p>
+                    {summary ? <p className="ex-lead">{summary}</p> : null}
 
                     <div className="ex-actions">
                         {website ? (
@@ -289,41 +294,41 @@ const ExperienceHero = () => {
                     ) : null}
                 </div>
 
-                <figure className="ex-media">
-                    {image ? (
+                {image ? (
+                    <figure className="ex-media">
                         <img src={image} alt={title} loading="lazy" />
-                    ) : (
-                        <div className="ex-media__placeholder">
-                            <FiGlobe aria-hidden />
-                            <span>{brandName}</span>
-                        </div>
-                    )}
 
-                    <div className="ex-media__overlay" />
+                        <div className="ex-media__overlay" />
 
-                    <figcaption className="ex-badge">
-                        <span className="ex-badge-label">
-                            {copy.badgeLabel}
-                        </span>
-                        <div className="ex-badge-main">
-                            <span className="ex-badge-num">
-                                <CountUp
-                                    className="ex-count-up"
-                                    from={0}
-                                    to={years}
-                                    duration={1.4}
+                        {years > 0 ? (
+                            <figcaption className="ex-badge">
+                                <span className="ex-badge-label">
+                                    {copy.badgeLabel}
+                                </span>
+                                <div className="ex-badge-main">
+                                    <span className="ex-badge-num">
+                                        <CountUp
+                                            className="ex-count-up"
+                                            from={0}
+                                            to={years}
+                                            duration={1.4}
+                                        />
+                                    </span>
+                                    <span className="ex-badge-unit">
+                                        {copy.badgeUnit}
+                                    </span>
+                                </div>
+                                <span
+                                    className="ex-badge-divider"
+                                    aria-hidden="true"
                                 />
-                            </span>
-                            <span className="ex-badge-unit">
-                                {copy.badgeUnit}
-                            </span>
-                        </div>
-                        <span className="ex-badge-divider" aria-hidden="true" />
-                        <span className="ex-badge-caption">
-                            {copy.badgeCaption}
-                        </span>
-                    </figcaption>
-                </figure>
+                                <span className="ex-badge-caption">
+                                    {copy.badgeCaption}
+                                </span>
+                            </figcaption>
+                        ) : null}
+                    </figure>
+                ) : null}
             </div>
         </section>
     );

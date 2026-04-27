@@ -11,6 +11,7 @@ class GlobalWebsiteService
     public function getWebsites(string $locale): array
     {
         $base   = rtrim(config('omr.base_url'), '/');
+        $endpoint = rtrim(config('omr.endpoint'), '/');
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         if (!$tenant) {
@@ -19,13 +20,13 @@ class GlobalWebsiteService
         }
 
         $locale = strtolower($locale);
-        $cacheKey = "global_websites:{$tenant}:{$locale}";
+        $cacheKey = "global_websites:" . config('omr.version', 'v1') . ":{$tenant}:{$locale}";
 
-        return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $tenant, $locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $endpoint, $tenant, $locale) {
             try {
                 $response = Http::timeout(10)
                     ->withHeaders(['X-Tenant-ID' => $tenant])
-                    ->get("{$base}/v1/websites", [
+                    ->get("{$base}{$endpoint}/websites", [
                         'tenant' => $tenant,
                         'locale' => $locale,
                     ]);

@@ -13,6 +13,8 @@ class SliderController extends Controller
     public function getSliders(string $locale, string $slug)
     {
         $base       = rtrim(config('omr.video_base_url') ?: config('omr.base_url'), '/');
+        $apiBase    = rtrim(config('omr.base_url'), '/');
+        $endpoint   = rtrim(config('omr.endpoint'), '/');
         $tenant     = config('omr.tenant_id');
         $mainTenant = config('omr.main_tenant') ?: $tenant;
 
@@ -31,6 +33,8 @@ class SliderController extends Controller
 
         $sliderData = Cache::remember($cacheKey, now()->addDays(7), function () use (
             $base,
+            $apiBase,
+            $endpoint,
             $mainTenant,
             $locale,
             $slug,
@@ -41,7 +45,7 @@ class SliderController extends Controller
                     ->withHeaders([
                         'X-Tenant-ID' => $mainTenant,
                     ])
-                    ->get("{$base}/v1/sliders/{$slug}", [
+                    ->get("{$apiBase}{$endpoint}/sliders/{$slug}", [
                         'tenant' => $mainTenant,
                         'locale' => $locale,
                     ]);
@@ -52,7 +56,7 @@ class SliderController extends Controller
                         'status' => $response->status(),
                         'tenant' => $tenant,
                         'locale' => $locale,
-                        'url'    => "{$base}/v1/sliders/{$slug}",
+                        'url'    => "{$apiBase}{$endpoint}/sliders/{$slug}",
                         'body'   => $response->body(),
                     ]);
 

@@ -18,7 +18,7 @@ class RatingWidgetsController extends Controller
     {
         $locale = strtolower($locale);
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-        $cacheKey = "rating_widgets:{$tenant}:{$locale}";
+        $cacheKey = "rating_widgets:" . config('omr.version', 'v1') . ":{$tenant}:{$locale}";
 
         $ratingData = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             if ($this->apiHealth->isAvailable()) {

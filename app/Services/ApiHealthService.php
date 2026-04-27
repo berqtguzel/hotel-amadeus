@@ -84,7 +84,8 @@ class ApiHealthService
     private function cacheKey(): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $version = config('omr.version', 'v1');
 
-        return self::CACHE_KEY . ':' . $tenant;
+        return self::CACHE_KEY . ':' . $version . ':' . $tenant;
     }
 }

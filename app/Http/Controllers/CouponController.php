@@ -9,15 +9,18 @@ class CouponController extends Controller
 {
     public static function fetchCoupons(): array
     {
-        $mainTenant = env("OMR_MAIN_TENANT", null);
-        $cacheKey = 'coupons:' . ($mainTenant ?: 'default');
+        $mainTenant = config('omr.main_tenant') ?: config('omr.tenant_id');
+        $version = config('omr.version', 'v1');
+        $cacheKey = 'coupons:' . ($mainTenant ?: 'default') . ':' . $version;
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($mainTenant) {
             try {
+                $base = rtrim(config('omr.base_url') ?? 'https://omerdogan.de/api', '/');
+                $endpoint = rtrim(config('omr.endpoint'), '/');
                 $tenantParam = $mainTenant ? '?tenant=' . $mainTenant : '';
 
                 $response = Http::timeout(5)
-                    ->get('https://omerdogan.de/api/v1/coupons' . $tenantParam);
+                    ->get("{$base}{$endpoint}/coupons" . $tenantParam);
 
                 if ($response->successful()) {
                     $json = $response->json();
@@ -34,15 +37,18 @@ class CouponController extends Controller
 
     public static function fetchCouponById(int $id): array
     {
-        $mainTenant = env("OMR_MAIN_TENANT", null);
-        $cacheKey = 'coupon:' . ($mainTenant ?: 'default') . ':' . $id;
+        $mainTenant = config('omr.main_tenant') ?: config('omr.tenant_id');
+        $version = config('omr.version', 'v1');
+        $cacheKey = 'coupon:' . ($mainTenant ?: 'default') . ':' . $version . ':' . $id;
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($mainTenant, $id) {
             try {
+                $base = rtrim(config('omr.base_url') ?? 'https://omerdogan.de/api', '/');
+                $endpoint = rtrim(config('omr.endpoint'), '/');
                 $tenantParam = $mainTenant ? '?tenant=' . $mainTenant : '';
 
                 $response = Http::timeout(5)
-                    ->get("https://omerdogan.de/api/v1/coupons/{$id}" . $tenantParam);
+                    ->get("{$base}{$endpoint}/coupons/{$id}" . $tenantParam);
 
                 if ($response->successful()) {
                     $json = $response->json();

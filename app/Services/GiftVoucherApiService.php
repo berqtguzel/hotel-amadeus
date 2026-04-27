@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class GiftVoucherApiService
 {
-    private const CACHE_PREFIX = 'billing_api_v1_';
+    private const CACHE_PREFIX = 'billing_api_';
 
     private const CACHE_TTL = 300;
 
@@ -20,10 +20,10 @@ class GiftVoucherApiService
      */
     public function getCompaniesRaw(): array
     {
-        $key = self::CACHE_PREFIX . 'companies';
+        $key = self::CACHE_PREFIX . config('omr.version', 'v1') . '_companies';
 
         return Cache::remember($key, self::CACHE_TTL, function () {
-            return $this->requestRemote('GET', '/v1/companies', []);
+            return $this->requestRemote('GET', $this->versionedPath('companies'), []);
         });
     }
 
@@ -32,10 +32,10 @@ class GiftVoucherApiService
      */
     public function getInvoicesRaw(array $query = []): array
     {
-        $key = self::CACHE_PREFIX . 'invoices_' . md5(json_encode($query));
+        $key = self::CACHE_PREFIX . config('omr.version', 'v1') . '_invoices_' . md5(json_encode($query));
 
         return Cache::remember($key, self::CACHE_TTL, function () use ($query) {
-            return $this->requestRemote('GET', '/v1/invoices', $query);
+            return $this->requestRemote('GET', $this->versionedPath('invoices'), $query);
         });
     }
 
@@ -44,7 +44,7 @@ class GiftVoucherApiService
      */
     public function getInvoiceRaw(string|int $invoice, array $query = []): array
     {
-        return $this->requestRemote('GET', '/v1/invoices/' . urlencode((string) $invoice), $query);
+        return $this->requestRemote('GET', $this->versionedPath('invoices/' . urlencode((string) $invoice)), $query);
     }
 
     /**
@@ -85,7 +85,7 @@ class GiftVoucherApiService
             'description' => $description,
         ], fn ($value) => $value !== null && $value !== '');
 
-        return $this->requestRemote('POST', '/v1/invoices', [], $body);
+        return $this->requestRemote('POST', $this->versionedPath('invoices'), [], $body);
     }
 
     /**
@@ -612,5 +612,10 @@ class GiftVoucherApiService
                 'data' => [],
             ];
         }
+    }
+
+    private function versionedPath(string $path): string
+    {
+        return rtrim((string) config('omr.endpoint_path', '/v1'), '/') . '/' . ltrim($path, '/');
     }
 }

@@ -20,7 +20,7 @@ class MenuService
         }
 
         $locale = strtolower($locale);
-        $cacheKey = "menu:{$tenant}:{$locale}";
+        $cacheKey = "menu:" . config('omr.version', 'v1') . ":{$tenant}:{$locale}";
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $endpoint, $tenant, $locale) {
             try {

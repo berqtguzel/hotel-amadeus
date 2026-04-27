@@ -64,8 +64,12 @@ export default function ErrorPage({ status = 500 }) {
     const code = Number(status) || 500;
     const content = CONTENT[code] || CONTENT[500];
     const homeHref = locale === "de" ? "/" : `/${locale}`;
+    const hotelName =
+        props?.global?.settings?.branding?.site_name ||
+        props?.global?.settings?.branding?.siteName ||
+        props?.global?.hotel_name ||
+        "";
 
-    console.log(hotelName);
     return (
         <>
             <SeoHead

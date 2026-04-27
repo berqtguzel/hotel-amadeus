@@ -1,26 +1,31 @@
-/* GENEL ALAN (Görseldeki gibi koyu ton) */
+/* General section */
 .ptn-wrap {
     position: relative;
     padding: 80px 20px;
-    background: #f8efda; /* Siyah arkaplan */
+    background: #f8efda;
     overflow: hidden;
     color: #fff;
 }
+
 .dark .ptn-wrap {
-    background: #614316; /* Siyah arkaplan */
-    color: #fff; /* Beyaz metin */
+    background: #614316;
+    color: #fff;
 }
 
-/* BAŞLIK KISMI */
+.ptn-section + .ptn-section {
+    margin-top: 70px;
+}
+
+/* Heading */
 .ptn-header {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 35px;
 }
 
 .ptn-eyebrow {
     font-size: 11px;
     letter-spacing: 0.15em;
-    color: #c59c5d; /* Altın sarısı */
+    color: #c59c5d;
     text-transform: uppercase;
     margin: 0 0 12px 0;
     font-weight: 600;
@@ -35,15 +40,15 @@
     letter-spacing: 0.02em;
 }
 
-/* 3D SLIDER KONTEYNERİ */
+/* 3D slider */
 .ptn-slider-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 480px; /* Kartlar ve yansımalar için yeterli alan */
-    perspective: 1200px; /* 3 Boyut derinliği (Bu değer kameranın uzaklığıdır) */
+    height: 440px;
+    perspective: 1400px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 0 auto;
 }
 
@@ -57,10 +62,9 @@
     transform-style: preserve-3d;
 }
 
-/* HER BİR KART GRUBU (Kart + Yansıma) */
 .ptn-item {
     position: absolute;
-    width: 260px;
+    width: 300px;
     height: 260px;
     transition:
         transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
@@ -69,7 +73,24 @@
     cursor: pointer;
 }
 
-/* BEYAZ LOGO KARTI */
+.ptn-card-action {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+}
+
+.ptn-card-action:focus-visible > .ptn-card {
+    outline: 3px solid #c59c5d;
+    outline-offset: 6px;
+}
+
 .ptn-card {
     width: 100%;
     height: 100%;
@@ -80,6 +101,14 @@
     padding: 30px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     position: relative;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.ptn-card-action:hover > .ptn-card {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.72);
 }
 
 .ptn-card img {
@@ -96,17 +125,14 @@
     text-align: center;
 }
 
-/* ALT YANSIMA (REFLECTION) MANTIĞI */
 .ptn-reflection {
     position: absolute;
-    top: 100%; /* Kartın hemen bittiği yer */
+    top: 100%;
     left: 0;
     width: 100%;
     height: 100%;
-    transform: scaleY(-1); /* Kartı baş aşağı çevir */
-    opacity: 0.35; /* Yansıma şeffaflığı */
-
-    /* Gittikçe kaybolan (fade out) yansıma maskesi */
+    transform: scaleY(-1);
+    opacity: 0.35;
     -webkit-mask-image: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0) 30%,
@@ -119,46 +145,37 @@
     );
 }
 
-/* ----------------------------------------------------
-   3D POZİSYONLANDIRMA VE AÇILAR (Coverflow)
-   ---------------------------------------------------- */
-
-/* MERKEZ (Aktif) */
+/* Coverflow positions */
 .is-active {
     transform: translateX(0) translateZ(80px) rotateY(0deg);
     z-index: 10;
     opacity: 1;
 }
 
-/* SOL 1. KART */
 .is-prev-1 {
-    transform: translateX(-55%) translateZ(-150px) rotateY(45deg);
+    transform: translateX(-95%) translateZ(-150px) rotateY(45deg);
     z-index: 5;
     opacity: 0.85;
 }
 
-/* SAĞ 1. KART */
 .is-next-1 {
-    transform: translateX(55%) translateZ(-150px) rotateY(-45deg);
+    transform: translateX(95%) translateZ(-150px) rotateY(-45deg);
     z-index: 5;
     opacity: 0.85;
 }
 
-/* SOL 2. KART (Daha Arkada) */
 .is-prev-2 {
-    transform: translateX(-100%) translateZ(-350px) rotateY(55deg);
+    transform: translateX(-175%) translateZ(-350px) rotateY(55deg);
     z-index: 2;
     opacity: 0.3;
 }
 
-/* SAĞ 2. KART (Daha Arkada) */
 .is-next-2 {
-    transform: translateX(100%) translateZ(-350px) rotateY(-55deg);
+    transform: translateX(175%) translateZ(-350px) rotateY(-55deg);
     z-index: 2;
     opacity: 0.3;
 }
 
-/* DİĞERLERİ (Saklı) */
 .is-hidden {
     transform: translateX(0) translateZ(-600px) rotateY(0deg);
     z-index: 1;
@@ -166,10 +183,42 @@
     pointer-events: none;
 }
 
-/* MOBİL UYUM */
+.ptn-section--four .is-active {
+    transform: translateX(-45%) translateZ(80px) rotateY(0deg);
+}
+
+.ptn-section--four .is-prev-1 {
+    transform: translateX(-135%) translateZ(-180px) rotateY(45deg);
+    opacity: 0.65;
+}
+
+.ptn-section--four .is-next-1 {
+    transform: translateX(45%) translateZ(20px) rotateY(-18deg);
+    z-index: 8;
+    opacity: 0.95;
+}
+
+.ptn-section--four .is-next-2 {
+    transform: translateX(135%) translateZ(-180px) rotateY(-45deg);
+    z-index: 4;
+    opacity: 0.65;
+}
+
 @media (max-width: 768px) {
+    .ptn-wrap {
+        padding: 60px 16px;
+    }
+
+    .ptn-section + .ptn-section {
+        margin-top: 55px;
+    }
+
+    .ptn-heading {
+        font-size: 30px;
+    }
+
     .ptn-slider-container {
-        height: 350px;
+        height: 320px;
     }
 
     .ptn-item {
@@ -181,7 +230,6 @@
         padding: 20px;
     }
 
-    /* Mobilde 2. kartları gizlemek görüntüyü temizler */
     .is-prev-2,
     .is-next-2 {
         opacity: 0;
@@ -194,5 +242,23 @@
 
     .is-next-1 {
         transform: translateX(60%) translateZ(-150px) rotateY(-40deg);
+    }
+
+    .ptn-section--four .is-active {
+        transform: translateX(-35%) translateZ(70px) rotateY(0deg);
+    }
+
+    .ptn-section--four .is-prev-1 {
+        transform: translateX(-95%) translateZ(-150px) rotateY(40deg);
+    }
+
+    .ptn-section--four .is-next-1 {
+        transform: translateX(35%) translateZ(20px) rotateY(-16deg);
+    }
+
+    .ptn-section--four .is-next-2 {
+        transform: translateX(95%) translateZ(-150px) rotateY(-40deg);
+        opacity: 0.55;
+        pointer-events: auto;
     }
 }

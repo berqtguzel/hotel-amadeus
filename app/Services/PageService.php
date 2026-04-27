@@ -181,14 +181,16 @@ class PageService
     private function cacheKey(string $locale, string $slug): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $version = config('omr.version', 'v1');
 
-        return self::CACHE_PREFIX . $tenant . ':' . strtolower($locale) . ':' . strtolower($slug);
+        return self::CACHE_PREFIX . $version . ':' . $tenant . ':' . strtolower($locale) . ':' . strtolower($slug);
     }
 
     private function listCacheKey(string $locale): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $version = config('omr.version', 'v1');
 
-        return self::CACHE_PREFIX . $tenant . ':list:' . strtolower($locale);
+        return self::CACHE_PREFIX . $version . ':' . $tenant . ':list:' . strtolower($locale);
     }
 }

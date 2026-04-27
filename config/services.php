@@ -31,4 +31,20 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'tracking' => [
+        'url' => env(
+            'TRACKING_API_URL',
+            rtrim(env('OMR_API_BASE', 'https://omerdogan.de/api'), '/') .
+                '/' .
+                trim(
+                    str_starts_with((string) env('OMR_API_VERSION', 'v1'), 'v')
+                        ? (string) env('OMR_API_VERSION', 'v1')
+                        : 'v' . env('OMR_API_VERSION', '1'),
+                    '/',
+                ) .
+                '/button-tracking/track',
+        ),
+        'tenant' => env('TRACKING_TENANT', env('OMR_MAIN_TENANT', env('OMR_TENANT_ID'))),
+    ],
+
 ];

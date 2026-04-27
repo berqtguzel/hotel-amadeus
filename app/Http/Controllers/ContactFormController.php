@@ -13,11 +13,12 @@ class ContactFormController extends Controller
     {
         $locale = strtolower($locale);
         $apiBase = rtrim(config('omr.base_url') ?? env('OMR_API_BASE', 'https://omerdogan.de/api'), '/');
+        $endpoint = rtrim(config('omr.endpoint'), '/');
         $mainTenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: env('OMR_TENANT_ID', '');
 
-        $cacheKey = "contact_forms:" . ($mainTenant ?: 'default') . ":{$locale}";
+        $cacheKey = "contact_forms:" . config('omr.version', 'v1') . ':' . ($mainTenant ?: 'default') . ":{$locale}";
 
-        return Cache::remember($cacheKey, now()->addDays(7), function () use ($apiBase, $mainTenant, $locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($apiBase, $endpoint, $mainTenant, $locale) {
             try {
                 $response = Http::withoutVerifying()
                     ->timeout(30)
@@ -26,7 +27,7 @@ class ContactFormController extends Controller
                         'Accept'       => 'application/json',
                         'X-Tenant-ID'  => $mainTenant,
                     ])
-                    ->get("{$apiBase}/v1/contact/forms", [
+                    ->get("{$apiBase}{$endpoint}/contact/forms", [
                         'tenant' => $mainTenant,
                         'locale' => $locale,
                     ]);
@@ -69,10 +70,11 @@ class ContactFormController extends Controller
     {
         $locale     = $request->route('locale') ?? $request->input('locale', 'de');
         $apiBase    = rtrim(config('omr.base_url') ?? env('OMR_API_BASE', 'https://omerdogan.de/api'), '/');
+        $endpoint   = rtrim(config('omr.endpoint'), '/');
         $mainTenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         try {
-            $url = "{$apiBase}/v1/contact/forms/{$id}/submit";
+            $url = "{$apiBase}{$endpoint}/contact/forms/{$id}/submit";
 
             $response = Http::withoutVerifying()
                 ->timeout(30)
